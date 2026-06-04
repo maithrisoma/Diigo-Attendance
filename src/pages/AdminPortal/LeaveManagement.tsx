@@ -94,7 +94,7 @@ export const LeaveManagement: React.FC = () => {
           >
             {t.label}
             {t.id === 'pending' && leavesWithEmployee.filter((l) => l.status === 'Pending').length > 0 && (
-              <span className="ml-1.5 bg-[#EF4444] text-white rounded-full px-1.5 py-0.5 text-[10px] font-bold">
+              <span className="ml-1.5 bg-destructive text-destructive-foreground rounded-full px-1.5 py-0.5 text-[10px] font-bold">
                 {leavesWithEmployee.filter((l) => l.status === 'Pending').length}
               </span>
             )}
@@ -160,7 +160,7 @@ export const LeaveManagement: React.FC = () => {
                           <Button
                             onClick={() => handleApprove(leave.id, leave.employee_name)}
                             size="sm"
-                            className="bg-primary hover:opacity-90 text-primary-foreground font-bold h-8 px-2.5 border-transparent animate-pulse"
+                            className="bg-primary hover:opacity-90 text-primary-foreground font-bold h-8 px-2.5 border-transparent"
                           >
                             <Check className="h-4 w-4 mr-1" />
                             <span>Approve</span>

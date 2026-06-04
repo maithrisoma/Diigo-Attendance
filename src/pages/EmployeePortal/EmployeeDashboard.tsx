@@ -227,27 +227,27 @@ export const EmployeeDashboard: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
 
         {/* Bento 1: Unified Shift & Identity Header (Spans 8) */}
-        <div className="md:col-span-8 bg-gradient-to-br from-secondary to-secondary/80 text-white rounded-2xl p-6 shadow-card hover:scale-[1.005] hover:shadow-lg transition-all duration-300 border border-secondary/30 flex flex-col justify-between min-h-[160px]">
+        <div className="md:col-span-8 bg-card border border-border rounded-xl p-6 shadow-sm hover:scale-[1.005] hover:shadow-lg transition-all duration-300 flex flex-col justify-between min-h-[160px]">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="flex items-center space-x-3.5">
-              <div className="h-12 w-12 rounded-full bg-white/10 flex items-center justify-center font-display font-bold text-white text-lg border border-white/20 shadow-inner">
+              <div className="h-12 w-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-display font-bold text-lg border border-border shadow-sm">
                 {currentUser.name.split(' ').map(n => n[0]).join('')}
               </div>
               <div className="text-left">
-                <h4 className="font-bold text-lg text-white font-display leading-tight">{currentUser.name}</h4>
-                <p className="text-xs text-white/80 font-mono mt-0.5">{currentUser.designation} • {currentUser.employee_id}</p>
+                <h4 className="font-bold text-lg text-foreground font-display leading-tight">{currentUser.name}</h4>
+                <p className="text-xs text-muted-foreground font-mono mt-0.5">{currentUser.designation} • {currentUser.employee_id}</p>
               </div>
             </div>
-            <div className="text-xs font-semibold text-white bg-white/10 px-3 py-1 rounded-full font-display">
+            <div className="text-xs font-semibold text-muted-foreground bg-muted/10 px-3 py-1 rounded-full font-display">
               {currentMonthYear}
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-6 pt-4 border-t border-white/10">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-6 pt-4 border-t border-border">
             <div className="flex items-center space-x-2.5">
-              <Clock className="h-5 w-5 text-white/80" />
+              <Clock className="h-5 w-5 text-muted-foreground" />
               <div className="text-left">
-                <p className="text-xs font-bold text-white/90 uppercase tracking-wider">Active Shift Time</p>
-                <p className="text-xs text-white/70 font-mono mt-0.5">
+                <p className="text-xs font-bold text-foreground uppercase tracking-wider">Active Shift Time</p>
+                <p className="text-xs text-muted-foreground font-mono mt-0.5">
                   {hasCheckedIn 
                     ? `Clocked In at ${new Date(`2000-01-01T${todayRecord.check_in}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
                     : todayHoliday 
@@ -263,18 +263,18 @@ export const EmployeeDashboard: React.FC = () => {
                 <button
                   onClick={handleCheckIn}
                   disabled={isWeekend || !!todayHoliday}
-                  className="px-5 py-2.5 bg-primary text-primary-foreground hover:opacity-90 disabled:bg-white/10 disabled:text-white/40 font-bold text-sm rounded-xl transition duration-150 shadow-md font-display"
+                  className="px-5 py-2.5 bg-primary text-primary-foreground hover:opacity-90 disabled:bg-muted/10 disabled:text-muted-foreground/40 font-bold text-sm rounded-lg transition duration-150 shadow-sm font-display"
                 >
                   Clock In
                 </button>
               ) : !hasCheckedOut ? (
                 <div className="flex items-center gap-3">
-                  <span className="text-xs font-mono bg-white/10 px-2 py-1 rounded-md text-white/90 animate-pulse">
+                  <span className="text-xs font-mono bg-muted/10 px-2 py-1 rounded-md text-foreground animate-pulse">
                     {runningHoursStr}
                   </span>
                   <button
                     onClick={handleCheckOut}
-                    className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm rounded-xl transition duration-150 shadow-md font-display"
+                    className="px-5 py-2.5 bg-[#EF4444] hover:bg-red-700 text-white font-bold text-sm rounded-lg transition duration-150 shadow-sm font-display"
                   >
                     Clock Out
                   </button>
@@ -282,7 +282,7 @@ export const EmployeeDashboard: React.FC = () => {
               ) : (
                 <button
                   disabled
-                  className="px-5 py-2.5 bg-white/10 text-white/40 font-bold text-sm rounded-xl"
+                  className="px-5 py-2.5 bg-muted/10 text-muted-foreground/40 font-bold text-sm rounded-lg"
                 >
                   Completed
                 </button>
@@ -292,7 +292,7 @@ export const EmployeeDashboard: React.FC = () => {
         </div>
 
         {/* Bento 2: Digital Clock Widget (Spans 4) */}
-        <div className="md:col-span-4 bg-card border border-border rounded-2xl p-6 shadow-card hover:scale-[1.005] hover:shadow-lg transition-all duration-300 flex flex-col justify-between min-h-[160px]">
+        <div className="md:col-span-4 bg-card border border-border rounded-xl p-6 shadow-sm hover:scale-[1.005] hover:shadow-lg transition-all duration-300 flex flex-col justify-between min-h-[160px]">
           <div className="flex justify-between items-center">
             <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Live Time Clock</span>
             <span className="h-2 w-2 rounded-full bg-primary animate-ping" />
@@ -312,7 +312,7 @@ export const EmployeeDashboard: React.FC = () => {
         </div>
 
         {/* Bento 3: Weekly Streak (Spans 8) */}
-        <div className="md:col-span-8 bg-card border border-border rounded-2xl p-6 shadow-card hover:scale-[1.005] hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+        <div className="md:col-span-8 bg-card border border-border rounded-xl p-6 shadow-sm hover:scale-[1.005] hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
           <div>
             <h3 className="text-xs font-bold text-foreground uppercase tracking-wider mb-4 text-left">Weekly Status Streak</h3>
             <div className="grid grid-cols-5 gap-4">
@@ -324,19 +324,19 @@ export const EmployeeDashboard: React.FC = () => {
                 let icon = null;
                 
                 if (status === 'Present') {
-                  bgStyle = 'bg-[var(--calendar-present-bg)] border-[#10B981]/40 text-[#10B981]';
+                  bgStyle = 'bg-[var(--calendar-present-bg)] border-[var(--calendar-present-border)] text-[var(--calendar-present-text)]';
                   icon = <Check className="h-3.5 w-3.5 stroke-[3]" />;
                 } else if (status === 'Absent') {
-                  bgStyle = 'bg-[var(--calendar-absent-bg)] border-[#E88B8B]/40 text-[#E88B8B]';
+                  bgStyle = 'bg-[var(--calendar-absent-bg)] border-[var(--calendar-absent-border)] text-[var(--calendar-absent-text)]';
                   icon = <span className="text-[10px] font-black">✕</span>;
                 } else if (status === 'Leave') {
-                  bgStyle = 'bg-[var(--calendar-leave-bg)] border-[#F3C969]/40 text-[#F3C969]';
+                  bgStyle = 'bg-[var(--calendar-leave-bg)] border-[var(--calendar-leave-border)] text-[var(--calendar-leave-text)]';
                   icon = <span className="text-[10px] font-bold">L</span>;
                 } else if (status === 'Holiday') {
-                  bgStyle = 'bg-[var(--calendar-holiday-bg)] border-[#87B5FF]/40 text-[#87B5FF]';
+                  bgStyle = 'bg-[var(--calendar-holiday-bg)] border-[var(--calendar-holiday-border)] text-[var(--calendar-holiday-text)]';
                   icon = <span className="text-[10px] font-bold">H</span>;
                 } else if (status === 'Half Day') {
-                  bgStyle = 'bg-[var(--calendar-leave-bg)]/80 border-[#F3C969]/30 text-[#F3C969]';
+                  bgStyle = 'bg-[var(--calendar-leave-bg)]/80 border-[var(--calendar-leave-border)]/70 text-[var(--calendar-leave-text)]';
                   icon = <span className="text-[10px] font-bold">HD</span>;
                 } else if (status === 'Pending') {
                   bgStyle = 'bg-muted/20 border-border animate-pulse';
@@ -362,14 +362,14 @@ export const EmployeeDashboard: React.FC = () => {
 
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-5 pt-4 border-t border-border text-[10px] text-muted-foreground font-semibold justify-between">
             <div className="flex items-center gap-3">
-              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-[#10B981]" /> Present</span>
-              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-[#E88B8B]" /> Absent</span>
-              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-[#F3C969]" /> Leave</span>
+              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-[#22C55E]" /> Present</span>
+              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-[#EF4444]" /> Absent</span>
+              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-[#F59E0B]" /> Leave</span>
             </div>
             <div className="flex items-center gap-3">
-              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-[#F3C969]/70" /> Half Day</span>
-              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-[#87B5FF]" /> Holiday</span>
-              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-[#CFCFCF]" /> Weekend</span>
+              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-[#EAB308]" /> Half Day</span>
+              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-[#3B82F6]" /> Holiday</span>
+              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-[#94A3B8]" /> Weekend</span>
             </div>
           </div>
         </div>
@@ -642,7 +642,7 @@ export const EmployeeDashboard: React.FC = () => {
                 </div>
                 
                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                  teammate.status === 'Online' ? 'bg-[var(--calendar-present-bg)] text-[#10B981]' : teammate.status === 'On Leave' ? 'bg-[var(--calendar-leave-bg)] text-[#F3C969]' : 'bg-muted text-muted-foreground'
+                  teammate.status === 'Online' ? 'bg-[var(--calendar-present-bg)] text-[var(--calendar-present-text)]' : teammate.status === 'On Leave' ? 'bg-[var(--calendar-leave-bg)] text-[var(--calendar-leave-text)]' : 'bg-muted text-muted-foreground'
                 }`}>
                   {teammate.status}
                 </span>

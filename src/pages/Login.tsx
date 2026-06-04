@@ -190,20 +190,14 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden bg-gradient-to-br from-background via-card/50 to-border/30 text-foreground transition-colors duration-200">
-
-      {/* Ambient sage green/mint white blobs */}
-      <div className="absolute top-[-10%] left-[-8%] w-[40%] h-[40%] rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(142,182,155,0.2) 0%, transparent 70%)', filter: 'blur(60px)' }} />
-      <div className="absolute bottom-[-10%] right-[-8%] w-[40%] h-[40%] rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(218,241,222,0.2) 0%, transparent 70%)', filter: 'blur(60px)' }} />
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden bg-background text-foreground transition-colors duration-200">
 
       {/* Brand */}
-      <div className="flex flex-col items-center mb-10 text-center z-10">
-        <div className="h-16 w-16 rounded-2xl flex items-center justify-center shadow-xl mb-4 bg-primary text-primary-foreground shadow-primary/20">
-          <Clock className="h-8 w-8" />
+      <div className="flex flex-col items-center mb-8 text-center z-10">
+        <div className="h-12 w-12 rounded-xl flex items-center justify-center border border-border bg-card text-primary mb-4 shadow-sm">
+          <Clock className="h-6 w-6" />
         </div>
-        <h1 className="text-3xl font-bold tracking-tight font-display text-primary">
+        <h1 className="text-3xl font-bold tracking-tight font-display text-foreground">
           DAttendance
         </h1>
         <p className="text-sm mt-1 text-muted-foreground">Enterprise Attendance Registry Portal</p>
@@ -213,12 +207,9 @@ export const Login: React.FC = () => {
       <div className="w-full max-w-4xl z-10 grid grid-cols-1 md:grid-cols-2 gap-6 px-2">
 
         {/* ── Employee Portal Card ── */}
-        <div className="relative rounded-2xl p-7 flex flex-col bg-card/75 border border-border/80 shadow-card backdrop-blur-md">
-          {/* top accent line */}
-          <div className="absolute top-0 left-8 right-8 h-[2.5px] rounded-full bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
-
+        <div className="relative rounded-xl p-7 flex flex-col bg-card border border-border shadow-sm">
           <div className="flex items-center gap-3 mb-1">
-            <div className="h-11 w-11 rounded-xl flex items-center justify-center border border-border/60 bg-muted/10">
+            <div className="h-11 w-11 rounded-lg flex items-center justify-center border border-border bg-muted/10">
               <UserCircle2 className="h-5 w-5 text-primary" />
             </div>
             <div>
@@ -227,10 +218,10 @@ export const Login: React.FC = () => {
             </div>
           </div>
 
-          <ul className="mt-4 space-y-1.5 text-xs border-t border-border/50 pt-4 text-foreground/80">
+          <ul className="mt-4 space-y-1.5 text-xs border-t border-border pt-4 text-muted-foreground">
             {['Check In / Check Out', 'View attendance calendar', 'Apply for leave'].map(f => (
               <li key={f} className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full flex-shrink-0 bg-primary/70" />
+                <span className="h-1.5 w-1.5 rounded-full flex-shrink-0 bg-primary/40" />
                 {f}
               </li>
             ))}
@@ -240,13 +231,10 @@ export const Login: React.FC = () => {
         </div>
 
         {/* ── Admin / HR Portal Card ── */}
-        <div className="relative rounded-2xl p-7 flex flex-col bg-card/75 border border-border/80 shadow-card backdrop-blur-md">
-          {/* top accent line */}
-          <div className="absolute top-0 left-8 right-8 h-[2.5px] rounded-full bg-gradient-to-r from-transparent via-secondary/60 to-transparent" />
-
+        <div className="relative rounded-xl p-7 flex flex-col bg-card border border-border shadow-sm">
           <div className="flex items-center gap-3 mb-1">
-            <div className="h-11 w-11 rounded-xl flex items-center justify-center border border-border/60 bg-muted/10">
-              <ShieldCheck className="h-5 w-5 text-secondary" />
+            <div className="h-11 w-11 rounded-lg flex items-center justify-center border border-border bg-muted/10">
+              <ShieldCheck className="h-5 w-5 text-primary" />
             </div>
             <div>
               <h2 className="font-bold text-lg leading-tight text-foreground font-display">Admin / HR Portal</h2>
@@ -254,10 +242,10 @@ export const Login: React.FC = () => {
             </div>
           </div>
 
-          <ul className="mt-4 space-y-1.5 text-xs border-t border-border/50 pt-4 text-foreground/80">
+          <ul className="mt-4 space-y-1.5 text-xs border-t border-border pt-4 text-muted-foreground">
             {['Manage employee directory', 'Approve / reject leave requests', 'Generate attendance reports'].map(f => (
               <li key={f} className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full flex-shrink-0 bg-secondary/70" />
+                <span className="h-1.5 w-1.5 rounded-full flex-shrink-0 bg-primary/40" />
                 {f}
               </li>
             ))}
@@ -269,7 +257,6 @@ export const Login: React.FC = () => {
 
       {/* Footer */}
       <div className="z-10 mt-10 flex items-center gap-2 text-xs text-muted-foreground">
-        <Leaf className="h-3.5 w-3.5 text-primary" />
         <span>DAttendance &copy; {new Date().getFullYear()} — Enterprise HRMS</span>
       </div>
     </div>

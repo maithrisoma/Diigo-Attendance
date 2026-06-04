@@ -198,10 +198,10 @@ export const HolidayManagement: React.FC = () => {
       {/* ── Page Header ── */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[#0F172A] font-display">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground font-display">
             Holiday Management
           </h1>
-          <p className="text-xs text-[#64748B] mt-0.5">
+          <p className="text-xs text-muted-foreground mt-0.5">
             Configure, update, and track corporate and public holidays observed across calendar cycles.
           </p>
         </div>
@@ -311,7 +311,7 @@ export const HolidayManagement: React.FC = () => {
                     </TableCell>
                     <TableCell>
                       {holiday.is_recurring ? (
-                        <span className="flex items-center gap-1 text-[11px] font-bold text-primary dark:text-[#10B981] bg-[var(--calendar-present-bg)]/40 border border-primary/20 px-2 py-0.5 rounded-full w-max">
+                        <span className="flex items-center gap-1 text-[11px] font-bold text-[var(--calendar-present-text)] bg-[var(--calendar-present-bg)]/40 border border-[var(--calendar-present-border)] px-2 py-0.5 rounded-full w-max">
                           <Check className="h-3.5 w-3.5" />
                           Annual Repeat
                         </span>

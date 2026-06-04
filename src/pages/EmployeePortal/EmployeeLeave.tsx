@@ -161,33 +161,30 @@ export const EmployeeLeave: React.FC = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 grid-rows-[auto] gap-4">
 
         {/* ① Big hero stat — spans 2 cols × 2 rows - Styled in corporate brand Navy/Teal */}
-        <div className="col-span-2 row-span-2 relative rounded-2xl overflow-hidden bg-secondary text-white p-6 flex flex-col justify-between shadow-xl min-h-[200px] border border-secondary/30">
-          <div className="absolute -top-6 -right-6 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
-          <div className="absolute bottom-0 left-0 h-24 w-24 rounded-full bg-[#14B8A6]/20 blur-xl" />
-
+        <div className="col-span-2 row-span-2 relative rounded-xl bg-card border border-border text-foreground p-6 flex flex-col justify-between shadow-sm min-h-[200px]">
           <div className="z-10">
-            <div className="h-12 w-12 rounded-2xl bg-white/10 flex items-center justify-center mb-4 shadow-inner">
-              <PlaneTakeoff className="h-6 w-6 text-white" />
+            <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 text-primary">
+              <PlaneTakeoff className="h-6 w-6" />
             </div>
-            <p className="text-white/80 text-xs font-semibold uppercase tracking-widest">Total Leave Days Used</p>
-            <p className="text-6xl font-bold mt-1 leading-none">{stats.totalDaysUsed}</p>
-            <p className="text-white/70 text-sm mt-1">across {stats.approved} approved request{stats.approved !== 1 ? 's' : ''}</p>
+            <p className="text-muted-foreground text-xs font-semibold uppercase tracking-widest">Total Leave Days Used</p>
+            <p className="text-6xl font-bold mt-1 leading-none text-foreground">{stats.totalDaysUsed}</p>
+            <p className="text-muted-foreground text-sm mt-1">across {stats.approved} approved request{stats.approved !== 1 ? 's' : ''}</p>
           </div>
 
-          <div className="z-10 flex items-center gap-3 pt-3 border-t border-white/20">
+          <div className="z-10 flex items-center gap-3 pt-3 border-t border-border">
             <div className="text-center">
-              <p className="text-2xl font-bold">{stats.total}</p>
-              <p className="text-white/60 text-[10px] uppercase tracking-wide">Total</p>
+              <p className="text-2xl font-bold text-foreground">{stats.total}</p>
+              <p className="text-muted-foreground text-[10px] uppercase tracking-wide font-semibold">Total</p>
             </div>
-            <div className="w-px h-8 bg-white/20" />
+            <div className="w-px h-8 bg-border" />
             <div className="text-center">
-              <p className="text-2xl font-bold text-[#14B8A6]">{stats.pending}</p>
-              <p className="text-white/60 text-[10px] uppercase tracking-wide">Pending</p>
+              <p className="text-2xl font-bold text-[#F59E0B]">{stats.pending}</p>
+              <p className="text-muted-foreground text-[10px] uppercase tracking-wide font-semibold">Pending</p>
             </div>
-            <div className="w-px h-8 bg-white/20" />
+            <div className="w-px h-8 bg-border" />
             <div className="text-center">
-              <p className="text-2xl font-bold">{stats.rejected}</p>
-              <p className="text-white/60 text-[10px] uppercase tracking-wide">Rejected</p>
+              <p className="text-2xl font-bold text-foreground">{stats.rejected}</p>
+              <p className="text-muted-foreground text-[10px] uppercase tracking-wide font-semibold">Rejected</p>
             </div>
           </div>
         </div>

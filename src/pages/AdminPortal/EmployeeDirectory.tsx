@@ -40,21 +40,21 @@ const getInitials = (name: string) =>
 
 // ─── Avatar background gradient by name ──────────────────────────────────────
 const AVATAR_GRADIENTS = [
-  'from-blue-500 to-cyan-500',
-  'from-violet-500 to-purple-600',
-  'from-rose-500 to-pink-500',
-  'from-amber-500 to-orange-500',
-  'from-emerald-500 to-teal-500',
-  'from-indigo-500 to-blue-500',
+  'from-slate-500 to-slate-600',
+  'from-slate-600 to-slate-700',
+  'from-indigo-600/85 to-indigo-700/85',
+  'from-slate-400 to-slate-500',
+  'from-zinc-600 to-zinc-700',
+  'from-slate-700 to-slate-800',
 ];
 const getAvatarGradient = (name: string) =>
   AVATAR_GRADIENTS[name.charCodeAt(0) % AVATAR_GRADIENTS.length];
 
 // ─── Status helpers ───────────────────────────────────────────────────────────
 const STATUS_CONFIG = {
-  Present: { label: 'Present', icon: CheckCircle2,  cls: 'text-[#10B981] bg-[var(--calendar-present-bg)] border-[#10B981]/30' },
-  Absent:  { label: 'Absent',  icon: XCircle,       cls: 'text-[#E88B8B] bg-[var(--calendar-absent-bg)] border-[#E88B8B]/30' },
-  Leave:   { label: 'On Leave',icon: Clock3,         cls: 'text-[#F3C969] bg-[var(--calendar-leave-bg)] border-[#F3C969]/30' },
+  Present: { label: 'Present', icon: CheckCircle2,  cls: 'text-[var(--calendar-present-text)] bg-[var(--calendar-present-bg)] border-[var(--calendar-present-border)]' },
+  Absent:  { label: 'Absent',  icon: XCircle,       cls: 'text-[var(--calendar-absent-text)] bg-[var(--calendar-absent-bg)] border-[var(--calendar-absent-border)]' },
+  Leave:   { label: 'On Leave',icon: Clock3,         cls: 'text-[var(--calendar-leave-text)] bg-[var(--calendar-leave-bg)] border-[var(--calendar-leave-border)]' },
 };
 
 const StatusChip: React.FC<{ status: string }> = ({ status }) => {
@@ -220,10 +220,10 @@ export const EmployeeDirectory: React.FC = () => {
       {/* ── Summary stats strip ────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: 'Total Staff',  value: stats.total,   icon: Users,          cls: 'text-primary',          bg: 'bg-primary/10' },
-          { label: 'Present Today',value: stats.present, icon: CheckCircle2,   cls: 'text-[#10B981]',        bg: 'bg-[var(--calendar-present-bg)]' },
-          { label: 'Absent Today', value: stats.absent,  icon: XCircle,        cls: 'text-[#E88B8B]',        bg: 'bg-[var(--calendar-absent-bg)]' },
-          { label: 'On Leave',     value: stats.leave,   icon: Clock3,         cls: 'text-[#F3C969]',        bg: 'bg-[var(--calendar-leave-bg)]' },
+          { label: 'Total Staff',  value: stats.total,   icon: Users,          cls: 'text-primary',                          bg: 'bg-primary/10' },
+          { label: 'Present Today',value: stats.present, icon: CheckCircle2,   cls: 'text-[var(--calendar-present-text)]',   bg: 'bg-[var(--calendar-present-bg)]' },
+          { label: 'Absent Today', value: stats.absent,  icon: XCircle,        cls: 'text-[var(--calendar-absent-text)]',    bg: 'bg-[var(--calendar-absent-bg)]' },
+          { label: 'On Leave',     value: stats.leave,   icon: Clock3,         cls: 'text-[var(--calendar-leave-text)]',     bg: 'bg-[var(--calendar-leave-bg)]' },
         ].map(s => {
           const Icon = s.icon;
           return (

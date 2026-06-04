@@ -159,16 +159,16 @@ export const AdminDashboard: React.FC = () => {
   const getActivityIcon = (type: string) => {
     switch (type) {
       case 'check_in':
-        return <div className="h-7 w-7 rounded-full bg-[#10B981]/20 text-[#10B981] flex items-center justify-center"><UserCheck className="h-4 w-4" /></div>;
+        return <div className="h-7 w-7 rounded-full bg-[#22C55E]/10 text-[#22C55E] flex items-center justify-center"><UserCheck className="h-4 w-4" /></div>;
       case 'check_out':
-        return <div className="h-7 w-7 rounded-full bg-[#064E3B]/20 text-[#064E3B] flex items-center justify-center"><Clock className="h-4 w-4" /></div>;
+        return <div className="h-7 w-7 rounded-full bg-[#334155]/10 text-[#334155] flex items-center justify-center"><Clock className="h-4 w-4" /></div>;
       case 'leave_approve':
-        return <div className="h-7 w-7 rounded-full bg-[#87B5FF]/20 text-[#87B5FF] flex items-center justify-center"><Briefcase className="h-4 w-4" /></div>;
+        return <div className="h-7 w-7 rounded-full bg-[#3B82F6]/10 text-[#3B82F6] flex items-center justify-center"><Briefcase className="h-4 w-4" /></div>;
       case 'leave_reject':
-        return <div className="h-7 w-7 rounded-full bg-[#E88B8B]/20 text-[#E88B8B] flex items-center justify-center"><UserX className="h-4 w-4" /></div>;
+        return <div className="h-7 w-7 rounded-full bg-[#EF4444]/10 text-[#EF4444] flex items-center justify-center"><UserX className="h-4 w-4" /></div>;
       case 'employee_add':
       default:
-        return <div className="h-7 w-7 rounded-full bg-[#F3C969]/20 text-[#F3C969] flex items-center justify-center"><Users className="h-4 w-4" /></div>;
+        return <div className="h-7 w-7 rounded-full bg-[#F59E0B]/10 text-[#F59E0B] flex items-center justify-center"><Users className="h-4 w-4" /></div>;
     }
   };
 
@@ -197,35 +197,35 @@ export const AdminDashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="border-[#10B981]/30 bg-[var(--calendar-present-bg)]/40 text-[#10B981] hover:scale-[1.01] hover:shadow-md transition-all duration-300">
+        <Card className="border-[var(--calendar-present-border)] bg-[var(--calendar-present-bg)]/40 text-[var(--calendar-present-text)] hover:scale-[1.01] hover:shadow-md transition-all duration-300">
           <CardContent className="p-6 space-y-2">
             <div className="flex justify-between items-start">
               <span className="text-xs font-semibold text-foreground/80 uppercase tracking-wide">Present Today</span>
-              <UserCheck className="h-5 w-5 text-[#10B981]" />
+              <UserCheck className="h-5 w-5 text-[var(--calendar-present-text)]" />
             </div>
-            <p className="text-3xl font-bold text-[#10B981] font-display">{stats.present}</p>
+            <p className="text-3xl font-bold text-[var(--calendar-present-text)] font-display">{stats.present}</p>
             <p className="text-[10px] text-foreground/75 font-medium">Checked-in today</p>
           </CardContent>
         </Card>
 
-        <Card className="border-[#E88B8B]/30 bg-[var(--calendar-absent-bg)]/40 text-[#E88B8B] hover:scale-[1.01] hover:shadow-md transition-all duration-300">
+        <Card className="border-[var(--calendar-absent-border)] bg-[var(--calendar-absent-bg)]/40 text-[var(--calendar-absent-text)] hover:scale-[1.01] hover:shadow-md transition-all duration-300">
           <CardContent className="p-6 space-y-2">
             <div className="flex justify-between items-start">
               <span className="text-xs font-semibold text-foreground/80 uppercase tracking-wide">Absent Today</span>
-              <UserX className="h-5 w-5 text-[#E88B8B]" />
+              <UserX className="h-5 w-5 text-[var(--calendar-absent-text)]" />
             </div>
-            <p className="text-3xl font-bold text-[#E88B8B] font-display">{stats.absent}</p>
+            <p className="text-3xl font-bold text-[var(--calendar-absent-text)] font-display">{stats.absent}</p>
             <p className="text-[10px] text-foreground/75 font-medium">No clock-in logged</p>
           </CardContent>
         </Card>
 
-        <Card className="border-[#F3C969]/30 bg-[var(--calendar-leave-bg)]/40 text-[#F3C969] hover:scale-[1.01] hover:shadow-md transition-all duration-300">
+        <Card className="border-[var(--calendar-leave-border)] bg-[var(--calendar-leave-bg)]/40 text-[var(--calendar-leave-text)] hover:scale-[1.01] hover:shadow-md transition-all duration-300">
           <CardContent className="p-6 space-y-2">
             <div className="flex justify-between items-start">
               <span className="text-xs font-semibold text-foreground/80 uppercase tracking-wide">On Leave</span>
-              <PlaneTakeoff className="h-5 w-5 text-[#F3C969]" />
+              <PlaneTakeoff className="h-5 w-5 text-[var(--calendar-leave-text)]" />
             </div>
-            <p className="text-3xl font-bold text-[#F3C969] font-display">{stats.leave}</p>
+            <p className="text-3xl font-bold text-[var(--calendar-leave-text)] font-display">{stats.leave}</p>
             <p className="text-[10px] text-foreground/75 font-medium">Approved leave requests</p>
           </CardContent>
         </Card>
@@ -281,9 +281,9 @@ export const AdminDashboard: React.FC = () => {
           </CardContent>
           {/* Pie legend */}
           <div className="px-6 pb-4 flex justify-center space-x-6 text-xs font-semibold text-muted-foreground border-t border-border pt-2 bg-muted/5">
-            <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[#10B981]" /> Present ({stats.present})</div>
-            <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[#E88B8B]" /> Absent ({stats.absent})</div>
-            <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[#F3C969]" /> On Leave ({stats.leave})</div>
+            <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[#22C55E]" /> Present ({stats.present})</div>
+            <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[#EF4444]" /> Absent ({stats.absent})</div>
+            <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[#F59E0B]" /> On Leave ({stats.leave})</div>
           </div>
         </Card>
 
@@ -297,21 +297,21 @@ export const AdminDashboard: React.FC = () => {
               <AreaChart data={weeklyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorPresent" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.2}/>
-                    <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#334155" stopOpacity={0.2}/>
+                    <stop offset="95%" stopColor="#334155" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
                 <XAxis dataKey="day" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} />
                 <YAxis stroke="var(--muted-foreground)" fontSize={11} tickLine={false} allowDecimals={false} />
                 <Tooltip contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }} />
-                <Area type="monotone" dataKey="Present" stroke="#10B981" fillOpacity={1} fill="url(#colorPresent)" strokeWidth={2.5} />
+                <Area type="monotone" dataKey="Present" stroke="#334155" fillOpacity={1} fill="url(#colorPresent)" strokeWidth={2.5} />
               </AreaChart>
             </ResponsiveContainer>
           </CardContent>
           <div className="px-6 pb-4 border-t border-border pt-2 bg-muted/5 flex items-center justify-between text-xs text-muted-foreground font-semibold">
             <span>Overall presence trend</span>
-            <span className="text-[#10B981] flex items-center gap-1"><TrendingUp className="h-3.5 w-3.5" /> Stable</span>
+            <span className="text-primary flex items-center gap-1"><TrendingUp className="h-3.5 w-3.5" /> Stable</span>
           </div>
         </Card>
 
@@ -362,7 +362,7 @@ export const AdminDashboard: React.FC = () => {
                 <XAxis type="number" domain={[0, 100]} stroke="var(--muted-foreground)" fontSize={10} tickLine={false} />
                 <YAxis dataKey="name" type="category" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} width={80} />
                 <Tooltip contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }} />
-                <Bar dataKey="Attendance Rate (%)" fill="#10B981" radius={[0, 4, 4, 0]} barSize={12} />
+                <Bar dataKey="Attendance Rate (%)" fill="#334155" radius={[0, 4, 4, 0]} barSize={12} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

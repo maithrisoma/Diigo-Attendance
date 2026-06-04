@@ -75,9 +75,9 @@ export const Navbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) =
           title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
         >
           {theme === 'light' ? (
-            <Moon className="h-5 w-5 transition-transform duration-300 hover:rotate-12 text-[#7B337E]" />
+            <Moon className="h-5 w-5 transition-transform duration-300 hover:rotate-12 text-[#334155]" />
           ) : (
-            <Sun className="h-5 w-5 transition-transform duration-300 hover:rotate-45 text-[#F5D5E0]" />
+            <Sun className="h-5 w-5 transition-transform duration-300 hover:rotate-45 text-amber-400" />
           )}
         </button>
 

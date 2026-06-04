@@ -6,103 +6,125 @@
 
 @layer base {
   :root {
-    /* ── LIGHT MODE COLOR SYSTEM (MINT / EMERALD GREEN) ── */
-    --background:   140 60% 98%;       /* #F4FDF7 fresh minty white background */
-    --foreground:   160 80% 10%;      /* #022c22 deepest forest green text */
+    /* ── LIGHT MODE COLOR SYSTEM (SLATE ENTERPRISE) ── */
+    --background:   210 40% 98%;       /* #F8FAFC */
+    --foreground:   222 47% 11%;      /* #0F172A */
 
-    --card:         0 0% 100%;        /* clean white cards */
-    --card-foreground: 160 80% 10%;
+    --card:         0 0% 100%;        /* #FFFFFF */
+    --card-foreground: 222 47% 11%;
 
-    --popover:      140 60% 99%;
-    --popover-foreground: 160 80% 10%;
+    --popover:      0 0% 100%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary:      162 76% 41%;      /* #10B981 vibrant mint/emerald green primary */
-    --primary-foreground: 0 0% 100%;  /* white text for maximum readability */
+    --primary:      215 16% 27%;      /* #334155 */
+    --primary-foreground: 0 0% 100%;  /* #FFFFFF */
 
-    --secondary:    160 84% 19%;      /* #047857 deep emerald green */
-    --secondary-foreground: 140 60% 98%; /* #F4FDF7 pale mint text */
+    --secondary:    210 40% 96%;      /* #F1F5F9 */
+    --secondary-foreground: 215 16% 27%; /* #334155 */
 
-    --muted:        160 25% 45%;       /* muted forest-green text */
-    --muted-foreground: 160 25% 45%;
+    --muted:        215 16% 47%;       /* #64748B */
+    --muted-foreground: 215 16% 47%;
 
-    --accent:       140 60% 90%;      /* #D1FAE5 soft mint */
-    --accent-foreground: 160 80% 10%;
+    --accent:       210 40% 96%;      /* #F1F5F9 */
+    --accent-foreground: 222 47% 11%;
 
-    --destructive:  0 84% 60%;        /* vibrant red */
+    --destructive:  0 84% 60%;        /* #EF4444 */
     --destructive-foreground: 0 0% 100%;
 
-    --border:       140 40% 91%;       /* very soft mint-green border */
-    --input:        140 40% 91%;
-    --ring:         162 76% 41%;
+    --border:       214 32% 91%;       /* #E2E8F0 */
+    --input:        214 32% 91%;
+    --ring:         215 16% 27%;
 
-    --radius: 1rem;                   /* Large rounded corners */
+    --radius: 0.5rem;
 
     /* Custom Theme Colors */
-    --sidebar-bg: #064E3B;            /* deep forest emerald */
-    --sidebar-active-bg: #10B981;     /* vibrant emerald active */
-    --sidebar-text: #D1FAE5;          /* pale mint */
-    --sidebar-hover: rgba(16, 185, 129, 0.15);
+    --sidebar-bg: #FFFFFF;
+    --sidebar-active-bg: #F1F5F9;
+    --sidebar-text: #0F172A;
+    --sidebar-hover: #F8FAFC;
     
     --navbar-bg: #FFFFFF;
     
-    --table-header-bg: #ECFDF5;
-    --table-row-hover-bg: #F0FDF4;
+    --table-header-bg: #F8FAFC;
+    --table-row-hover-bg: #F8FAFC;
 
     /* Calendar Day Backgrounds (Light) */
-    --calendar-present-bg: #D1FAE5;
-    --calendar-absent-bg: #FDE2E2;
-    --calendar-leave-bg: #FFF1C7;
-    --calendar-holiday-bg: #DDEBFF;
-    --calendar-weekend-bg: #ECECEC;
+    --calendar-present-bg: #DCFCE7;
+    --calendar-absent-bg: #FEE2E2;
+    --calendar-leave-bg: #FEF3C7;
+    --calendar-holiday-bg: #DBEAFE;
+    --calendar-weekend-bg: #F8FAFC;
+
+    --calendar-present-text: #166534;
+    --calendar-present-border: rgba(34, 197, 94, 0.3);
+    --calendar-absent-text: #991B1B;
+    --calendar-absent-border: rgba(239, 68, 68, 0.3);
+    --calendar-leave-text: #92400E;
+    --calendar-leave-border: rgba(245, 158, 11, 0.3);
+    --calendar-holiday-text: #1D4ED8;
+    --calendar-holiday-border: rgba(59, 130, 246, 0.3);
+    --calendar-weekend-text: #475569;
+    --calendar-weekend-border: rgba(148, 163, 184, 0.2);
   }
 
   [data-theme='dark'] {
-    /* ── DARK MODE COLOR SYSTEM (MINT / EMERALD GREEN) ── */
-    --background:   160 80% 5%;       /* #02140f deepest forest green background */
-    --foreground:   140 60% 90%;      /* #D1FAE5 pale mint text */
+    /* ── DARK MODE COLOR SYSTEM (SLATE ENTERPRISE) ── */
+    --background:   222 47% 11%;       /* #0F172A */
+    --foreground:   210 40% 98%;      /* #F8FAFC */
 
-    --card:         160 80% 8%;       /* #031f18 deep emerald card background */
-    --card-foreground: 140 60% 90%;
+    --card:         217 33% 17%;       /* #1E293B */
+    --card-foreground: 210 40% 98%;
 
-    --popover:      160 80% 8%;
-    --popover-foreground: 140 60% 90%;
+    --popover:      217 33% 17%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary:      162 76% 41%;      /* #10B981 emerald highlight */
-    --primary-foreground: 160 80% 5%;
+    --primary:      210 40% 96%;      /* #F1F5F9 */
+    --primary-foreground: 222 47% 11%; /* #0F172A */
 
-    --secondary:    160 84% 19%;      /* #047857 deep emerald */
-    --secondary-foreground: 140 60% 90%;
+    --secondary:    215 16% 27%;      /* #334155 */
+    --secondary-foreground: 210 40% 96%;
 
-    --muted:        160 20% 60%;      /* slate forest-green */
-    --muted-foreground: 160 20% 55%;
+    --muted:        215 16% 47%;       /* #64748B */
+    --muted-foreground: 215 16% 47%;
 
-    --accent:       160 80% 12%;      /* dark forest teal */
-    --accent-foreground: 140 60% 90%;
+    --accent:       215 16% 27%;      /* #334155 */
+    --accent-foreground: 210 40% 98%;
 
-    --destructive:  0 84% 60%;        /* vibrant red */
+    --destructive:  0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border:       160 40% 15%;
-    --input:        160 40% 15%;
-    --ring:         162 76% 41%;
+    --border:       217 30% 26%;
+    --input:        217 30% 26%;
+    --ring:         210 40% 96%;
 
     /* Custom Theme Colors */
-    --sidebar-bg: #02140f;            /* deepest green */
-    --sidebar-active-bg: #031f18;     /* deep emerald active */
-    --sidebar-text: #D1FAE5;
-    --sidebar-hover: #064E3B;
+    --sidebar-bg: #1E293B;
+    --sidebar-active-bg: #334155;
+    --sidebar-text: #F8FAFC;
+    --sidebar-hover: #0F172A;
     
-    --navbar-bg: #031f18;
+    --navbar-bg: #1E293B;
     
-    --table-header-bg: #042f24;
-    --table-row-hover-bg: #064e3b;
+    --table-header-bg: #0F172A;
+    --table-row-hover-bg: #0F172A;
 
     /* Calendar Day Backgrounds (Dark) */
-    --calendar-present-bg: #064E3B;
-    --calendar-absent-bg: #4A2424;
-    --calendar-leave-bg: #54461D;
-    --calendar-holiday-bg: #20324D;
-    --calendar-weekend-bg: #333333;
+    --calendar-present-bg: #052e16;
+    --calendar-absent-bg: #450a0a;
+    --calendar-leave-bg: #451a03;
+    --calendar-holiday-bg: #1e3a8a;
+    --calendar-weekend-bg: #0F172A;
+
+    --calendar-present-text: #4ade80;
+    --calendar-present-border: rgba(74, 222, 128, 0.3);
+    --calendar-absent-text: #fca5a5;
+    --calendar-absent-border: rgba(252, 165, 165, 0.3);
+    --calendar-leave-text: #fcd34d;
+    --calendar-leave-border: rgba(252, 211, 77, 0.3);
+    --calendar-holiday-text: #93c5fd;
+    --calendar-holiday-border: rgba(147, 197, 253, 0.3);
+    --calendar-weekend-text: #94a3b8;
+    --calendar-weekend-border: rgba(148, 163, 184, 0.2);
   }
 }
 
@@ -118,10 +140,10 @@ h1, h2, h3, h4, h5, h6 {
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track  { @apply bg-transparent; }
 ::-webkit-scrollbar-thumb  {
-  @apply bg-[#10B981]/40 rounded-full;
+  @apply bg-muted/20 rounded-full;
   transition: background 0.2s;
 }
-::-webkit-scrollbar-thumb:hover { @apply bg-[#10B981]/70; }
+::-webkit-scrollbar-thumb:hover { @apply bg-muted/40; }
 
 /* ── Sidebar theme overrides ───────────────────────────────────────────── */
 aside {
@@ -138,25 +160,25 @@ header.sticky {
 }
 
 /* ── Calendar cell theme overrides ────────────────────────────────────── */
-.cell-present { background-color: var(--calendar-present-bg); border-color: #10B981; color: #10B981; }
-.cell-absent { background-color: var(--calendar-absent-bg); border-color: #E88B8B; color: #E88B8B; }
-.cell-leave { background-color: var(--calendar-leave-bg); border-color: #F3C969; color: #F3C969; }
-.cell-holiday { background-color: var(--calendar-holiday-bg); border-color: #87B5FF; color: #87B5FF; }
-.cell-weekend { background-color: var(--calendar-weekend-bg); border-color: #CFCFCF; color: #94A3B8; }
+.cell-present { background-color: var(--calendar-present-bg); border-color: var(--calendar-present-border); color: var(--calendar-present-text); }
+.cell-absent { background-color: var(--calendar-absent-bg); border-color: var(--calendar-absent-border); color: var(--calendar-absent-text); }
+.cell-leave { background-color: var(--calendar-leave-bg); border-color: var(--calendar-leave-border); color: var(--calendar-leave-text); }
+.cell-holiday { background-color: var(--calendar-holiday-bg); border-color: var(--calendar-holiday-border); color: var(--calendar-holiday-text); }
+.cell-weekend { background-color: var(--calendar-weekend-bg); border-color: var(--calendar-weekend-border); color: var(--calendar-weekend-text); }
 
 /* ── Soft Shadows ──────────────────────────────────────────────────────── */
 .shadow-premium-light {
-  box-shadow: 0 10px 30px -10px rgba(16, 185, 129, 0.12);
+  box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.06);
 }
 .shadow-premium-dark {
-  box-shadow: 0 10px 35px -12px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 8px 28px -12px rgba(0, 0, 0, 0.4);
 }
 
 .shadow-card {
-  box-shadow: 0 4px 20px -2px rgba(16, 185, 129, 0.05);
+  box-shadow: 0 2px 12px -2px rgba(0, 0, 0, 0.04);
 }
 [data-theme='dark'] .shadow-card {
-  box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 16px -2px rgba(0, 0, 0, 0.3);
 }
 
 /* ── Circular progress ring (used in stats) ────────────────────────────── */
@@ -165,14 +187,14 @@ header.sticky {
 }
 
 /* ── Legend color circles ─────────────────────────────────────────────── */
-.bg-present { background-color: #10B981; }
-.bg-absent { background-color: #E88B8B; }
-.bg-leave { background-color: #F3C969; }
-.bg-holiday { background-color: #87B5FF; }
-.bg-weekend { background-color: #CFCFCF; }
+.bg-present { background-color: #22C55E; }
+.bg-absent { background-color: #EF4444; }
+.bg-leave { background-color: #F59E0B; }
+.bg-holiday { background-color: #3B82F6; }
+.bg-weekend { background-color: #94A3B8; }
 
-.text-present { color: #10B981; }
-.text-absent { color: #E88B8B; }
-.text-leave { color: #F3C969; }
-.text-holiday { color: #87B5FF; }
-.text-weekend { color: #CFCFCF; }
+.text-present { color: #22C55E; }
+.text-absent { color: #EF4444; }
+.text-leave { color: #F59E0B; }
+.text-holiday { color: #3B82F6; }
+.text-weekend { color: #94A3B8; }

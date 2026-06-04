@@ -125,17 +125,17 @@ export const EmployeeCalendar: React.FC = () => {
   const getDayStatusColor = (status: string) => {
     switch (status) {
       case 'Present':
-        return 'bg-[var(--calendar-present-bg)] text-[#10B981] border-[#10B981]/40 hover:opacity-90';
+        return 'bg-[var(--calendar-present-bg)] text-[var(--calendar-present-text)] border-[var(--calendar-present-border)] hover:opacity-90';
       case 'Absent':
-        return 'bg-[var(--calendar-absent-bg)] text-[#E88B8B] border-[#E88B8B]/40 hover:opacity-90';
+        return 'bg-[var(--calendar-absent-bg)] text-[var(--calendar-absent-text)] border-[var(--calendar-absent-border)] hover:opacity-90';
       case 'Half Day':
-        return 'bg-[var(--calendar-leave-bg)]/80 text-[#F3C969] border-[#F3C969]/30 hover:opacity-90';
+        return 'bg-[var(--calendar-leave-bg)]/80 text-[var(--calendar-leave-text)] border-[var(--calendar-leave-border)]/70 hover:opacity-90';
       case 'Leave':
-        return 'bg-[var(--calendar-leave-bg)] text-[#F3C969] border-[#F3C969]/40 hover:opacity-90';
+        return 'bg-[var(--calendar-leave-bg)] text-[var(--calendar-leave-text)] border-[var(--calendar-leave-border)] hover:opacity-90';
       case 'Holiday':
-        return 'bg-[var(--calendar-holiday-bg)] text-[#87B5FF] border-[#87B5FF]/40 hover:opacity-90';
+        return 'bg-[var(--calendar-holiday-bg)] text-[var(--calendar-holiday-text)] border-[var(--calendar-holiday-border)] hover:opacity-90';
       case 'Weekend':
-        return 'bg-[var(--calendar-weekend-bg)] text-[#94A3B8] border-[#CFCFCF]/40 hover:opacity-90';
+        return 'bg-[var(--calendar-weekend-bg)] text-[var(--calendar-weekend-text)] border-[var(--calendar-weekend-border)] hover:opacity-90';
       case 'Future':
         return 'bg-card/20 text-muted-foreground/30 border-dashed border-border cursor-not-allowed';
       default:

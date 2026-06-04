@@ -26,19 +26,19 @@ export const Badge: React.FC<BadgeProps> = ({ children, variant = 'default', cla
     switch (variant) {
       case 'success':
       case 'Present':
-        return 'bg-[var(--calendar-present-bg)] text-[#10B981] border-[#10B981]/40 hover:opacity-90';
+        return 'bg-[var(--calendar-present-bg)] text-[var(--calendar-present-text)] border-[var(--calendar-present-border)] hover:opacity-90';
       case 'danger':
       case 'Absent':
-        return 'bg-[var(--calendar-absent-bg)] text-[#E88B8B] border-[#E88B8B]/40 hover:opacity-90';
+        return 'bg-[var(--calendar-absent-bg)] text-[var(--calendar-absent-text)] border-[var(--calendar-absent-border)] hover:opacity-90';
       case 'warning':
       case 'Leave':
-        return 'bg-[var(--calendar-leave-bg)] text-[#F3C969] border-[#F3C969]/40 hover:opacity-90';
+        return 'bg-[var(--calendar-leave-bg)] text-[var(--calendar-leave-text)] border-[var(--calendar-leave-border)] hover:opacity-90';
       case 'pending':
       case 'Half Day':
-        return 'bg-[var(--calendar-leave-bg)]/80 text-[#F3C969] border-[#F3C969]/30 hover:opacity-90';
+        return 'bg-[var(--calendar-leave-bg)]/80 text-[var(--calendar-leave-text)] border-[var(--calendar-leave-border)]/70 hover:opacity-90';
       case 'info':
       case 'Holiday':
-        return 'bg-[var(--calendar-holiday-bg)] text-[#87B5FF] border-[#87B5FF]/40 hover:opacity-90';
+        return 'bg-[var(--calendar-holiday-bg)] text-[var(--calendar-holiday-text)] border-[var(--calendar-holiday-border)] hover:opacity-90';
       case 'secondary':
       case 'outline':
       case 'Weekend':
