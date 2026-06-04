@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Employee } from '../types';
-import { INITIAL_EMPLOYEES } from '../utils/mockData';
 
 interface AuthContextType {
   currentUser: Employee | null;
@@ -30,35 +29,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (emailOrId: string, password: string): Promise<{ success: boolean; message: string }> => {
-    // Simple password validation for demo: "password" or anything matches for mock
-    // If the user inputs a specific seed password, we can check it
     if (!password) {
       return { success: false, message: 'Password is required' };
     }
 
-    // Retrieve active employees from localStorage or fallback to seed
-    const storedEmployees = localStorage.getItem('employees');
-    const employees: Employee[] = storedEmployees ? JSON.parse(storedEmployees) : INITIAL_EMPLOYEES;
-
-    const normalizedInput = emailOrId.toLowerCase().trim();
-    const user = employees.find(
-      (emp) =>
-        emp.email.toLowerCase() === normalizedInput ||
-        emp.employee_id.toLowerCase() === normalizedInput
-    );
-
-    if (!user) {
-      return { success: false, message: 'Invalid Employee ID or Email' };
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ emailOrId, password }),
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        localStorage.setItem('currentUser', JSON.stringify(data.user));
+        setCurrentUser(data.user);
+        return { success: true, message: data.message || 'Login successful' };
+      } else {
+        return { success: false, message: data.message || 'Login failed' };
+      }
+    } catch (err) {
+      console.error(err);
+      return { success: false, message: 'Server is currently offline or unreachable.' };
     }
-
-    // Accept "password" as the mock password for all accounts
-    if (password !== 'password') {
-      return { success: false, message: 'Incorrect password. Try using "password".' };
-    }
-
-    localStorage.setItem('currentUser', JSON.stringify(user));
-    setCurrentUser(user);
-    return { success: true, message: 'Login successful' };
   };
 
   const logout = () => {
@@ -67,24 +59,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const forgotPassword = async (emailOrId: string): Promise<{ success: boolean; message: string }> => {
-    const storedEmployees = localStorage.getItem('employees');
-    const employees: Employee[] = storedEmployees ? JSON.parse(storedEmployees) : INITIAL_EMPLOYEES;
-
-    const normalizedInput = emailOrId.toLowerCase().trim();
-    const user = employees.find(
-      (emp) =>
-        emp.email.toLowerCase() === normalizedInput ||
-        emp.employee_id.toLowerCase() === normalizedInput
-    );
-
-    if (!user) {
-      return { success: false, message: 'User not found in registry' };
+    try {
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ emailOrId }),
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        return { success: true, message: data.message };
+      } else {
+        return { success: false, message: data.message || 'Failed to process forgot password request.' };
+      }
+    } catch (err) {
+      console.error(err);
+      return { success: false, message: 'Server is currently offline or unreachable.' };
     }
-
-    return { 
-      success: true, 
-      message: `Password reset instructions have been sent to ${user.email}. (Demo note: password is "password")` 
-    };
   };
 
   return (

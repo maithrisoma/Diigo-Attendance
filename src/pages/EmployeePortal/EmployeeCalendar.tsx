@@ -323,7 +323,7 @@ export const EmployeeCalendar: React.FC = () => {
                   <span className="text-sm font-bold text-primary font-mono flex items-center gap-1.5">
                     <Timer className="h-4 w-4 text-primary/70" />
                     {selectedDayDetail.workingHours !== null ? (
-                      `${selectedDayDetail.workingHours.toFixed(2)} hrs`
+                      `${Number(selectedDayDetail.workingHours).toFixed(2)} hrs`
                     ) : (
                       <span className="text-muted-foreground font-medium">Running...</span>
                     )}

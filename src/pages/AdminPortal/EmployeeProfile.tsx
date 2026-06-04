@@ -89,7 +89,7 @@ export const EmployeeProfile: React.FC = () => {
     const leave    = empAttendance.filter(a => a.status === 'Leave').length;
     const total    = present + absent + halfDay + leave;
     const rate     = total > 0 ? Math.round(((present + halfDay * 0.5) / total) * 100) : 0;
-    const avgHours = empAttendance.filter(a => a.working_hours).reduce((s, a) => s + (a.working_hours ?? 0), 0) /
+    const avgHours = empAttendance.filter(a => a.working_hours).reduce((s, a) => s + Number(a.working_hours || 0), 0) /
                      (empAttendance.filter(a => a.working_hours).length || 1);
     return { present, absent, halfDay, leave, total, rate, avgHours: avgHours.toFixed(1) };
   }, [empAttendance]);
@@ -280,10 +280,17 @@ export const EmployeeProfile: React.FC = () => {
                           : rec.check_in ? <span className="text-[var(--calendar-leave-text)] text-xs font-semibold">Active ●</span>
                           : <span className="text-muted-foreground/30">—</span>}
                       </td>
+<<<<<<< Updated upstream
                       <td className="px-5 py-3 text-muted-foreground">
                         {rec.working_hours != null && rec.working_hours > 0
                           ? <span className="font-semibold">{rec.working_hours}h</span>
                           : <span className="text-muted-foreground/30">—</span>}
+=======
+                      <td className="px-5 py-3 text-slate-600">
+                        {rec.working_hours != null && Number(rec.working_hours) > 0
+                          ? <span className="font-semibold">{Number(rec.working_hours).toFixed(2)}h</span>
+                          : <span className="text-slate-300">—</span>}
+>>>>>>> Stashed changes
                       </td>
                     </tr>
                   ))

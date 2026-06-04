@@ -87,13 +87,13 @@ export const Reports: React.FC = () => {
           if (rec.status === 'Present') {
             present++;
             if (rec.working_hours) {
-              totalHours += rec.working_hours;
+              totalHours += Number(rec.working_hours);
               hoursCount++;
             }
           } else if (rec.status === 'Half Day') {
             halfDay++;
             if (rec.working_hours) {
-              totalHours += rec.working_hours;
+              totalHours += Number(rec.working_hours);
               hoursCount++;
             }
           } else if (rec.status === 'Leave') {
