@@ -353,7 +353,7 @@ export const EmployeeDirectory: React.FC = () => {
       <Modal isOpen={addOpen} onClose={() => setAddOpen(false)} title="Register New Employee" size="md">
         <form onSubmit={handleAddSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Input label="Employee ID" placeholder="e.g. EMP007" value={empForm.employee_id}
+            <Input label="Employee ID" placeholder="e.g. D07" value={empForm.employee_id}
               onChange={e => setEmpForm(p => ({ ...p, employee_id: e.target.value }))} error={formErrors.employee_id} />
             <Input label="Full Name" placeholder="e.g. Clark Kent" value={empForm.name}
               onChange={e => setEmpForm(p => ({ ...p, name: e.target.value }))} error={formErrors.name} />

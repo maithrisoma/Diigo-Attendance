@@ -113,7 +113,7 @@ const PortalForm: React.FC<PortalFormProps> = ({ portal, onSuccess }) => {
       <form onSubmit={handleSubmit} className="space-y-4 mt-4">
         <Input
           label={isAdmin ? 'Admin ID or Email' : 'Employee ID or Email'}
-          placeholder={isAdmin ? 'e.g. HR001 or admin@company.com' : 'e.g. EMP001 or employee@company.com'}
+          placeholder={isAdmin ? 'e.g. HR001 or admin@company.com' : 'e.g. D01 or employee@company.com'}
           value={emailOrId}
           onChange={e => setEmailOrId(e.target.value)}
           error={errors.emailOrId}
@@ -167,7 +167,7 @@ const PortalForm: React.FC<PortalFormProps> = ({ portal, onSuccess }) => {
               Enter your Employee ID or Email address and we'll help reset your password.
             </p>
           </div>
-          <Input label="Employee ID or Email" placeholder="e.g. EMP001"
+          <Input label="Employee ID or Email" placeholder="e.g. D01"
             value={forgotInput} onChange={e => setForgotInput(e.target.value)}
             error={forgotError} autoFocus />
           <div className="flex gap-3 pt-2 justify-end">
