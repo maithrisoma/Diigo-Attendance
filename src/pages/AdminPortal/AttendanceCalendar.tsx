@@ -249,7 +249,7 @@ export const AttendanceCalendar: React.FC = () => {
                       : day.isWeekend
                       ? 'bg-[#F1F5F9] border-[#CBD5E1] text-[#475569] cursor-pointer hover:bg-slate-200/80'
                       : 'bg-white border-[#E2E8F0] text-[#0F172A] cursor-pointer hover:bg-[#F8FAFC]'
-                  } ${isToday ? 'ring-2 ring-[#1E3A8A] border-[#1E3A8A]' : ''}`}
+                  } ${isToday ? 'ring-2 ring-primary border-primary' : ''}`}
                 >
                 {day.dayNumber !== null && (
                   <>

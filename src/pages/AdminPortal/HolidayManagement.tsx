@@ -288,7 +288,7 @@ export const HolidayManagement: React.FC = () => {
                 filteredHolidays.map((holiday) => (
                   <TableRow key={holiday.id}>
                     <TableCell className="font-bold text-slate-900 flex items-center gap-2">
-                      <Milestone className="h-4.5 w-4.5 text-[#1E3A8A]" />
+                      <Milestone className="h-4.5 w-4.5 text-secondary" />
                       {holiday.holiday_name}
                     </TableCell>
                     <TableCell className="font-mono text-xs text-slate-700 font-medium">
@@ -325,7 +325,7 @@ export const HolidayManagement: React.FC = () => {
                           variant="ghost"
                           size="icon"
                           onClick={() => openEdit(holiday)}
-                          className="h-8.5 w-8.5 text-slate-400 hover:text-[#1E3A8A] hover:bg-slate-100"
+                          className="h-8.5 w-8.5 text-slate-400 hover:text-secondary hover:bg-slate-100"
                         >
                           <Edit2 className="h-4 w-4" />
                         </Button>
@@ -392,7 +392,7 @@ export const HolidayManagement: React.FC = () => {
               id="is_recurring_add"
               checked={holidayForm.is_recurring}
               onChange={(e) => setHolidayForm(p => ({ ...p, is_recurring: e.target.checked }))}
-              className="h-4 w-4 rounded border-slate-300 text-[#1E3A8A] focus:ring-[#1E3A8A]"
+              className="h-4 w-4 rounded border-slate-300 text-secondary focus:ring-secondary"
             />
             <label htmlFor="is_recurring_add" className="text-xs font-bold text-slate-700 cursor-pointer">
               Recurring annual holiday
@@ -453,7 +453,7 @@ export const HolidayManagement: React.FC = () => {
               id="is_recurring_edit"
               checked={holidayForm.is_recurring}
               onChange={(e) => setHolidayForm(p => ({ ...p, is_recurring: e.target.checked }))}
-              className="h-4 w-4 rounded border-slate-300 text-[#1E3A8A] focus:ring-[#1E3A8A]"
+              className="h-4 w-4 rounded border-slate-300 text-secondary focus:ring-secondary"
             />
             <label htmlFor="is_recurring_edit" className="text-xs font-bold text-slate-700 cursor-pointer">
               Recurring annual holiday

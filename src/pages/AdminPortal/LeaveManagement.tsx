@@ -88,7 +88,7 @@ export const LeaveManagement: React.FC = () => {
             onClick={() => setActiveTab(t.id as any)}
             className={`pb-3 transition-colors duration-150 relative ${
               activeTab === t.id
-                ? 'text-[#1E3A8A]'
+                ? 'text-secondary'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
@@ -99,7 +99,7 @@ export const LeaveManagement: React.FC = () => {
               </span>
             )}
             {activeTab === t.id && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1E3A8A] rounded-full" />
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-secondary rounded-full" />
             )}
           </button>
         ))}

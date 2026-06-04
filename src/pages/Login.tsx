@@ -192,11 +192,11 @@ export const Login: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden bg-gradient-to-br from-background via-card/50 to-border/30 text-foreground transition-colors duration-200">
 
-      {/* Ambient purple/lavender blobs */}
+      {/* Ambient sage green/mint white blobs */}
       <div className="absolute top-[-10%] left-[-8%] w-[40%] h-[40%] rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(123,51,126,0.15) 0%, transparent 70%)', filter: 'blur(60px)' }} />
+        style={{ background: 'radial-gradient(circle, rgba(142,182,155,0.2) 0%, transparent 70%)', filter: 'blur(60px)' }} />
       <div className="absolute bottom-[-10%] right-[-8%] w-[40%] h-[40%] rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(245,213,224,0.15) 0%, transparent 70%)', filter: 'blur(60px)' }} />
+        style={{ background: 'radial-gradient(circle, rgba(218,241,222,0.2) 0%, transparent 70%)', filter: 'blur(60px)' }} />
 
       {/* Brand */}
       <div className="flex flex-col items-center mb-10 text-center z-10">

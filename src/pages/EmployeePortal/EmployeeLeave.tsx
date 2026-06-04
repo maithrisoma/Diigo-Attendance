@@ -27,7 +27,7 @@ const LEAVE_TYPES = [
 ];
 
 const LEAVE_TYPE_META: Record<string, { color: string; bg: string; light: string }> = {
-  'Annual Leave':               { color: 'text-[#1E3A8A]',    bg: 'bg-[#1E3A8A]',    light: 'bg-[#1E3A8A]/10' },
+  'Annual Leave':               { color: 'text-[#235347]',    bg: 'bg-[#235347]',    light: 'bg-[#235347]/10' },
   'Sick Leave':                 { color: 'text-[#EF4444]',    bg: 'bg-[#EF4444]',    light: 'bg-[#FEE2E2]'    },
   'Casual Leave':               { color: 'text-[#14B8A6]',    bg: 'bg-[#14B8A6]',    light: 'bg-[#14B8A6]/10' },
   'Maternity / Paternity Leave':{ color: 'text-[#3B82F6]',    bg: 'bg-[#3B82F6]',    light: 'bg-[#DBEAFE]'    },
@@ -148,7 +148,7 @@ export const EmployeeLeave: React.FC = () => {
         </div>
         <button
           onClick={() => { resetForm(); setModalOpen(true); }}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#1E3A8A] text-white text-sm font-semibold hover:bg-[#172554] transition shadow-md"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-secondary text-white text-sm font-semibold hover:bg-secondary/90 transition shadow-md"
         >
           <Plus className="h-4 w-4" />
           Apply for Leave
@@ -161,7 +161,7 @@ export const EmployeeLeave: React.FC = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 grid-rows-[auto] gap-4">
 
         {/* ① Big hero stat — spans 2 cols × 2 rows - Styled in corporate brand Navy/Teal */}
-        <div className="col-span-2 row-span-2 relative rounded-2xl overflow-hidden bg-[#1E3A8A] text-white p-6 flex flex-col justify-between shadow-xl min-h-[200px] border border-blue-900/30">
+        <div className="col-span-2 row-span-2 relative rounded-2xl overflow-hidden bg-secondary text-white p-6 flex flex-col justify-between shadow-xl min-h-[200px] border border-secondary/30">
           <div className="absolute -top-6 -right-6 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
           <div className="absolute bottom-0 left-0 h-24 w-24 rounded-full bg-[#14B8A6]/20 blur-xl" />
 
@@ -213,7 +213,7 @@ export const EmployeeLeave: React.FC = () => {
         {/* ④ Leave type breakdown - Progress bar highlights in Teal/Navy */}
         <div className="col-span-2 rounded-2xl bg-white border border-[#E2E8F0] p-5 shadow-sm">
           <div className="flex items-center gap-2 mb-4">
-            <TrendingUp className="h-4 w-4 text-[#1E3A8A]" />
+            <TrendingUp className="h-4 w-4 text-secondary" />
             <h3 className="font-bold text-[#0F172A] text-sm">Leave Type Breakdown</h3>
           </div>
           {typeBreakdown.length === 0 ? (
@@ -243,7 +243,7 @@ export const EmployeeLeave: React.FC = () => {
         <div className="col-span-4 rounded-2xl bg-white border border-[#E2E8F0] shadow-sm overflow-hidden">
           <div className="px-5 py-4 border-b border-[#E2E8F0] flex items-center justify-between bg-slate-50">
             <div className="flex items-center gap-2">
-              <CalendarCheck className="h-4 w-4 text-[#1E3A8A]" />
+              <CalendarCheck className="h-4 w-4 text-secondary" />
               <h3 className="font-bold text-[#0F172A]">My Leave History</h3>
             </div>
             <span className="text-xs text-[#64748B]">{myLeaves.length} request{myLeaves.length !== 1 ? 's' : ''} total</span>
@@ -253,7 +253,7 @@ export const EmployeeLeave: React.FC = () => {
             <div className="flex flex-col items-center justify-center py-16 text-[#64748B]">
               <PlaneTakeoff className="h-10 w-10 mb-3 opacity-30" />
               <p className="font-semibold text-sm">No leave requests yet</p>
-              <p className="text-xs mt-1">Click <strong className="text-[#1E3A8A]">Apply for Leave</strong> to get started</p>
+              <p className="text-xs mt-1">Click <strong className="text-secondary">Apply for Leave</strong> to get started</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-[#E2E8F0]">
@@ -285,7 +285,7 @@ export const EmployeeLeave: React.FC = () => {
 
         {/* ⑥ Info banner — styled in corporate Teal/Navy tints */}
         <div className="col-span-4 flex items-start gap-3 rounded-2xl border border-[#CBD5E1] bg-[#F1F5F9] px-5 py-4">
-          <Info className="h-5 w-5 text-[#1E3A8A] flex-shrink-0 mt-0.5" />
+          <Info className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
           <div className="text-xs text-[#0F172A] leading-relaxed">
             <span className="font-bold">How it works: </span>
             Submit your leave request below. HR will review and approve or reject within 1–2 business days. Approved leaves automatically update your attendance calendar.
@@ -303,8 +303,8 @@ export const EmployeeLeave: React.FC = () => {
             {/* Header */}
             <div className="px-6 py-4 border-b border-[#E2E8F0] flex items-center justify-between bg-[#F1F5F9]">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-[#1E3A8A]/10 flex items-center justify-center">
-                  <Send className="h-5 w-5 text-[#1E3A8A]" />
+                <div className="h-10 w-10 rounded-xl bg-secondary/10 flex items-center justify-center">
+                  <Send className="h-5 w-5 text-secondary" />
                 </div>
                 <div>
                   <h3 className="font-bold text-[#0F172A]">Apply for Leave</h3>
@@ -332,7 +332,7 @@ export const EmployeeLeave: React.FC = () => {
                         key={t}
                         onClick={() => setLeaveType(t)}
                         className={`text-left px-3 py-2 rounded-xl border text-xs font-semibold transition-all
-                          ${active ? `${meta.light} ${meta.color} border-[#1E3A8A] shadow-sm` : 'border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'}`}
+                          ${active ? `${meta.light} ${meta.color} border-secondary shadow-sm` : 'border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'}`}
                       >
                         {t}
                       </button>
@@ -347,7 +347,7 @@ export const EmployeeLeave: React.FC = () => {
                   <label className="block text-xs font-bold text-[#64748B] mb-1.5 uppercase tracking-wide">Start Date</label>
                   <input type="date" value={startDate} min={today}
                     onChange={e => { setStartDate(e.target.value); if (e.target.value > endDate) setEndDate(e.target.value); }}
-                    className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]/30 focus:border-[#1E3A8A] transition
+                    className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-secondary/30 focus:border-secondary transition
                       ${errors.startDate ? 'border-rose-400 bg-rose-50' : 'border-slate-200 bg-slate-50'}`}
                   />
                   {errors.startDate && <p className="text-[11px] text-rose-500 mt-1">{errors.startDate}</p>}
@@ -356,7 +356,7 @@ export const EmployeeLeave: React.FC = () => {
                   <label className="block text-xs font-bold text-[#64748B] mb-1.5 uppercase tracking-wide">End Date</label>
                   <input type="date" value={endDate} min={startDate}
                     onChange={e => setEndDate(e.target.value)}
-                    className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]/30 focus:border-[#1E3A8A] transition
+                    className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-secondary/30 focus:border-secondary transition
                       ${errors.endDate ? 'border-rose-400 bg-rose-50' : 'border-slate-200 bg-slate-50'}`}
                   />
                   {errors.endDate && <p className="text-[11px] text-rose-500 mt-1">{errors.endDate}</p>}
@@ -383,7 +383,7 @@ export const EmployeeLeave: React.FC = () => {
                 </label>
                 <textarea value={reason} onChange={e => setReason(e.target.value)} rows={3}
                   placeholder="Brief description of your leave reason…"
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]/30 focus:border-[#1E3A8A] transition resize-none"
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm focus:outline-none focus:ring-2 focus:ring-secondary/30 focus:border-secondary transition resize-none"
                 />
               </div>
 
@@ -394,7 +394,7 @@ export const EmployeeLeave: React.FC = () => {
                   Cancel
                 </button>
                 <button type="submit" disabled={submitting}
-                  className="flex-1 py-2.5 rounded-xl bg-[#1E3A8A] text-white text-sm font-semibold hover:bg-[#172554] transition flex items-center justify-center gap-2 shadow-md disabled:opacity-60">
+                  className="flex-1 py-2.5 rounded-xl bg-secondary text-white text-sm font-semibold hover:bg-secondary/90 transition flex items-center justify-center gap-2 shadow-md disabled:opacity-60">
                   <Send className="h-4 w-4" />
                   {submitting ? 'Submitting…' : 'Submit Request'}
                 </button>

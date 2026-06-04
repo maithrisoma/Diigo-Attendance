@@ -74,7 +74,7 @@ export const AdminDashboard: React.FC = () => {
   // Donut Chart Data: Attendance Distribution
   const pieData = useMemo(() => {
     return [
-      { name: 'Present', value: stats.present, color: '#7BC67B' },
+      { name: 'Present', value: stats.present, color: '#8EB69B' },
       { name: 'Absent', value: stats.absent, color: '#E88B8B' },
       { name: 'Leave', value: stats.leave, color: '#F3C969' },
     ];
@@ -159,9 +159,9 @@ export const AdminDashboard: React.FC = () => {
   const getActivityIcon = (type: string) => {
     switch (type) {
       case 'check_in':
-        return <div className="h-7 w-7 rounded-full bg-[#7BC67B]/20 text-[#7BC67B] flex items-center justify-center"><UserCheck className="h-4 w-4" /></div>;
+        return <div className="h-7 w-7 rounded-full bg-[#8EB69B]/20 text-[#8EB69B] flex items-center justify-center"><UserCheck className="h-4 w-4" /></div>;
       case 'check_out':
-        return <div className="h-7 w-7 rounded-full bg-[#B79AB5]/20 text-[#B79AB5] flex items-center justify-center"><Clock className="h-4 w-4" /></div>;
+        return <div className="h-7 w-7 rounded-full bg-[#235347]/20 text-[#235347] flex items-center justify-center"><Clock className="h-4 w-4" /></div>;
       case 'leave_approve':
         return <div className="h-7 w-7 rounded-full bg-[#87B5FF]/20 text-[#87B5FF] flex items-center justify-center"><Briefcase className="h-4 w-4" /></div>;
       case 'leave_reject':
@@ -197,13 +197,13 @@ export const AdminDashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="border-[#7BC67B]/30 bg-[var(--calendar-present-bg)]/40 text-[#7BC67B]">
+        <Card className="border-[#8EB69B]/30 bg-[var(--calendar-present-bg)]/40 text-[#8EB69B]">
           <CardContent className="p-6 space-y-2">
             <div className="flex justify-between items-start">
               <span className="text-xs font-semibold text-foreground/80 uppercase tracking-wide">Present Today</span>
-              <UserCheck className="h-5 w-5 text-[#7BC67B]" />
+              <UserCheck className="h-5 w-5 text-[#8EB69B]" />
             </div>
-            <p className="text-3xl font-bold text-[#7BC67B] font-display">{stats.present}</p>
+            <p className="text-3xl font-bold text-[#8EB69B] font-display">{stats.present}</p>
             <p className="text-[10px] text-foreground/75 font-medium">Checked-in today</p>
           </CardContent>
         </Card>
@@ -287,7 +287,7 @@ export const AdminDashboard: React.FC = () => {
               </CardContent>
               {/* Pie legend */}
               <div className="px-6 pb-4 flex justify-center space-x-6 text-xs font-semibold text-muted-foreground border-t border-border pt-2 bg-muted/5">
-                <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[#7BC67B]" /> Present ({stats.present})</div>
+                <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[#8EB69B]" /> Present ({stats.present})</div>
                 <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[#E88B8B]" /> Absent ({stats.absent})</div>
                 <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[#F3C969]" /> On Leave ({stats.leave})</div>
               </div>
@@ -303,15 +303,15 @@ export const AdminDashboard: React.FC = () => {
                   <AreaChart data={weeklyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorPresent" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#7BC67B" stopOpacity={0.2}/>
-                        <stop offset="95%" stopColor="#7BC67B" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="#8EB69B" stopOpacity={0.2}/>
+                        <stop offset="95%" stopColor="#8EB69B" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
                     <XAxis dataKey="day" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} />
                     <YAxis stroke="var(--muted-foreground)" fontSize={11} tickLine={false} allowDecimals={false} />
                     <Tooltip contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }} />
-                    <Area type="monotone" dataKey="Present" stroke="#7BC67B" fillOpacity={1} fill="url(#colorPresent)" strokeWidth={2.5} />
+                    <Area type="monotone" dataKey="Present" stroke="#8EB69B" fillOpacity={1} fill="url(#colorPresent)" strokeWidth={2.5} />
                   </AreaChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -331,7 +331,7 @@ export const AdminDashboard: React.FC = () => {
                   <XAxis type="number" domain={[0, 100]} stroke="var(--muted-foreground)" fontSize={10} tickLine={false} />
                   <YAxis dataKey="name" type="category" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} width={80} />
                   <Tooltip contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }} />
-                  <Bar dataKey="Attendance Rate (%)" fill="#B79AB5" radius={[0, 4, 4, 0]} barSize={12} />
+                  <Bar dataKey="Attendance Rate (%)" fill="#8EB69B" radius={[0, 4, 4, 0]} barSize={12} />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>

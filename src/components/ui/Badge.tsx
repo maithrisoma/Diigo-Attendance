@@ -26,7 +26,7 @@ export const Badge: React.FC<BadgeProps> = ({ children, variant = 'default', cla
     switch (variant) {
       case 'success':
       case 'Present':
-        return 'bg-[var(--calendar-present-bg)] text-[#7BC67B] border-[#7BC67B]/40 hover:opacity-90';
+        return 'bg-[var(--calendar-present-bg)] text-[#8EB69B] border-[#8EB69B]/40 hover:opacity-90';
       case 'danger':
       case 'Absent':
         return 'bg-[var(--calendar-absent-bg)] text-[#E88B8B] border-[#E88B8B]/40 hover:opacity-90';

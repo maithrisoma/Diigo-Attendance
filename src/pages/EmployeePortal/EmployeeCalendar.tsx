@@ -125,7 +125,7 @@ export const EmployeeCalendar: React.FC = () => {
   const getDayStatusColor = (status: string) => {
     switch (status) {
       case 'Present':
-        return 'bg-[var(--calendar-present-bg)] text-[#7BC67B] border-[#7BC67B]/40 hover:opacity-90';
+        return 'bg-[var(--calendar-present-bg)] text-[#8EB69B] border-[#8EB69B]/40 hover:opacity-90';
       case 'Absent':
         return 'bg-[var(--calendar-absent-bg)] text-[#E88B8B] border-[#E88B8B]/40 hover:opacity-90';
       case 'Half Day':

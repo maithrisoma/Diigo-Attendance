@@ -309,7 +309,7 @@ export const EmployeeDashboard: React.FC = () => {
                   let icon = null;
                   
                   if (status === 'Present') {
-                    bgStyle = 'bg-[var(--calendar-present-bg)] border-[#7BC67B]/40 text-[#7BC67B]';
+                    bgStyle = 'bg-[var(--calendar-present-bg)] border-[#8EB69B]/40 text-[#8EB69B]';
                     icon = <Check className="h-3 w-3 stroke-[3]" />;
                   } else if (status === 'Absent') {
                     bgStyle = 'bg-[var(--calendar-absent-bg)] border-[#E88B8B]/40 text-[#E88B8B]';
@@ -346,7 +346,7 @@ export const EmployeeDashboard: React.FC = () => {
 
               {/* Status color legends - localized near calendar */}
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-5 pt-4 border-t border-border text-[10.5px] text-muted-foreground font-medium">
-                <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full bg-[#7BC67B]" /> Present</span>
+                <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full bg-[#8EB69B]" /> Present</span>
                 <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full bg-[#E88B8B]" /> Absent</span>
                 <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full bg-[#F3C969]" /> Leave</span>
                 <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full bg-[#F3C969]/70" /> Half Day</span>
@@ -632,7 +632,7 @@ export const EmployeeDashboard: React.FC = () => {
                 </div>
                 
                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                  teammate.status === 'Online' ? 'bg-[var(--calendar-present-bg)] text-[#7BC67B]' : teammate.status === 'On Leave' ? 'bg-[var(--calendar-leave-bg)] text-[#F3C969]' : 'bg-muted text-muted-foreground'
+                  teammate.status === 'Online' ? 'bg-[var(--calendar-present-bg)] text-[#8EB69B]' : teammate.status === 'On Leave' ? 'bg-[var(--calendar-leave-bg)] text-[#F3C969]' : 'bg-muted text-muted-foreground'
                 }`}>
                   {teammate.status}
                 </span>
