@@ -7,7 +7,7 @@
 @layer base {
   :root {
     /* ── LIGHT MODE COLOR SYSTEM (PREMIUM LILAC-LAVENDER) ── */
-    --background:   260 30% 97%;       /* #F4F2FB - Near-white with faint lilac */
+    --background:   260 60% 93%;       /* #EAE3FC - Soft Lilac Backdrop matching the screenshot */
     --foreground:   262 24% 28%;       /* #3E3B4F */
 
     --card:         0 0% 100%;        /* #FFFFFF */
@@ -16,26 +16,26 @@
     --popover:      0 0% 100%;
     --popover-foreground: 262 24% 28%;
 
-    --primary:      260 75% 82%;      /* #D2C6FC - Soft Lilac Primary Background */
-    --primary-foreground: 260 60% 22%; /* #311E52 - Deep Lilac Navy for contrast */
-    --primary-text: 260 50% 40%;       /* #4C3280 - Readable Lilac text */
-    --primary-text-hover: 260 60% 30%; /* #38216A - Darker Lilac text hover */
+    --primary:      260 80% 62%;      /* #8A5CF5 - Vibrant Lilac Primary Background matching the screenshot */
+    --primary-foreground: 0 0% 100%;  /* #FFFFFF - White text for contrast */
+    --primary-text: 260 75% 50%;       /* #7045E6 - Readable Lilac text */
+    --primary-text-hover: 260 85% 42%; /* #5527CD - Darker Lilac text hover */
 
-    --secondary:    260 75% 90%;      /* #EDE9FE - Soft Lilac Fill */
-    --secondary-foreground: 260 50% 40%; /* #4C3280 - Readable Lilac */
+    --secondary:    260 60% 88%;      /* #DCD0FC - Soft Lilac Fill */
+    --secondary-foreground: 260 75% 50%; /* #7045E6 - Readable Lilac */
 
-    --muted:        260 10% 65%;       /* #A29EB2 */
-    --muted-foreground: 260 10% 65%;
+    --muted:        260 12% 58%;       /* #9793A6 */
+    --muted-foreground: 260 12% 58%;
 
-    --accent:       260 50% 95%;      /* #F3E8FF - Soft Lilac Hover */
-    --accent-foreground: 260 50% 40%;
+    --accent:       260 60% 95%;      /* #F5F2FE - Soft Lilac Hover */
+    --accent-foreground: 260 75% 50%;
 
     --destructive:  0 84% 60%;        /* #F28B82 */
     --destructive-foreground: 0 0% 100%;
 
-    --border:       260 30% 90%;       /* #E6E0F8 - Soft Lilac Divider */
-    --input:        260 30% 90%;
-    --ring:         260 75% 82%;
+    --border:       260 40% 86%;       /* #ECE7F9 - Soft Lilac Divider */
+    --input:        260 40% 86%;
+    --ring:         260 80% 62%;
 
     --radius: 1.25rem;                 /* 20px */
 
@@ -52,8 +52,8 @@
     --table-header-bg: #F8F7FE;
     --table-row-hover-bg: #F5F3FF;
 
-    --primary-hover: #C4B4FC;
-    --secondary-hover: #E2DBFD;
+    --primary-hover: #7341EC;          /* #7341EC - Slightly darker primary hover */
+    --secondary-hover: #D0C0FC;
 
     /* Calendar Day Backgrounds (Light) */
     --calendar-present-bg: #EAF8EC;
