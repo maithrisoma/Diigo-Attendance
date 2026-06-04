@@ -88,7 +88,7 @@ export const LeaveManagement: React.FC = () => {
             onClick={() => setActiveTab(t.id as any)}
             className={`pb-3 transition-colors duration-150 relative ${
               activeTab === t.id
-                ? 'text-secondary'
+                ? 'text-primary'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
@@ -99,7 +99,7 @@ export const LeaveManagement: React.FC = () => {
               </span>
             )}
             {activeTab === t.id && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-secondary rounded-full" />
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
             )}
           </button>
         ))}
@@ -130,23 +130,23 @@ export const LeaveManagement: React.FC = () => {
               ) : (
                 filteredLeaves.map((leave) => (
                   <TableRow key={leave.id}>
-                    <TableCell className="font-semibold text-slate-900 flex items-center gap-2">
-                      <UserRound className="h-4 w-4 text-slate-400" />
+                    <TableCell className="font-semibold text-foreground flex items-center gap-2">
+                      <UserRound className="h-4 w-4 text-muted-foreground" />
                       {leave.employee_name}
                     </TableCell>
-                    <TableCell className="text-slate-600 text-xs font-medium">{leave.department}</TableCell>
-                    <TableCell className="text-slate-700 text-xs flex items-center gap-1.5">
-                      <Plane className="h-3.5 w-3.5 text-slate-400" />
+                    <TableCell className="text-muted-foreground text-xs font-medium">{leave.department}</TableCell>
+                    <TableCell className="text-foreground text-xs flex items-center gap-1.5">
+                      <Plane className="h-3.5 w-3.5 text-muted-foreground" />
                       {leave.leave_type}
                     </TableCell>
-                    <TableCell className="font-mono text-xs text-slate-600">
+                    <TableCell className="font-mono text-xs text-muted-foreground">
                       {new Date(leave.start_date).toLocaleDateString('en-US', {
                         month: 'short',
                         day: 'numeric',
                         year: 'numeric',
                       })}
                     </TableCell>
-                    <TableCell className="font-mono text-xs text-slate-600">
+                    <TableCell className="font-mono text-xs text-muted-foreground">
                       {new Date(leave.end_date).toLocaleDateString('en-US', {
                         month: 'short',
                         day: 'numeric',
@@ -160,7 +160,7 @@ export const LeaveManagement: React.FC = () => {
                           <Button
                             onClick={() => handleApprove(leave.id, leave.employee_name)}
                             size="sm"
-                            className="bg-[#14B8A6] hover:bg-[#0F766E] text-white font-bold h-8 px-2.5 border-transparent"
+                            className="bg-primary hover:opacity-90 text-primary-foreground font-bold h-8 px-2.5 border-transparent animate-pulse"
                           >
                             <Check className="h-4 w-4 mr-1" />
                             <span>Approve</span>
@@ -169,7 +169,7 @@ export const LeaveManagement: React.FC = () => {
                             onClick={() => handleReject(leave.id, leave.employee_name)}
                             size="sm"
                             variant="destructive"
-                            className="h-8 px-2.5 bg-[#EF4444] hover:bg-red-700"
+                            className="h-8 px-2.5 bg-destructive hover:bg-destructive/90 text-destructive-foreground"
                           >
                             <X className="h-4 w-4 mr-1" />
                             <span>Reject</span>

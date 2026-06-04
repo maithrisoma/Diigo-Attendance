@@ -223,21 +223,31 @@ export const EmployeeDashboard: React.FC = () => {
   return (
     <div className="space-y-6">
       
-      {/* ── Desktop Grid Layout ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      {/* ── Unified Bento Grid Layout ── */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
 
-        {/* ── Left Column: Active Tracking, Calendar, Stats ── */}
-        <div className="lg:col-span-8 space-y-6">
-
-          {/* 1. Take Attendance Today Header Banner - Primary purple bg */}
-          <div className="bg-primary text-primary-foreground rounded-2xl p-5 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4 border border-primary/20">
+        {/* Bento 1: Unified Shift & Identity Header (Spans 8) */}
+        <div className="md:col-span-8 bg-gradient-to-br from-secondary to-secondary/80 text-white rounded-2xl p-6 shadow-card hover:scale-[1.005] hover:shadow-lg transition-all duration-300 border border-secondary/30 flex flex-col justify-between min-h-[160px]">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="flex items-center space-x-3.5">
-              <div className="h-11 w-11 rounded-xl bg-white/10 flex items-center justify-center shadow-inner">
-                <Calendar className="h-5.5 w-5.5 text-primary-foreground/90" />
+              <div className="h-12 w-12 rounded-full bg-white/10 flex items-center justify-center font-display font-bold text-white text-lg border border-white/20 shadow-inner">
+                {currentUser.name.split(' ').map(n => n[0]).join('')}
               </div>
               <div className="text-left">
-                <p className="text-sm font-bold text-primary-foreground font-display">Take attendance today</p>
-                <p className="text-xs text-primary-foreground/80 mt-0.5 font-mono">
+                <h4 className="font-bold text-lg text-white font-display leading-tight">{currentUser.name}</h4>
+                <p className="text-xs text-white/80 font-mono mt-0.5">{currentUser.designation} • {currentUser.employee_id}</p>
+              </div>
+            </div>
+            <div className="text-xs font-semibold text-white bg-white/10 px-3 py-1 rounded-full font-display">
+              {currentMonthYear}
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-6 pt-4 border-t border-white/10">
+            <div className="flex items-center space-x-2.5">
+              <Clock className="h-5 w-5 text-white/80" />
+              <div className="text-left">
+                <p className="text-xs font-bold text-white/90 uppercase tracking-wider">Active Shift Time</p>
+                <p className="text-xs text-white/70 font-mono mt-0.5">
                   {hasCheckedIn 
                     ? `Clocked In at ${new Date(`2000-01-01T${todayRecord.check_in}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
                     : todayHoliday 
@@ -248,14 +258,12 @@ export const EmployeeDashboard: React.FC = () => {
                 </p>
               </div>
             </div>
-
-            {/* Check-In/Out Button - purple secondary colors */}
             <div>
               {!hasCheckedIn ? (
                 <button
                   onClick={handleCheckIn}
                   disabled={isWeekend || !!todayHoliday}
-                  className="px-5 py-2.5 bg-secondary text-secondary-foreground hover:opacity-90 disabled:bg-primary-foreground/20 disabled:text-primary-foreground/40 font-bold text-sm rounded-xl transition duration-150 shadow-md font-display"
+                  className="px-5 py-2.5 bg-primary text-primary-foreground hover:opacity-90 disabled:bg-white/10 disabled:text-white/40 font-bold text-sm rounded-xl transition duration-150 shadow-md font-display"
                 >
                   Clock In
                 </button>
@@ -266,7 +274,7 @@ export const EmployeeDashboard: React.FC = () => {
                   </span>
                   <button
                     onClick={handleCheckOut}
-                    className="px-5 py-2.5 bg-[#EF4444] hover:bg-red-700 text-white font-bold text-sm rounded-xl transition duration-150 shadow-md font-display"
+                    className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm rounded-xl transition duration-150 shadow-md font-display"
                   >
                     Clock Out
                   </button>
@@ -281,233 +289,235 @@ export const EmployeeDashboard: React.FC = () => {
               )}
             </div>
           </div>
-
-          {/* 2. Date & Weekly Status Card */}
-          <div className="bg-card rounded-2xl p-6 shadow-sm border border-border">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-border pb-4 mb-5">
-              <div className="flex items-baseline space-x-1.5">
-                <span className="text-4xl font-extrabold font-display text-foreground">{currentDayNum}</span>
-                <span className="text-lg font-bold font-display text-primary">{getNumberSuffix(currentDayNum)}</span>
-                <span className="text-lg font-medium text-muted-foreground ml-1.5">{currentDayName}</span>
-              </div>
-              <div className="text-xs font-semibold text-primary tracking-wide mt-1 sm:mt-0 bg-primary/10 px-2.5 py-1 rounded-full font-display">
-                {currentMonthYear}
-              </div>
-            </div>
-
-            {/* This week status section */}
-            <div>
-              <h3 className="text-xs font-bold text-foreground uppercase tracking-wider mb-4">This week status</h3>
-              
-              <div className="grid grid-cols-5 gap-4">
-                {weekDays.map((day, idx) => {
-                  const status = getDayStatus(day);
-                  const isToday = day.toISOString().split('T')[0] === todayStr;
-
-                  // Define status styling using exact attendance status colors from spec
-                  let bgStyle = 'bg-muted/10 border-border';
-                  let icon = null;
-                  
-                  if (status === 'Present') {
-                    bgStyle = 'bg-[var(--calendar-present-bg)] border-[#8EB69B]/40 text-[#8EB69B]';
-                    icon = <Check className="h-3 w-3 stroke-[3]" />;
-                  } else if (status === 'Absent') {
-                    bgStyle = 'bg-[var(--calendar-absent-bg)] border-[#E88B8B]/40 text-[#E88B8B]';
-                    icon = <span className="text-[9px] font-extrabold">✕</span>;
-                  } else if (status === 'Leave') {
-                    bgStyle = 'bg-[var(--calendar-leave-bg)] border-[#F3C969]/40 text-[#F3C969]';
-                    icon = <span className="text-[9px] font-bold">L</span>;
-                  } else if (status === 'Holiday') {
-                    bgStyle = 'bg-[var(--calendar-holiday-bg)] border-[#87B5FF]/40 text-[#87B5FF]';
-                    icon = <span className="text-[9px] font-bold">H</span>;
-                  } else if (status === 'Half Day') {
-                    bgStyle = 'bg-[var(--calendar-leave-bg)]/80 border-[#F3C969]/30 text-[#F3C969]';
-                    icon = <span className="text-[9px] font-bold">HD</span>;
-                  } else if (status === 'Pending') {
-                    bgStyle = 'bg-muted/20 border-border animate-pulse';
-                  }
-
-                  return (
-                    <div key={idx} className="flex flex-col items-center space-y-2">
-                      <span className="text-xs font-bold text-muted-foreground">
-                        {day.toLocaleDateString('en-US', { weekday: 'narrow' })}
-                      </span>
-                      <div 
-                        className={`w-9 h-9 rounded-full flex items-center justify-center border font-display transition shadow-sm ${bgStyle} ${
-                          isToday ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''
-                        }`}
-                      >
-                        {icon ? icon : <span className="text-[10px] text-muted-foreground font-bold">{day.getDate()}</span>}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Status color legends - localized near calendar */}
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-5 pt-4 border-t border-border text-[10.5px] text-muted-foreground font-medium">
-                <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full bg-[#8EB69B]" /> Present</span>
-                <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full bg-[#E88B8B]" /> Absent</span>
-                <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full bg-[#F3C969]" /> Leave</span>
-                <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full bg-[#F3C969]/70" /> Half Day</span>
-                <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full bg-[#87B5FF]" /> Holiday</span>
-                <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full bg-[#CFCFCF]" /> Weekend</span>
-              </div>
-            </div>
-          </div>
-
-          {/* 3. Circular Stats Rings Row - Purple secondary progress indicators */}
-          <div className="bg-card rounded-2xl p-6 shadow-sm border border-border">
-            <h3 className="text-xs font-bold text-foreground uppercase tracking-wider mb-5">Monthly Overview</h3>
-            
-            <div className="grid grid-cols-3 gap-3">
-              {/* Ring 1: Attendance Rate */}
-              <div className="flex flex-col items-center justify-center p-3 bg-muted/5 rounded-xl border border-border/60">
-                <div className="relative flex items-center justify-center w-20 h-20">
-                  <svg className="w-full h-full transform -rotate-90">
-                    <circle cx="50%" cy="50%" r="28" className="stroke-border fill-transparent" strokeWidth="4.5" />
-                    <circle cx="50%" cy="50%" r="28" className="stroke-secondary fill-transparent transition-all duration-500" strokeWidth="4.5" 
-                      strokeDasharray={2 * Math.PI * 28} 
-                      strokeDashoffset={2 * Math.PI * 28 - (baseAttendanceRate / 100) * (2 * Math.PI * 28)} 
-                      strokeLinecap="round" />
-                  </svg>
-                  <span className="absolute text-[13px] font-black font-display text-foreground">{baseAttendanceRate}%</span>
-                </div>
-                <span className="text-[10px] font-bold text-muted-foreground mt-2 text-center">Attendance</span>
-              </div>
-
-              {/* Ring 2: Leaves Taken */}
-              <div className="flex flex-col items-center justify-center p-3 bg-muted/5 rounded-xl border border-border/60">
-                <div className="relative flex items-center justify-center w-20 h-20">
-                  <svg className="w-full h-full transform -rotate-90">
-                    <circle cx="50%" cy="50%" r="28" className="stroke-border fill-transparent" strokeWidth="4.5" />
-                    <circle cx="50%" cy="50%" r="28" className="stroke-secondary fill-transparent transition-all duration-500" strokeWidth="4.5" 
-                      strokeDasharray={2 * Math.PI * 28} 
-                      strokeDashoffset={2 * Math.PI * 28 - (Math.min(100, (approvedLeavesCount / 12) * 100) / 100) * (2 * Math.PI * 28)} 
-                      strokeLinecap="round" />
-                  </svg>
-                  <span className="absolute text-[15px] font-black font-display text-foreground">{approvedLeavesCount.toString().padStart(2, '0')}</span>
-                </div>
-                <span className="text-[10px] font-bold text-muted-foreground mt-2 text-center">Leave Taken</span>
-              </div>
-
-              {/* Ring 3: Completed Days */}
-              <div className="flex flex-col items-center justify-center p-3 bg-muted/5 rounded-xl border border-border/60">
-                <div className="relative flex items-center justify-center w-20 h-20">
-                  <svg className="w-full h-full transform -rotate-90">
-                    <circle cx="50%" cy="50%" r="28" className="stroke-border fill-transparent" strokeWidth="4.5" />
-                    <circle cx="50%" cy="50%" r="28" className="stroke-secondary fill-transparent transition-all duration-500" strokeWidth="4.5" 
-                      strokeDasharray={2 * Math.PI * 28} 
-                      strokeDashoffset={2 * Math.PI * 28 - (Math.min(100, (presentThisMonth / 22) * 100) / 100) * (2 * Math.PI * 28)} 
-                      strokeLinecap="round" />
-                  </svg>
-                  <span className="absolute text-[15px] font-black font-display text-foreground">{presentThisMonth.toString().padStart(2, '0')}</span>
-                </div>
-                <span className="text-[10px] font-bold text-muted-foreground mt-2 text-center">Working Days</span>
-              </div>
-            </div>
-          </div>
-
         </div>
 
-        {/* ── Right Column: Bento Quick Actions & Context Panels ── */}
-        <div className="lg:col-span-4 space-y-6">
-
-          {/* User Identity Card - Primary purple background */}
-          <div className="bg-primary text-primary-foreground rounded-2xl p-5 shadow-sm border border-primary/20 flex items-center space-x-3">
-            <div className="h-10 w-10 bg-primary-foreground/15 rounded-full flex items-center justify-center font-display font-bold text-primary-foreground">
-              {currentUser.name.split(' ').map(n => n[0]).join('')}
+        {/* Bento 2: Digital Clock Widget (Spans 4) */}
+        <div className="md:col-span-4 bg-card border border-border rounded-2xl p-6 shadow-card hover:scale-[1.005] hover:shadow-lg transition-all duration-300 flex flex-col justify-between min-h-[160px]">
+          <div className="flex justify-between items-center">
+            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Live Time Clock</span>
+            <span className="h-2 w-2 rounded-full bg-primary animate-ping" />
+          </div>
+          <div className="text-left my-auto py-1">
+            <div className="text-4xl font-black font-mono tracking-tight text-foreground leading-none">
+              {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
             </div>
-            <div>
-              <h4 className="font-bold text-sm text-primary-foreground">{currentUser.name}</h4>
-              <p className="text-[10.5px] text-primary-foreground/80 font-mono">{currentUser.designation} • {currentUser.employee_id}</p>
+            <p className="text-xs text-muted-foreground mt-2 font-medium">
+              {currentDayName}, {currentTime.toLocaleDateString([], { month: 'short', day: 'numeric' })}
+            </p>
+          </div>
+          <div className="text-[10px] text-muted-foreground/80 font-semibold border-t border-border/60 pt-2 flex items-center gap-1">
+            <Info className="h-3.5 w-3.5 text-primary" />
+            <span>Updates automatically in real time</span>
+          </div>
+        </div>
+
+        {/* Bento 3: Weekly Streak (Spans 8) */}
+        <div className="md:col-span-8 bg-card border border-border rounded-2xl p-6 shadow-card hover:scale-[1.005] hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+          <div>
+            <h3 className="text-xs font-bold text-foreground uppercase tracking-wider mb-4 text-left">Weekly Status Streak</h3>
+            <div className="grid grid-cols-5 gap-4">
+              {weekDays.map((day, idx) => {
+                const status = getDayStatus(day);
+                const isToday = day.toISOString().split('T')[0] === todayStr;
+
+                let bgStyle = 'bg-muted/10 border-border';
+                let icon = null;
+                
+                if (status === 'Present') {
+                  bgStyle = 'bg-[var(--calendar-present-bg)] border-[#10B981]/40 text-[#10B981]';
+                  icon = <Check className="h-3.5 w-3.5 stroke-[3]" />;
+                } else if (status === 'Absent') {
+                  bgStyle = 'bg-[var(--calendar-absent-bg)] border-[#E88B8B]/40 text-[#E88B8B]';
+                  icon = <span className="text-[10px] font-black">✕</span>;
+                } else if (status === 'Leave') {
+                  bgStyle = 'bg-[var(--calendar-leave-bg)] border-[#F3C969]/40 text-[#F3C969]';
+                  icon = <span className="text-[10px] font-bold">L</span>;
+                } else if (status === 'Holiday') {
+                  bgStyle = 'bg-[var(--calendar-holiday-bg)] border-[#87B5FF]/40 text-[#87B5FF]';
+                  icon = <span className="text-[10px] font-bold">H</span>;
+                } else if (status === 'Half Day') {
+                  bgStyle = 'bg-[var(--calendar-leave-bg)]/80 border-[#F3C969]/30 text-[#F3C969]';
+                  icon = <span className="text-[10px] font-bold">HD</span>;
+                } else if (status === 'Pending') {
+                  bgStyle = 'bg-muted/20 border-border animate-pulse';
+                }
+
+                return (
+                  <div key={idx} className="flex flex-col items-center space-y-2">
+                    <span className="text-xs font-bold text-muted-foreground">
+                      {day.toLocaleDateString('en-US', { weekday: 'short' })}
+                    </span>
+                    <div 
+                      className={`w-10 h-10 rounded-full flex items-center justify-center border font-display transition shadow-sm ${bgStyle} ${
+                        isToday ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''
+                      }`}
+                    >
+                      {icon ? icon : <span className="text-xs text-muted-foreground font-bold">{day.getDate()}</span>}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
-          {/* Bento Quick Actions Grid */}
-          <div className="bg-card rounded-2xl p-5 shadow-sm border border-border">
-            <h3 className="text-xs font-bold text-foreground uppercase tracking-wider mb-4">Quick Actions</h3>
-            
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-5 pt-4 border-t border-border text-[10px] text-muted-foreground font-semibold justify-between">
+            <div className="flex items-center gap-3">
+              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-[#10B981]" /> Present</span>
+              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-[#E88B8B]" /> Absent</span>
+              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-[#F3C969]" /> Leave</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-[#F3C969]/70" /> Half Day</span>
+              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-[#87B5FF]" /> Holiday</span>
+              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-[#CFCFCF]" /> Weekend</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Bento 4: Quick Actions Grid (Spans 4) */}
+        <div className="md:col-span-4 bg-card border border-border rounded-2xl p-6 shadow-card hover:scale-[1.005] hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+          <div>
+            <h3 className="text-xs font-bold text-foreground uppercase tracking-wider mb-4 text-left">Quick Actions</h3>
             <div className="grid grid-cols-2 gap-3">
-              {/* Action 1: Ask Leave */}
               <button 
                 onClick={() => navigate('/employee/leaves')}
-                className="flex flex-col items-center justify-center p-4 bg-muted/5 hover:bg-primary/10 rounded-xl border border-border transition text-center group"
+                className="flex flex-col items-center justify-center p-3 bg-muted/5 hover:bg-primary/10 rounded-xl border border-border/80 transition text-center group active:scale-95"
               >
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-2 group-hover:scale-110 transition duration-150">
-                  <CalendarDays className="h-5 w-5" />
+                <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-2 group-hover:scale-110 transition duration-150">
+                  <CalendarDays className="h-4.5 w-4.5" />
                 </div>
                 <span className="text-xs font-bold text-foreground">Ask Leave</span>
               </button>
 
-              {/* Action 2: Leaderboard */}
               <button 
                 onClick={() => setIsLeaderboardOpen(true)}
-                className="flex flex-col items-center justify-center p-4 bg-muted/5 hover:bg-primary/10 rounded-xl border border-border transition text-center group"
+                className="flex flex-col items-center justify-center p-3 bg-muted/5 hover:bg-primary/10 rounded-xl border border-border/80 transition text-center group active:scale-95"
               >
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-2 group-hover:scale-110 transition duration-150">
-                  <Award className="h-5 w-5" />
+                <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-2 group-hover:scale-110 transition duration-150">
+                  <Award className="h-4.5 w-4.5" />
                 </div>
                 <span className="text-xs font-bold text-foreground">Leaderboard</span>
               </button>
 
-              {/* Action 3: News */}
               <button 
                 onClick={() => setIsNewsOpen(true)}
-                className="flex flex-col items-center justify-center p-4 bg-muted/5 hover:bg-primary/10 rounded-xl border border-border transition text-center group"
+                className="flex flex-col items-center justify-center p-3 bg-muted/5 hover:bg-primary/10 rounded-xl border border-border/80 transition text-center group active:scale-95"
               >
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-2 group-hover:scale-110 transition duration-150">
-                  <Newspaper className="h-5 w-5" />
+                <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-2 group-hover:scale-110 transition duration-150">
+                  <Newspaper className="h-4.5 w-4.5" />
                 </div>
                 <span className="text-xs font-bold text-foreground">News</span>
               </button>
 
-              {/* Action 4: Predictor */}
               <button 
                 onClick={() => setIsPredictorOpen(true)}
-                className="flex flex-col items-center justify-center p-4 bg-muted/5 hover:bg-primary/10 rounded-xl border border-border transition text-center group"
+                className="flex flex-col items-center justify-center p-3 bg-muted/5 hover:bg-primary/10 rounded-xl border border-border/80 transition text-center group active:scale-95"
               >
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-2 group-hover:scale-110 transition duration-150">
-                  <Sparkles className="h-5 w-5" />
+                <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-2 group-hover:scale-110 transition duration-150">
+                  <Sparkles className="h-4.5 w-4.5" />
                 </div>
                 <span className="text-xs font-bold text-foreground">Predictor</span>
               </button>
-
-              {/* Action 5: Friends/Teammates */}
-              <button 
-                onClick={() => setIsTeammatesOpen(true)}
-                className="flex flex-col items-center justify-center p-4 bg-muted/5 hover:bg-primary/10 rounded-xl border border-border transition text-center group"
-              >
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-2 group-hover:scale-110 transition duration-150">
-                  <Users2 className="h-5 w-5" />
-                </div>
-                <span className="text-xs font-bold text-foreground">Teammates</span>
-              </button>
-
-              {/* Action 6: Shifts */}
-              <button 
-                onClick={() => setIsShiftsOpen(true)}
-                className="flex flex-col items-center justify-center p-4 bg-muted/5 hover:bg-primary/10 rounded-xl border border-border transition text-center group"
-              >
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-2 group-hover:scale-110 transition duration-150">
-                  <CalendarCheck className="h-5 w-5" />
-                </div>
-                <span className="text-xs font-bold text-foreground">Shifts</span>
-              </button>
             </div>
           </div>
+          <div className="flex gap-2 mt-4">
+            <button 
+              onClick={() => setIsTeammatesOpen(true)}
+              className="flex-1 py-2 bg-muted/5 hover:bg-primary/10 text-xs font-bold text-foreground border border-border/80 rounded-lg transition active:scale-95"
+            >
+              Teammates
+            </button>
+            <button 
+              onClick={() => setIsShiftsOpen(true)}
+              className="flex-1 py-2 bg-muted/5 hover:bg-primary/10 text-xs font-bold text-foreground border border-border/80 rounded-lg transition active:scale-95"
+            >
+              Active Shift
+            </button>
+          </div>
+        </div>
 
-          {/* Quick Info Announcement banner - styled in theme variables */}
-          <div className="bg-muted/5 text-foreground rounded-2xl p-4 shadow-inner border border-border flex items-start gap-3">
-            <Info className="h-4.5 w-4.5 text-primary mt-0.5 flex-shrink-0" />
+        {/* Bento 5: Monthly Circular Overview (Spans 8) */}
+        <div className="md:col-span-8 bg-card border border-border rounded-2xl p-6 shadow-card hover:scale-[1.005] hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+          <h3 className="text-xs font-bold text-foreground uppercase tracking-wider mb-5 text-left">Monthly Overview Metrics</h3>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="flex flex-col items-center justify-center p-4 bg-muted/5 rounded-xl border border-border/60">
+              <div className="relative flex items-center justify-center w-20 h-20">
+                <svg className="w-full h-full transform -rotate-90">
+                  <circle cx="50%" cy="50%" r="28" className="stroke-border fill-transparent" strokeWidth="4.5" />
+                  <circle cx="50%" cy="50%" r="28" className="stroke-primary fill-transparent transition-all duration-500" strokeWidth="4.5" 
+                    strokeDasharray={2 * Math.PI * 28} 
+                    strokeDashoffset={2 * Math.PI * 28 - (baseAttendanceRate / 100) * (2 * Math.PI * 28)} 
+                    strokeLinecap="round" />
+                </svg>
+                <span className="absolute text-sm font-extrabold font-display text-foreground">{baseAttendanceRate}%</span>
+              </div>
+              <span className="text-[10px] font-bold text-muted-foreground mt-2 text-center">Attendance Rate</span>
+            </div>
+
+            <div className="flex flex-col items-center justify-center p-4 bg-muted/5 rounded-xl border border-border/60">
+              <div className="relative flex items-center justify-center w-20 h-20">
+                <svg className="w-full h-full transform -rotate-90">
+                  <circle cx="50%" cy="50%" r="28" className="stroke-border fill-transparent" strokeWidth="4.5" />
+                  <circle cx="50%" cy="50%" r="28" className="stroke-primary fill-transparent transition-all duration-500" strokeWidth="4.5" 
+                    strokeDasharray={2 * Math.PI * 28} 
+                    strokeDashoffset={2 * Math.PI * 28 - (Math.min(100, (approvedLeavesCount / 12) * 100) / 100) * (2 * Math.PI * 28)} 
+                    strokeLinecap="round" />
+                </svg>
+                <span className="absolute text-sm font-extrabold font-display text-foreground">{approvedLeavesCount.toString().padStart(2, '0')}</span>
+              </div>
+              <span className="text-[10px] font-bold text-muted-foreground mt-2 text-center">Leaves Taken</span>
+            </div>
+
+            <div className="flex flex-col items-center justify-center p-4 bg-muted/5 rounded-xl border border-border/60">
+              <div className="relative flex items-center justify-center w-20 h-20">
+                <svg className="w-full h-full transform -rotate-90">
+                  <circle cx="50%" cy="50%" r="28" className="stroke-border fill-transparent" strokeWidth="4.5" />
+                  <circle cx="50%" cy="50%" r="28" className="stroke-primary fill-transparent transition-all duration-500" strokeWidth="4.5" 
+                    strokeDasharray={2 * Math.PI * 28} 
+                    strokeDashoffset={2 * Math.PI * 28 - (Math.min(100, (presentThisMonth / 22) * 100) / 100) * (2 * Math.PI * 28)} 
+                    strokeLinecap="round" />
+                </svg>
+                <span className="absolute text-sm font-extrabold font-display text-foreground">{presentThisMonth.toString().padStart(2, '0')}</span>
+              </div>
+              <span className="text-[10px] font-bold text-muted-foreground mt-2 text-center">Working Days</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Bento 6: Colleagues & System Info Tip (Spans 4) */}
+        <div className="md:col-span-4 bg-card border border-border rounded-2xl p-6 shadow-card hover:scale-[1.005] hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+          <div>
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-xs font-bold text-foreground uppercase tracking-wider text-left">Colleagues ({teammatesList.filter(t => t.status === 'Online').length} Online)</h3>
+              <button onClick={() => setIsTeammatesOpen(true)} className="text-[10px] text-primary font-bold hover:underline">View All</button>
+            </div>
+            <div className="space-y-2 max-h-[110px] overflow-y-auto pr-1">
+              {teammatesList.slice(0, 3).map(teammate => (
+                <div key={teammate.id} className="flex items-center justify-between py-1 border-b border-border/30 last:border-0 text-left">
+                  <div className="flex items-center space-x-2">
+                    <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center font-bold text-[10px] text-primary">
+                      {teammate.name.split(' ').map(n => n[0]).join('')}
+                    </div>
+                    <span className="text-xs font-medium text-foreground truncate max-w-[120px]">{teammate.name}</span>
+                  </div>
+                  <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
+                    teammate.status === 'Online' ? 'bg-[var(--calendar-present-bg)] text-[#10B981]' : teammate.status === 'On Leave' ? 'bg-[var(--calendar-leave-bg)] text-[#F3C969]' : 'bg-muted text-muted-foreground'
+                  }`}>
+                    {teammate.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="bg-muted/5 text-foreground rounded-xl p-3 border border-border/80 flex items-start gap-2.5 mt-4">
+            <Info className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
             <div className="text-left">
-              <span className="text-xs font-bold text-foreground block">Quick tip</span>
-              <span className="text-[11px] text-muted-foreground leading-relaxed block mt-1">
-                Forgot to check-out yesterday? Reach out directly to your HR Representative to update or override past registry records.
+              <span className="text-[10px] font-bold text-foreground block">Quick tip</span>
+              <span className="text-[9.5px] text-muted-foreground leading-normal block mt-0.5">
+                Forgot check-out? Reach out directly to your HR Representative to adjust past registry logs.
               </span>
             </div>
           </div>
-
         </div>
 
       </div>
@@ -632,7 +642,7 @@ export const EmployeeDashboard: React.FC = () => {
                 </div>
                 
                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                  teammate.status === 'Online' ? 'bg-[var(--calendar-present-bg)] text-[#8EB69B]' : teammate.status === 'On Leave' ? 'bg-[var(--calendar-leave-bg)] text-[#F3C969]' : 'bg-muted text-muted-foreground'
+                  teammate.status === 'Online' ? 'bg-[var(--calendar-present-bg)] text-[#10B981]' : teammate.status === 'On Leave' ? 'bg-[var(--calendar-leave-bg)] text-[#F3C969]' : 'bg-muted text-muted-foreground'
                 }`}>
                   {teammate.status}
                 </span>

@@ -6,50 +6,50 @@
 
 @layer base {
   :root {
-    /* ── LIGHT MODE COLOR SYSTEM (SAGE GREEN / MINT) ── */
-    --background:   130 43% 96%;       /* #F1FAF3 very soft light mint background */
-    --foreground:   171 59% 11%;      /* #0B2B26 deep forest green text */
+    /* ── LIGHT MODE COLOR SYSTEM (MINT / EMERALD GREEN) ── */
+    --background:   140 60% 98%;       /* #F4FDF7 fresh minty white background */
+    --foreground:   160 80% 10%;      /* #022c22 deepest forest green text */
 
-    --card:         130 43% 99%;      /* #F9FDFB card background */
-    --card-foreground: 171 59% 11%;
+    --card:         0 0% 100%;        /* clean white cards */
+    --card-foreground: 160 80% 10%;
 
-    --popover:      130 43% 99%;
-    --popover-foreground: 171 59% 11%;
+    --popover:      140 60% 99%;
+    --popover-foreground: 160 80% 10%;
 
-    --primary:      140 24% 64%;      /* #8EB69B sage green primary brand */
-    --primary-foreground: 171 59% 11%; /* dark green text on primary for readability */
+    --primary:      162 76% 41%;      /* #10B981 vibrant mint/emerald green primary */
+    --primary-foreground: 0 0% 100%;  /* white text for maximum readability */
 
-    --secondary:    165 41% 23%;      /* #235347 medium forest green */
-    --secondary-foreground: 130 43% 90%; /* #DAF1DE pale sage/mint white */
+    --secondary:    160 84% 19%;      /* #047857 deep emerald green */
+    --secondary-foreground: 140 60% 98%; /* #F4FDF7 pale mint text */
 
-    --muted:        169 20% 45%;       /* muted gray-green text */
-    --muted-foreground: 169 20% 45%;
+    --muted:        160 25% 45%;       /* muted forest-green text */
+    --muted-foreground: 160 25% 45%;
 
-    --accent:       130 43% 90%;      /* #DAF1DE pale sage/mint white */
-    --accent-foreground: 171 59% 11%;
+    --accent:       140 60% 90%;      /* #D1FAE5 soft mint */
+    --accent-foreground: 160 80% 10%;
 
-    --destructive:  0 69% 73%;        /* #E88B8B Absent status */
+    --destructive:  0 84% 60%;        /* vibrant red */
     --destructive-foreground: 0 0% 100%;
 
-    --border:       130 20% 86%;       /* soft pale green-gray border */
-    --input:        130 20% 86%;
-    --ring:         140 24% 64%;
+    --border:       140 40% 91%;       /* very soft mint-green border */
+    --input:        140 40% 91%;
+    --ring:         162 76% 41%;
 
     --radius: 1rem;                   /* Large rounded corners */
 
     /* Custom Theme Colors */
-    --sidebar-bg: #0B2B26;            /* deep forest teal */
-    --sidebar-active-bg: #235347;     /* medium forest green */
-    --sidebar-text: #DAF1DE;
-    --sidebar-hover: rgba(142, 182, 155, 0.15);
+    --sidebar-bg: #064E3B;            /* deep forest emerald */
+    --sidebar-active-bg: #10B981;     /* vibrant emerald active */
+    --sidebar-text: #D1FAE5;          /* pale mint */
+    --sidebar-hover: rgba(16, 185, 129, 0.15);
     
-    --navbar-bg: #F9FDFB;
+    --navbar-bg: #FFFFFF;
     
-    --table-header-bg: #E6F2EA;
-    --table-row-hover-bg: #F0F8F3;
+    --table-header-bg: #ECFDF5;
+    --table-row-hover-bg: #F0FDF4;
 
     /* Calendar Day Backgrounds (Light) */
-    --calendar-present-bg: #E6F5EB;
+    --calendar-present-bg: #D1FAE5;
     --calendar-absent-bg: #FDE2E2;
     --calendar-leave-bg: #FFF1C7;
     --calendar-holiday-bg: #DDEBFF;
@@ -57,48 +57,48 @@
   }
 
   [data-theme='dark'] {
-    /* ── DARK MODE COLOR SYSTEM (SAGE GREEN / MINT) ── */
-    --background:   182 73% 7%;       /* #051F20 deepest forest green background */
-    --foreground:   130 43% 90%;      /* #DAF1DE pale sage text */
+    /* ── DARK MODE COLOR SYSTEM (MINT / EMERALD GREEN) ── */
+    --background:   160 80% 5%;       /* #02140f deepest forest green background */
+    --foreground:   140 60% 90%;      /* #D1FAE5 pale mint text */
 
-    --card:         171 59% 11%;      /* #0B2B26 deep teal-green card background */
-    --card-foreground: 130 43% 90%;
+    --card:         160 80% 8%;       /* #031f18 deep emerald card background */
+    --card-foreground: 140 60% 90%;
 
-    --popover:      171 59% 11%;
-    --popover-foreground: 130 43% 90%;
+    --popover:      160 80% 8%;
+    --popover-foreground: 140 60% 90%;
 
-    --primary:      140 24% 64%;      /* #8EB69B sage green highlight */
-    --primary-foreground: 171 59% 11%;
+    --primary:      162 76% 41%;      /* #10B981 emerald highlight */
+    --primary-foreground: 160 80% 5%;
 
-    --secondary:    165 41% 23%;      /* #235347 medium forest green */
-    --secondary-foreground: 130 43% 90%;
+    --secondary:    160 84% 19%;      /* #047857 deep emerald */
+    --secondary-foreground: 140 60% 90%;
 
-    --muted:        169 20% 65%;      /* slate forest-green */
-    --muted-foreground: 169 20% 60%;
+    --muted:        160 20% 60%;      /* slate forest-green */
+    --muted-foreground: 160 20% 55%;
 
-    --accent:       169 44% 15%;      /* #163832 dark forest teal */
-    --accent-foreground: 130 43% 90%;
+    --accent:       160 80% 12%;      /* dark forest teal */
+    --accent-foreground: 140 60% 90%;
 
-    --destructive:  0 69% 73%;        /* #E88B8B Absent status */
+    --destructive:  0 84% 60%;        /* vibrant red */
     --destructive-foreground: 0 0% 100%;
 
-    --border:       169 44% 18%;      /* #1e453e border */
-    --input:        169 44% 18%;
-    --ring:         140 24% 64%;
+    --border:       160 40% 15%;
+    --input:        160 40% 15%;
+    --ring:         162 76% 41%;
 
     /* Custom Theme Colors */
-    --sidebar-bg: #051F20;            /* deepest forest green */
-    --sidebar-active-bg: #0B2B26;     /* deep teal active */
-    --sidebar-text: #DAF1DE;
-    --sidebar-hover: #163832;
+    --sidebar-bg: #02140f;            /* deepest green */
+    --sidebar-active-bg: #031f18;     /* deep emerald active */
+    --sidebar-text: #D1FAE5;
+    --sidebar-hover: #064E3B;
     
-    --navbar-bg: #0B2B26;
+    --navbar-bg: #031f18;
     
-    --table-header-bg: #163832;
-    --table-row-hover-bg: #235347;
+    --table-header-bg: #042f24;
+    --table-row-hover-bg: #064e3b;
 
     /* Calendar Day Backgrounds (Dark) */
-    --calendar-present-bg: #122C1E;
+    --calendar-present-bg: #064E3B;
     --calendar-absent-bg: #4A2424;
     --calendar-leave-bg: #54461D;
     --calendar-holiday-bg: #20324D;
@@ -118,10 +118,10 @@ h1, h2, h3, h4, h5, h6 {
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track  { @apply bg-transparent; }
 ::-webkit-scrollbar-thumb  {
-  @apply bg-[#8EB69B]/40 rounded-full;
+  @apply bg-[#10B981]/40 rounded-full;
   transition: background 0.2s;
 }
-::-webkit-scrollbar-thumb:hover { @apply bg-[#8EB69B]/70; }
+::-webkit-scrollbar-thumb:hover { @apply bg-[#10B981]/70; }
 
 /* ── Sidebar theme overrides ───────────────────────────────────────────── */
 aside {
@@ -138,7 +138,7 @@ header.sticky {
 }
 
 /* ── Calendar cell theme overrides ────────────────────────────────────── */
-.cell-present { background-color: var(--calendar-present-bg); border-color: #8EB69B; color: #8EB69B; }
+.cell-present { background-color: var(--calendar-present-bg); border-color: #10B981; color: #10B981; }
 .cell-absent { background-color: var(--calendar-absent-bg); border-color: #E88B8B; color: #E88B8B; }
 .cell-leave { background-color: var(--calendar-leave-bg); border-color: #F3C969; color: #F3C969; }
 .cell-holiday { background-color: var(--calendar-holiday-bg); border-color: #87B5FF; color: #87B5FF; }
@@ -146,14 +146,14 @@ header.sticky {
 
 /* ── Soft Shadows ──────────────────────────────────────────────────────── */
 .shadow-premium-light {
-  box-shadow: 0 10px 30px -10px rgba(142, 182, 155, 0.15);
+  box-shadow: 0 10px 30px -10px rgba(16, 185, 129, 0.12);
 }
 .shadow-premium-dark {
   box-shadow: 0 10px 35px -12px rgba(0, 0, 0, 0.5);
 }
 
 .shadow-card {
-  box-shadow: 0 4px 20px -2px rgba(142, 182, 155, 0.08);
+  box-shadow: 0 4px 20px -2px rgba(16, 185, 129, 0.05);
 }
 [data-theme='dark'] .shadow-card {
   box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.4);
@@ -165,13 +165,13 @@ header.sticky {
 }
 
 /* ── Legend color circles ─────────────────────────────────────────────── */
-.bg-present { background-color: #8EB69B; }
+.bg-present { background-color: #10B981; }
 .bg-absent { background-color: #E88B8B; }
 .bg-leave { background-color: #F3C969; }
 .bg-holiday { background-color: #87B5FF; }
 .bg-weekend { background-color: #CFCFCF; }
 
-.text-present { color: #8EB69B; }
+.text-present { color: #10B981; }
 .text-absent { color: #E88B8B; }
 .text-leave { color: #F3C969; }
 .text-holiday { color: #87B5FF; }

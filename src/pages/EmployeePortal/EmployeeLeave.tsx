@@ -27,12 +27,12 @@ const LEAVE_TYPES = [
 ];
 
 const LEAVE_TYPE_META: Record<string, { color: string; bg: string; light: string }> = {
-  'Annual Leave':               { color: 'text-[#235347]',    bg: 'bg-[#235347]',    light: 'bg-[#235347]/10' },
-  'Sick Leave':                 { color: 'text-[#EF4444]',    bg: 'bg-[#EF4444]',    light: 'bg-[#FEE2E2]'    },
+  'Annual Leave':               { color: 'text-[#047857]',    bg: 'bg-[#047857]',    light: 'bg-[#047857]/10' },
+  'Sick Leave':                 { color: 'text-[#EF4444]',    bg: 'bg-[#EF4444]',    light: 'bg-[#FEE2E2] dark:bg-[#EF4444]/20'    },
   'Casual Leave':               { color: 'text-[#14B8A6]',    bg: 'bg-[#14B8A6]',    light: 'bg-[#14B8A6]/10' },
-  'Maternity / Paternity Leave':{ color: 'text-[#3B82F6]',    bg: 'bg-[#3B82F6]',    light: 'bg-[#DBEAFE]'    },
-  'Unpaid Leave':               { color: 'text-[#64748B]',    bg: 'bg-[#64748B]',    light: 'bg-[#F1F5F9]'    },
-  'Compensatory Leave':         { color: 'text-[#F59E0B]',    bg: 'bg-[#F59E0B]',    light: 'bg-[#FEF3C7]'    },
+  'Maternity / Paternity Leave':{ color: 'text-[#3B82F6]',    bg: 'bg-[#3B82F6]',    light: 'bg-[#DBEAFE] dark:bg-[#3B82F6]/20'    },
+  'Unpaid Leave':               { color: 'text-[#64748B]',    bg: 'bg-[#64748B]',    light: 'bg-[#F1F5F9] dark:bg-[#64748B]/20'    },
+  'Compensatory Leave':         { color: 'text-[#F59E0B]',    bg: 'bg-[#F59E0B]',    light: 'bg-[#FEF3C7] dark:bg-[#F59E0B]/20'    },
 };
 
 const STATUS_CFG = {
@@ -143,12 +143,12 @@ export const EmployeeLeave: React.FC = () => {
       {/* ── Page header ────────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[#0F172A] font-display">Leave Requests</h1>
-          <p className="text-xs text-[#64748B] mt-0.5">Apply for leave and track your request status.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground font-display">Leave Requests</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">Apply for leave and track your request status.</p>
         </div>
         <button
           onClick={() => { resetForm(); setModalOpen(true); }}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-secondary text-white text-sm font-semibold hover:bg-secondary/90 transition shadow-md"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition shadow-md"
         >
           <Plus className="h-4 w-4" />
           Apply for Leave
@@ -193,31 +193,31 @@ export const EmployeeLeave: React.FC = () => {
         </div>
 
         {/* ② Approved count card - Status specific styling */}
-        <div className="rounded-2xl bg-[#DCFCE7] border border-[#22C55E]/40 p-5 flex flex-col justify-between shadow-sm">
+        <div className="rounded-2xl bg-[#DCFCE7] dark:bg-[#166534]/30 border border-[#22C55E]/40 p-5 flex flex-col justify-between shadow-sm">
           <CheckCircle2 className="h-7 w-7 text-[#22C55E] mb-3" />
           <div>
-            <p className="text-3xl font-bold text-[#166534]">{stats.approved}</p>
-            <p className="text-xs text-[#166534] font-semibold mt-0.5">Approved</p>
+            <p className="text-3xl font-bold text-[#166534] dark:text-[#22C55E]">{stats.approved}</p>
+            <p className="text-xs text-[#166534] dark:text-[#22C55E]/85 font-semibold mt-0.5">Approved</p>
           </div>
         </div>
 
         {/* ③ Pending count card - Status specific styling */}
-        <div className="rounded-2xl bg-[#FEF3C7] border border-[#F59E0B]/40 p-5 flex flex-col justify-between shadow-sm">
+        <div className="rounded-2xl bg-[#FEF3C7] dark:bg-[#92400E]/30 border border-[#F59E0B]/40 p-5 flex flex-col justify-between shadow-sm">
           <Hourglass className="h-7 w-7 text-[#F59E0B] mb-3" />
           <div>
-            <p className="text-3xl font-bold text-[#92400E]">{stats.pending}</p>
-            <p className="text-xs text-[#92400E] font-semibold mt-0.5">Pending Review</p>
+            <p className="text-3xl font-bold text-[#92400E] dark:text-[#F59E0B]">{stats.pending}</p>
+            <p className="text-xs text-[#92400E] dark:text-[#F59E0B]/85 font-semibold mt-0.5">Pending Review</p>
           </div>
         </div>
 
         {/* ④ Leave type breakdown - Progress bar highlights in Teal/Navy */}
-        <div className="col-span-2 rounded-2xl bg-white border border-[#E2E8F0] p-5 shadow-sm">
+        <div className="col-span-2 rounded-2xl bg-card border border-border p-5 shadow-sm">
           <div className="flex items-center gap-2 mb-4">
-            <TrendingUp className="h-4 w-4 text-secondary" />
-            <h3 className="font-bold text-[#0F172A] text-sm">Leave Type Breakdown</h3>
+            <TrendingUp className="h-4 w-4 text-primary" />
+            <h3 className="font-bold text-foreground text-sm">Leave Type Breakdown</h3>
           </div>
           {typeBreakdown.length === 0 ? (
-            <p className="text-xs text-[#64748B] text-center py-4">No data yet</p>
+            <p className="text-xs text-muted-foreground text-center py-4">No data yet</p>
           ) : (
             <div className="space-y-2.5">
               {typeBreakdown.map(([type, count]) => {
@@ -227,9 +227,9 @@ export const EmployeeLeave: React.FC = () => {
                   <div key={type}>
                     <div className="flex justify-between text-xs mb-1">
                       <span className={`font-semibold ${meta.color}`}>{type}</span>
-                      <span className="text-[#64748B]">{count} req · {pct}%</span>
+                      <span className="text-muted-foreground">{count} req · {pct}%</span>
                     </div>
-                    <div className="h-1.5 w-full rounded-full bg-slate-100 overflow-hidden">
+                    <div className="h-1.5 w-full rounded-full bg-muted/20 overflow-hidden">
                       <div className={`h-full rounded-full ${meta.bg} transition-all duration-700`} style={{ width: `${pct}%` }} />
                     </div>
                   </div>
@@ -240,36 +240,36 @@ export const EmployeeLeave: React.FC = () => {
         </div>
 
         {/* ⑤ Recent requests — spans full 4 cols */}
-        <div className="col-span-4 rounded-2xl bg-white border border-[#E2E8F0] shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-[#E2E8F0] flex items-center justify-between bg-slate-50">
+        <div className="col-span-4 rounded-2xl bg-card border border-border shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-border flex items-center justify-between bg-muted/5">
             <div className="flex items-center gap-2">
-              <CalendarCheck className="h-4 w-4 text-secondary" />
-              <h3 className="font-bold text-[#0F172A]">My Leave History</h3>
+              <CalendarCheck className="h-4 w-4 text-primary" />
+              <h3 className="font-bold text-foreground">My Leave History</h3>
             </div>
-            <span className="text-xs text-[#64748B]">{myLeaves.length} request{myLeaves.length !== 1 ? 's' : ''} total</span>
+            <span className="text-xs text-muted-foreground">{myLeaves.length} request{myLeaves.length !== 1 ? 's' : ''} total</span>
           </div>
 
           {myLeaves.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-[#64748B]">
+            <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
               <PlaneTakeoff className="h-10 w-10 mb-3 opacity-30" />
               <p className="font-semibold text-sm">No leave requests yet</p>
-              <p className="text-xs mt-1">Click <strong className="text-secondary">Apply for Leave</strong> to get started</p>
+              <p className="text-xs mt-1">Click <strong className="text-primary">Apply for Leave</strong> to get started</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-[#E2E8F0]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-border">
               {recentLeaves.map(lv => {
                 const meta = LEAVE_TYPE_META[lv.leave_type] ?? LEAVE_TYPE_META['Annual Leave'];
                 const days = daysBetween(lv.start_date, lv.end_date);
                 return (
-                  <div key={lv.id} className="bg-white p-5 hover:bg-[#F8FAFC] transition-colors">
+                  <div key={lv.id} className="bg-card p-5 hover:bg-muted/10 transition-colors">
                     <div className="flex items-start justify-between gap-2 mb-3">
                       <div className={`h-9 w-9 rounded-xl ${meta.light} flex items-center justify-center flex-shrink-0`}>
                         <CalendarDays className={`h-4 w-4 ${meta.color}`} />
                       </div>
                       <StatusBadge status={lv.status} />
                     </div>
-                    <p className="font-bold text-[#0F172A] text-sm">{lv.leave_type}</p>
-                    <p className="text-xs text-[#64748B] mt-1">
+                    <p className="font-bold text-foreground text-sm">{lv.leave_type}</p>
+                    <p className="text-xs text-muted-foreground mt-1">
                       {fmtDate(lv.start_date)}
                       {lv.start_date !== lv.end_date && <> — {fmtDate(lv.end_date)}</>}
                     </p>
@@ -284,9 +284,9 @@ export const EmployeeLeave: React.FC = () => {
         </div>
 
         {/* ⑥ Info banner — styled in corporate Teal/Navy tints */}
-        <div className="col-span-4 flex items-start gap-3 rounded-2xl border border-[#CBD5E1] bg-[#F1F5F9] px-5 py-4">
-          <Info className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-          <div className="text-xs text-[#0F172A] leading-relaxed">
+        <div className="col-span-4 flex items-start gap-3 rounded-2xl border border-border bg-muted/10 px-5 py-4">
+          <Info className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+          <div className="text-xs text-foreground leading-relaxed">
             <span className="font-bold">How it works: </span>
             Submit your leave request below. HR will review and approve or reject within 1–2 business days. Approved leaves automatically update your attendance calendar.
           </div>
@@ -297,22 +297,22 @@ export const EmployeeLeave: React.FC = () => {
       {/* ── Apply Leave Modal ── */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-[#0F172A]/60 backdrop-blur-sm" onClick={() => setModalOpen(false)} />
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setModalOpen(false)} />
 
-          <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden z-50 border border-[#E2E8F0]">
+          <div className="relative w-full max-w-lg bg-card rounded-2xl shadow-2xl overflow-hidden z-50 border border-border">
             {/* Header */}
-            <div className="px-6 py-4 border-b border-[#E2E8F0] flex items-center justify-between bg-[#F1F5F9]">
+            <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-muted/20">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-secondary/10 flex items-center justify-center">
-                  <Send className="h-5 w-5 text-secondary" />
+                <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Send className="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-[#0F172A]">Apply for Leave</h3>
-                  <p className="text-xs text-[#64748B]">Fill in the details and submit</p>
+                  <h3 className="font-bold text-foreground">Apply for Leave</h3>
+                  <p className="text-xs text-muted-foreground">Fill in the details and submit</p>
                 </div>
               </div>
-              <button onClick={() => setModalOpen(false)} className="h-8 w-8 rounded-full hover:bg-slate-200 flex items-center justify-center transition">
-                <X className="h-4 w-4 text-slate-500" />
+              <button onClick={() => setModalOpen(false)} className="h-8 w-8 rounded-full hover:bg-muted flex items-center justify-center transition">
+                <X className="h-4 w-4 text-muted-foreground" />
               </button>
             </div>
 
@@ -321,7 +321,7 @@ export const EmployeeLeave: React.FC = () => {
 
               {/* Leave type selector */}
               <div>
-                <label className="block text-xs font-bold text-[#64748B] mb-1.5 uppercase tracking-wide">Leave Type</label>
+                <label className="block text-xs font-bold text-muted-foreground mb-1.5 uppercase tracking-wide">Leave Type</label>
                 <div className="grid grid-cols-2 gap-2">
                   {LEAVE_TYPES.map(t => {
                     const meta = LEAVE_TYPE_META[t];
@@ -332,7 +332,7 @@ export const EmployeeLeave: React.FC = () => {
                         key={t}
                         onClick={() => setLeaveType(t)}
                         className={`text-left px-3 py-2 rounded-xl border text-xs font-semibold transition-all
-                          ${active ? `${meta.light} ${meta.color} border-secondary shadow-sm` : 'border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'}`}
+                          ${active ? `${meta.light} ${meta.color} border-primary shadow-sm` : 'border-border text-muted-foreground hover:border-border/80 hover:bg-muted/10'}`}
                       >
                         {t}
                       </button>
@@ -344,20 +344,20 @@ export const EmployeeLeave: React.FC = () => {
               {/* Date pickers */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-[#64748B] mb-1.5 uppercase tracking-wide">Start Date</label>
+                  <label className="block text-xs font-bold text-muted-foreground mb-1.5 uppercase tracking-wide">Start Date</label>
                   <input type="date" value={startDate} min={today}
                     onChange={e => { setStartDate(e.target.value); if (e.target.value > endDate) setEndDate(e.target.value); }}
-                    className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-secondary/30 focus:border-secondary transition
-                      ${errors.startDate ? 'border-rose-400 bg-rose-50' : 'border-slate-200 bg-slate-50'}`}
+                    className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition
+                      ${errors.startDate ? 'border-rose-400 bg-rose-50 dark:bg-rose-950/20' : 'border-border bg-muted/10'}`}
                   />
                   {errors.startDate && <p className="text-[11px] text-rose-500 mt-1">{errors.startDate}</p>}
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-[#64748B] mb-1.5 uppercase tracking-wide">End Date</label>
+                  <label className="block text-xs font-bold text-muted-foreground mb-1.5 uppercase tracking-wide">End Date</label>
                   <input type="date" value={endDate} min={startDate}
                     onChange={e => setEndDate(e.target.value)}
-                    className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-secondary/30 focus:border-secondary transition
-                      ${errors.endDate ? 'border-rose-400 bg-rose-50' : 'border-slate-200 bg-slate-50'}`}
+                    className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition
+                      ${errors.endDate ? 'border-rose-400 bg-rose-50 dark:bg-rose-950/20' : 'border-border bg-muted/10'}`}
                   />
                   {errors.endDate && <p className="text-[11px] text-rose-500 mt-1">{errors.endDate}</p>}
                 </div>
@@ -365,36 +365,36 @@ export const EmployeeLeave: React.FC = () => {
 
               {/* Duration preview */}
               {previewDays > 0 && (
-                <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border ${(LEAVE_TYPE_META[leaveType] ?? LEAVE_TYPE_META['Annual Leave']).light} border-[#CBD5E1]`}>
+                <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border ${(LEAVE_TYPE_META[leaveType] ?? LEAVE_TYPE_META['Annual Leave']).light} border-border`}>
                   <CalendarDays className={`h-5 w-5 ${(LEAVE_TYPE_META[leaveType] ?? LEAVE_TYPE_META['Annual Leave']).color}`} />
                   <div>
                     <p className={`text-sm font-bold ${(LEAVE_TYPE_META[leaveType] ?? LEAVE_TYPE_META['Annual Leave']).color}`}>
                       {previewDays} day{previewDays !== 1 ? 's' : ''} of {leaveType}
                     </p>
-                    <p className="text-xs text-[#64748B]">{fmtDate(startDate)}{startDate !== endDate && ` → ${fmtDate(endDate)}`}</p>
+                    <p className="text-xs text-muted-foreground">{fmtDate(startDate)}{startDate !== endDate && ` → ${fmtDate(endDate)}`}</p>
                   </div>
                 </div>
               )}
 
               {/* Reason */}
               <div>
-                <label className="block text-xs font-bold text-[#64748B] mb-1.5 uppercase tracking-wide">
-                  Reason <span className="font-normal normal-case text-slate-400">(optional)</span>
+                <label className="block text-xs font-bold text-muted-foreground mb-1.5 uppercase tracking-wide">
+                  Reason <span className="font-normal normal-case text-muted-foreground/60">(optional)</span>
                 </label>
                 <textarea value={reason} onChange={e => setReason(e.target.value)} rows={3}
                   placeholder="Brief description of your leave reason…"
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm focus:outline-none focus:ring-2 focus:ring-secondary/30 focus:border-secondary transition resize-none"
+                  className="w-full px-3 py-2.5 rounded-xl border border-border bg-muted/10 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition resize-none"
                 />
               </div>
 
               {/* Footer buttons */}
               <div className="flex gap-3 pt-1">
                 <button type="button" onClick={() => setModalOpen(false)}
-                  className="flex-1 py-2.5 rounded-xl border border-[#CBD5E1] text-sm font-semibold text-[#0F172A] hover:bg-[#F1F5F9] transition">
+                  className="flex-1 py-2.5 rounded-xl border border-border text-sm font-semibold text-foreground hover:bg-muted/10 transition">
                   Cancel
                 </button>
                 <button type="submit" disabled={submitting}
-                  className="flex-1 py-2.5 rounded-xl bg-secondary text-white text-sm font-semibold hover:bg-secondary/90 transition flex items-center justify-center gap-2 shadow-md disabled:opacity-60">
+                  className="flex-1 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition flex items-center justify-center gap-2 shadow-md disabled:opacity-60">
                   <Send className="h-4 w-4" />
                   {submitting ? 'Submitting…' : 'Submit Request'}
                 </button>

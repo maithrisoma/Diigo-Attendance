@@ -74,7 +74,7 @@ export const AdminDashboard: React.FC = () => {
   // Donut Chart Data: Attendance Distribution
   const pieData = useMemo(() => {
     return [
-      { name: 'Present', value: stats.present, color: '#8EB69B' },
+      { name: 'Present', value: stats.present, color: '#10B981' },
       { name: 'Absent', value: stats.absent, color: '#E88B8B' },
       { name: 'Leave', value: stats.leave, color: '#F3C969' },
     ];
@@ -159,9 +159,9 @@ export const AdminDashboard: React.FC = () => {
   const getActivityIcon = (type: string) => {
     switch (type) {
       case 'check_in':
-        return <div className="h-7 w-7 rounded-full bg-[#8EB69B]/20 text-[#8EB69B] flex items-center justify-center"><UserCheck className="h-4 w-4" /></div>;
+        return <div className="h-7 w-7 rounded-full bg-[#10B981]/20 text-[#10B981] flex items-center justify-center"><UserCheck className="h-4 w-4" /></div>;
       case 'check_out':
-        return <div className="h-7 w-7 rounded-full bg-[#235347]/20 text-[#235347] flex items-center justify-center"><Clock className="h-4 w-4" /></div>;
+        return <div className="h-7 w-7 rounded-full bg-[#064E3B]/20 text-[#064E3B] flex items-center justify-center"><Clock className="h-4 w-4" /></div>;
       case 'leave_approve':
         return <div className="h-7 w-7 rounded-full bg-[#87B5FF]/20 text-[#87B5FF] flex items-center justify-center"><Briefcase className="h-4 w-4" /></div>;
       case 'leave_reject':
@@ -186,7 +186,7 @@ export const AdminDashboard: React.FC = () => {
 
       {/* KPI Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-6">
-        <Card className="relative overflow-hidden">
+        <Card className="relative overflow-hidden hover:scale-[1.01] hover:shadow-md transition-all duration-300">
           <CardContent className="p-6 space-y-2">
             <div className="flex justify-between items-start">
               <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Total Staff</span>
@@ -197,18 +197,18 @@ export const AdminDashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="border-[#8EB69B]/30 bg-[var(--calendar-present-bg)]/40 text-[#8EB69B]">
+        <Card className="border-[#10B981]/30 bg-[var(--calendar-present-bg)]/40 text-[#10B981] hover:scale-[1.01] hover:shadow-md transition-all duration-300">
           <CardContent className="p-6 space-y-2">
             <div className="flex justify-between items-start">
               <span className="text-xs font-semibold text-foreground/80 uppercase tracking-wide">Present Today</span>
-              <UserCheck className="h-5 w-5 text-[#8EB69B]" />
+              <UserCheck className="h-5 w-5 text-[#10B981]" />
             </div>
-            <p className="text-3xl font-bold text-[#8EB69B] font-display">{stats.present}</p>
+            <p className="text-3xl font-bold text-[#10B981] font-display">{stats.present}</p>
             <p className="text-[10px] text-foreground/75 font-medium">Checked-in today</p>
           </CardContent>
         </Card>
 
-        <Card className="border-[#E88B8B]/30 bg-[var(--calendar-absent-bg)]/40 text-[#E88B8B]">
+        <Card className="border-[#E88B8B]/30 bg-[var(--calendar-absent-bg)]/40 text-[#E88B8B] hover:scale-[1.01] hover:shadow-md transition-all duration-300">
           <CardContent className="p-6 space-y-2">
             <div className="flex justify-between items-start">
               <span className="text-xs font-semibold text-foreground/80 uppercase tracking-wide">Absent Today</span>
@@ -219,7 +219,7 @@ export const AdminDashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="border-[#F3C969]/30 bg-[var(--calendar-leave-bg)]/40 text-[#F3C969]">
+        <Card className="border-[#F3C969]/30 bg-[var(--calendar-leave-bg)]/40 text-[#F3C969] hover:scale-[1.01] hover:shadow-md transition-all duration-300">
           <CardContent className="p-6 space-y-2">
             <div className="flex justify-between items-start">
               <span className="text-xs font-semibold text-foreground/80 uppercase tracking-wide">On Leave</span>
@@ -230,7 +230,7 @@ export const AdminDashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="border-primary/30 bg-primary/10 col-span-2 lg:col-span-1 text-primary">
+        <Card className="border-primary/30 bg-primary/10 col-span-2 lg:col-span-1 text-primary hover:scale-[1.01] hover:shadow-md transition-all duration-300">
           <CardContent className="p-6 space-y-2">
             <div className="flex justify-between items-start">
               <span className="text-xs font-semibold text-primary uppercase tracking-wide">Daily Rate</span>
@@ -242,105 +242,81 @@ export const AdminDashboard: React.FC = () => {
         </Card>
       </div>
 
-      {/* Grid: Charts & Activity Panel */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      {/* ── Unified Bento Grid Layout ── */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
         
-        {/* Visualizations Block */}
-        <div className="xl:col-span-2 space-y-6">
-          
-          {/* Charts Row 1: Distribution & Weekly Trend */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
-            {/* Donut Chart */}
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Attendance Share</CardTitle>
-              </CardHeader>
-              <CardContent className="h-64 flex items-center justify-center relative">
-                {stats.total === 0 ? (
-                  <span className="text-xs text-muted-foreground">No data today</span>
-                ) : (
-                  <>
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={pieData}
-                          innerRadius={60}
-                          outerRadius={80}
-                          paddingAngle={3}
-                          dataKey="value"
-                        >
-                          {pieData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </Pie>
-                        <Tooltip contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }} />
-                      </PieChart>
-                    </ResponsiveContainer>
-                    {/* Inner Center text */}
-                    <div className="absolute flex flex-col items-center justify-center">
-                      <p className="text-2xl font-bold text-foreground">{stats.attendanceRate}%</p>
-                      <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wide">Present</p>
-                    </div>
-                  </>
-                )}
-              </CardContent>
-              {/* Pie legend */}
-              <div className="px-6 pb-4 flex justify-center space-x-6 text-xs font-semibold text-muted-foreground border-t border-border pt-2 bg-muted/5">
-                <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[#8EB69B]" /> Present ({stats.present})</div>
-                <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[#E88B8B]" /> Absent ({stats.absent})</div>
-                <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[#F3C969]" /> On Leave ({stats.leave})</div>
-              </div>
-            </Card>
-
-            {/* Weekly Trend Area Chart */}
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Weekly Trend</CardTitle>
-              </CardHeader>
-              <CardContent className="h-64 pt-2">
+        {/* Bento 1: Donut Chart (Spans 4) */}
+        <Card className="md:col-span-4 hover:scale-[1.005] hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Attendance Share</CardTitle>
+          </CardHeader>
+          <CardContent className="h-64 flex items-center justify-center relative">
+            {stats.total === 0 ? (
+              <span className="text-xs text-muted-foreground">No data today</span>
+            ) : (
+              <>
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={weeklyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="colorPresent" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#8EB69B" stopOpacity={0.2}/>
-                        <stop offset="95%" stopColor="#8EB69B" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
-                    <XAxis dataKey="day" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} />
-                    <YAxis stroke="var(--muted-foreground)" fontSize={11} tickLine={false} allowDecimals={false} />
+                  <PieChart>
+                    <Pie
+                      data={pieData}
+                      innerRadius={60}
+                      outerRadius={80}
+                      paddingAngle={3}
+                      dataKey="value"
+                    >
+                      {pieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
                     <Tooltip contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }} />
-                    <Area type="monotone" dataKey="Present" stroke="#8EB69B" fillOpacity={1} fill="url(#colorPresent)" strokeWidth={2.5} />
-                  </AreaChart>
+                  </PieChart>
                 </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
+                {/* Inner Center text */}
+                <div className="absolute flex flex-col items-center justify-center">
+                  <p className="text-2xl font-bold text-foreground">{stats.attendanceRate}%</p>
+                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wide">Present</p>
+                </div>
+              </>
+            )}
+          </CardContent>
+          {/* Pie legend */}
+          <div className="px-6 pb-4 flex justify-center space-x-6 text-xs font-semibold text-muted-foreground border-t border-border pt-2 bg-muted/5">
+            <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[#10B981]" /> Present ({stats.present})</div>
+            <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[#E88B8B]" /> Absent ({stats.absent})</div>
+            <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[#F3C969]" /> On Leave ({stats.leave})</div>
           </div>
+        </Card>
 
-          {/* Department Attendance Rate Bar Chart */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Department-wise Presence</CardTitle>
-            </CardHeader>
-            <CardContent className="h-60 pt-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={deptData} layout="vertical" margin={{ top: 0, right: 10, left: 10, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
-                  <XAxis type="number" domain={[0, 100]} stroke="var(--muted-foreground)" fontSize={10} tickLine={false} />
-                  <YAxis dataKey="name" type="category" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} width={80} />
-                  <Tooltip contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }} />
-                  <Bar dataKey="Attendance Rate (%)" fill="#8EB69B" radius={[0, 4, 4, 0]} barSize={12} />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+        {/* Bento 2: Weekly Trend Area Chart (Spans 4) */}
+        <Card className="md:col-span-4 hover:scale-[1.005] hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Weekly Trend</CardTitle>
+          </CardHeader>
+          <CardContent className="h-64 pt-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={weeklyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorPresent" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.2}/>
+                    <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+                <XAxis dataKey="day" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} />
+                <YAxis stroke="var(--muted-foreground)" fontSize={11} tickLine={false} allowDecimals={false} />
+                <Tooltip contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }} />
+                <Area type="monotone" dataKey="Present" stroke="#10B981" fillOpacity={1} fill="url(#colorPresent)" strokeWidth={2.5} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </CardContent>
+          <div className="px-6 pb-4 border-t border-border pt-2 bg-muted/5 flex items-center justify-between text-xs text-muted-foreground font-semibold">
+            <span>Overall presence trend</span>
+            <span className="text-[#10B981] flex items-center gap-1"><TrendingUp className="h-3.5 w-3.5" /> Stable</span>
+          </div>
+        </Card>
 
-        </div>
-
-        {/* Dynamic Activity Log Sidebar Panel */}
-        <Card className="flex flex-col h-full xl:max-h-[580px] overflow-hidden">
+        {/* Bento 3: Dynamic Activity Log Sidebar Panel (Spans 4, vertically row-span-2) */}
+        <Card className="md:col-span-4 md:row-span-2 flex flex-col h-full overflow-hidden hover:scale-[1.005] hover:shadow-lg transition-all duration-300">
           <CardHeader className="border-b border-border bg-muted/5 py-4 flex flex-row items-center justify-between">
             <CardTitle className="text-sm font-bold uppercase tracking-wider text-foreground">Recent Activity Log</CardTitle>
             <Badge variant="outline" className="text-[10px] font-bold">Live Stream</Badge>
@@ -372,6 +348,28 @@ export const AdminDashboard: React.FC = () => {
               ))
             )}
           </CardContent>
+        </Card>
+
+        {/* Bento 4: Department Attendance Rate Bar Chart (Spans 8) */}
+        <Card className="md:col-span-8 hover:scale-[1.005] hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Department-wise Presence</CardTitle>
+          </CardHeader>
+          <CardContent className="h-60 pt-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={deptData} layout="vertical" margin={{ top: 0, right: 10, left: 10, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
+                <XAxis type="number" domain={[0, 100]} stroke="var(--muted-foreground)" fontSize={10} tickLine={false} />
+                <YAxis dataKey="name" type="category" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} width={80} />
+                <Tooltip contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }} />
+                <Bar dataKey="Attendance Rate (%)" fill="#10B981" radius={[0, 4, 4, 0]} barSize={12} />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+          <div className="px-6 pb-4 border-t border-border pt-2 bg-muted/5 flex items-center justify-between text-xs text-muted-foreground font-semibold">
+            <span>Presence rate by department</span>
+            <span>Target: 90%+</span>
+          </div>
         </Card>
 
       </div>
