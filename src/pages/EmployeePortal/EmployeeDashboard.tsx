@@ -64,24 +64,6 @@ export const EmployeeDashboard: React.FC = () => {
 
   const todayStr = new Date().toISOString().split('T')[0];
 
-  const myAttendance = useMemo(() => {
-    if (!currentUser) return [];
-    return attendance.filter(a => a.employee_id === currentUser.employee_id);
-  }, [attendance, currentUser]);
-
-  // Build calendar lookup maps
-  const myAttendanceByDate = useMemo(() => {
-    const map: Record<string, { status: string }> = {};
-    myAttendance.forEach(a => { map[a.date] = { status: a.status }; });
-    return map;
-  }, [myAttendance]);
-
-  const holidayByDate = useMemo(() => {
-    const map: Record<string, string> = {};
-    holidays.forEach(h => { map[h.holiday_date] = h.holiday_name; });
-    return map;
-  }, [holidays]);
-
   // Find today's attendance record
   const todayRecord = attendance.find(
     (a) => a.employee_id === currentUser?.employee_id && a.date === todayStr
