@@ -16,42 +16,44 @@
     --popover:      0 0% 100%;
     --popover-foreground: 262 24% 28%;
 
-    --primary:      260 70% 60%;      /* #8B63F5 - Premium Lilac-Purple */
-    --primary-foreground: 0 0% 100%;  /* #FFFFFF */
+    --primary:      260 75% 82%;      /* #D2C6FC - Soft Lilac Primary Background */
+    --primary-foreground: 260 60% 22%; /* #311E52 - Deep Lilac Navy for contrast */
+    --primary-text: 260 50% 40%;       /* #4C3280 - Readable Lilac text */
+    --primary-text-hover: 260 60% 30%; /* #38216A - Darker Lilac text hover */
 
-    --secondary:    260 60% 90%;      /* #EBE5FC - Soft Lilac Fill */
-    --secondary-foreground: 260 70% 60%; /* #8B63F5 */
+    --secondary:    260 75% 90%;      /* #EDE9FE - Soft Lilac Fill */
+    --secondary-foreground: 260 50% 40%; /* #4C3280 - Readable Lilac */
 
     --muted:        260 10% 65%;       /* #A29EB2 */
     --muted-foreground: 260 10% 65%;
 
-    --accent:       260 50% 97%;      /* #FAF7FF - Soft Lilac Hover */
-    --accent-foreground: 260 70% 60%;
+    --accent:       260 50% 95%;      /* #F3E8FF - Soft Lilac Hover */
+    --accent-foreground: 260 50% 40%;
 
     --destructive:  0 84% 60%;        /* #F28B82 */
     --destructive-foreground: 0 0% 100%;
 
-    --border:       260 25% 95%;       /* #F2EEFB - Soft Lilac Divider */
-    --input:        260 25% 95%;
-    --ring:         260 70% 60%;
+    --border:       260 30% 90%;       /* #E6E0F8 - Soft Lilac Divider */
+    --input:        260 30% 90%;
+    --ring:         260 75% 82%;
 
     --radius: 1.25rem;                 /* 20px */
 
     /* Custom Theme Colors */
     --sidebar-bg: #FFFFFF;
-    --sidebar-active-bg: #EBE5FC;
+    --sidebar-active-bg: #EDE9FE;
     --sidebar-text: #3E3B4F;
-    --sidebar-active-text: #6D28D9;
-    --sidebar-hover: #FAF7FF;
-    --sidebar-icon: #A78BFA;
+    --sidebar-active-text: #4C3280;
+    --sidebar-hover: #F5F3FF;
+    --sidebar-icon: #9A86E8;
     
     --navbar-bg: #FFFFFF;
     
-    --table-header-bg: #F5F2FA;
-    --table-row-hover-bg: #F4EFFC;
+    --table-header-bg: #F2EEFB;
+    --table-row-hover-bg: #FAF7FF;
 
-    --primary-hover: #7C3AED;
-    --secondary-hover: #DDD2FA;
+    --primary-hover: #C4B4FC;
+    --secondary-hover: #E2DBFD;
 
     /* Calendar Day Backgrounds (Light) */
     --calendar-present-bg: #EAF8EC;
@@ -217,3 +219,20 @@ header.sticky {
 .text-holiday { color: #8AB4F8; }
 .text-weekend { color: #D1D5DB; }
 .text-halfday { color: #FFD166; }
+
+/* ── Accessible Lilac Text Overrides ───────────────────────────────────── */
+.text-primary {
+  color: hsl(var(--primary-text)) !important;
+}
+.hover\:text-primary:hover {
+  color: hsl(var(--primary-text-hover)) !important;
+}
+.hover\:text-primary\/80:hover {
+  color: hsla(var(--primary-text), 0.8) !important;
+}
+.text-primary\/80 {
+  color: hsla(var(--primary-text), 0.8) !important;
+}
+.text-primary\/70 {
+  color: hsla(var(--primary-text), 0.7) !important;
+}
