@@ -1,0 +1,341 @@
+import React, { useMemo } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useData } from '../../context/DataContext';
+import {
+  ArrowLeft,
+  Mail,
+  Building2,
+  Briefcase,
+  ShieldCheck,
+  User,
+  CalendarDays,
+  CheckCircle2,
+  XCircle,
+  Clock3,
+  TrendingUp,
+  ClipboardList,
+  AlertCircle,
+  CalendarCheck,
+} from 'lucide-react';
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+const AVATAR_GRADIENTS = [
+  'from-blue-500 to-cyan-500',
+  'from-violet-500 to-purple-600',
+  'from-rose-500 to-pink-500',
+  'from-amber-500 to-orange-500',
+  'from-emerald-500 to-teal-500',
+  'from-indigo-500 to-blue-500',
+];
+const getGradient = (name: string) =>
+  AVATAR_GRADIENTS[name.charCodeAt(0) % AVATAR_GRADIENTS.length];
+
+const getInitials = (name: string) =>
+  name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+
+const DEPT_COLORS: Record<string, { bg: string; text: string; dot: string }> = {
+  Engineering:       { bg: 'bg-blue-100',   text: 'text-blue-700',   dot: 'bg-blue-500'   },
+  Marketing:         { bg: 'bg-pink-100',    text: 'text-pink-700',   dot: 'bg-pink-500'   },
+  Sales:             { bg: 'bg-amber-100',   text: 'text-amber-700',  dot: 'bg-amber-500'  },
+  'Human Resources': { bg: 'bg-violet-100',  text: 'text-violet-700', dot: 'bg-violet-500' },
+  Finance:           { bg: 'bg-emerald-100', text: 'text-emerald-700',dot: 'bg-emerald-500'},
+};
+const getDept = (dept: string) =>
+  DEPT_COLORS[dept] ?? { bg: 'bg-slate-100', text: 'text-slate-700', dot: 'bg-slate-500' };
+
+const STATUS_STYLE: Record<string, { label: string; cls: string; dot: string }> = {
+  Present:  { label: 'Present',  cls: 'bg-emerald-50 text-emerald-700 border-emerald-200', dot: 'bg-emerald-500' },
+  Absent:   { label: 'Absent',   cls: 'bg-rose-50 text-rose-700 border-rose-200',          dot: 'bg-rose-500'   },
+  'Half Day':{ label: 'Half Day',cls: 'bg-amber-50 text-amber-700 border-amber-200',        dot: 'bg-amber-500'  },
+  Leave:    { label: 'On Leave', cls: 'bg-blue-50 text-blue-700 border-blue-200',          dot: 'bg-blue-500'   },
+};
+
+const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
+  const s = STATUS_STYLE[status] ?? STATUS_STYLE.Absent;
+  return (
+    <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border ${s.cls}`}>
+      <span className={`h-1.5 w-1.5 rounded-full ${s.dot}`} />
+      {s.label}
+    </span>
+  );
+};
+
+const fmt = (dateStr: string) =>
+  new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+const fmtShort = (dateStr: string) =>
+  new Date(dateStr).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
+
+// ─── Main Component ───────────────────────────────────────────────────────────
+
+export const EmployeeProfile: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { employees, attendance, leaveRequests } = useData();
+
+  const emp = useMemo(() => employees.find(e => e.id === id), [employees, id]);
+
+  const empAttendance = useMemo(() =>
+    attendance
+      .filter(a => a.employee_id === emp?.employee_id)
+      .sort((a, b) => b.date.localeCompare(a.date)),
+    [attendance, emp]
+  );
+
+  const empLeaves = useMemo(() =>
+    leaveRequests
+      .filter(l => l.employee_id === emp?.employee_id)
+      .sort((a, b) => b.start_date.localeCompare(a.start_date)),
+    [leaveRequests, emp]
+  );
+
+  const stats = useMemo(() => {
+    const present  = empAttendance.filter(a => a.status === 'Present').length;
+    const absent   = empAttendance.filter(a => a.status === 'Absent').length;
+    const halfDay  = empAttendance.filter(a => a.status === 'Half Day').length;
+    const leave    = empAttendance.filter(a => a.status === 'Leave').length;
+    const total    = present + absent + halfDay + leave;
+    const rate     = total > 0 ? Math.round(((present + halfDay * 0.5) / total) * 100) : 0;
+    const avgHours = empAttendance.filter(a => a.working_hours).reduce((s, a) => s + (a.working_hours ?? 0), 0) /
+                     (empAttendance.filter(a => a.working_hours).length || 1);
+    return { present, absent, halfDay, leave, total, rate, avgHours: avgHours.toFixed(1) };
+  }, [empAttendance]);
+
+  const tenure = useMemo(() => {
+    if (!emp?.join_date) return '—';
+    const joined = new Date(emp.join_date);
+    const now = new Date();
+    const months = (now.getFullYear() - joined.getFullYear()) * 12 + (now.getMonth() - joined.getMonth());
+    const years = Math.floor(months / 12);
+    const rem   = months % 12;
+    if (years === 0) return `${rem} month${rem !== 1 ? 's' : ''}`;
+    if (rem === 0)   return `${years} year${years !== 1 ? 's' : ''}`;
+    return `${years}y ${rem}m`;
+  }, [emp]);
+
+  if (!emp) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 text-slate-400 gap-3">
+        <AlertCircle className="h-10 w-10 opacity-40" />
+        <p className="font-medium">Employee not found.</p>
+        <button onClick={() => navigate('/admin/employees')}
+          className="text-sm text-primary font-semibold hover:underline">
+          ← Back to Directory
+        </button>
+      </div>
+    );
+  }
+
+  const grad = getGradient(emp.name);
+  const dept = getDept(emp.department);
+  const recentRecords = empAttendance.slice(0, 15);
+
+  const LEAVE_STATUS_STYLE: Record<string, string> = {
+    Approved: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    Rejected: 'bg-rose-50 text-rose-700 border-rose-200',
+    Pending:  'bg-amber-50 text-amber-700 border-amber-200',
+  };
+
+  return (
+    <div className="space-y-6">
+
+      {/* ── Back button + breadcrumb ──────────────────────────────────────── */}
+      <div className="flex items-center gap-3">
+        <button
+          onClick={() => navigate('/admin/employees')}
+          className="flex items-center gap-2 text-sm text-slate-500 hover:text-primary font-medium transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Directory
+        </button>
+        <span className="text-slate-300">/</span>
+        <span className="text-sm font-semibold text-slate-700">{emp.name}</span>
+      </div>
+
+      {/* ── Hero banner + identity card ───────────────────────────────────── */}
+      <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm bg-white">
+        {/* Gradient banner */}
+        <div className={`h-36 bg-gradient-to-r ${grad} relative`}>
+          {emp.role === 'admin' && (
+            <span className="absolute top-4 right-4 inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full bg-white/90 text-violet-700">
+              <ShieldCheck className="h-3.5 w-3.5" /> HR Admin
+            </span>
+          )}
+        </div>
+
+        <div className="px-6 pb-6">
+          {/* Avatar overlapping banner */}
+          <div className={`-mt-14 mb-4 h-24 w-24 rounded-2xl bg-gradient-to-br ${grad} text-white text-3xl font-bold flex items-center justify-center ring-4 ring-white shadow-xl`}>
+            {getInitials(emp.name)}
+          </div>
+
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-800 font-display">{emp.name}</h1>
+              <p className="text-slate-500 mt-0.5">{emp.designation}</p>
+              <div className="flex flex-wrap items-center gap-2 mt-3">
+                <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full ${dept.bg} ${dept.text}`}>
+                  <span className={`h-2 w-2 rounded-full ${dept.dot}`} />
+                  {emp.department}
+                </span>
+                <StatusBadge status={emp.current_status} />
+              </div>
+            </div>
+
+            {/* Key info pills */}
+            <div className="flex flex-wrap gap-3 text-sm">
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 border border-slate-100">
+                <CalendarDays className="h-4 w-4 text-slate-400" />
+                <div>
+                  <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wide">Joined</p>
+                  <p className="text-slate-700 font-semibold text-xs">{emp.join_date ? fmtShort(emp.join_date) : '—'}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 border border-slate-100">
+                <TrendingUp className="h-4 w-4 text-slate-400" />
+                <div>
+                  <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wide">Tenure</p>
+                  <p className="text-slate-700 font-semibold text-xs">{tenure}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Contact info row ──────────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          { icon: Mail,      label: 'Email',       value: emp.email },
+          { icon: Building2, label: 'Department',  value: emp.department },
+          { icon: Briefcase, label: 'Designation', value: emp.designation },
+          { icon: User,      label: 'Employee ID', value: emp.employee_id, mono: true },
+        ].map(item => {
+          const Icon = item.icon;
+          return (
+            <div key={item.label} className="flex items-start gap-3 rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
+              <div className="h-9 w-9 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
+                <Icon className="h-4 w-4 text-slate-500" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wide">{item.label}</p>
+                <p className={`text-slate-800 font-semibold text-sm truncate ${item.mono ? 'font-mono' : ''}`}>{item.value}</p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* ── Attendance stats ──────────────────────────────────────────────── */}
+      <div>
+        <h2 className="text-base font-bold text-slate-700 mb-3 flex items-center gap-2">
+          <CalendarCheck className="h-5 w-5 text-primary" /> Attendance Overview
+        </h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+          {[
+            { label: 'Attendance Rate', value: `${stats.rate}%`,        bg: 'bg-indigo-50',  text: 'text-indigo-700',  icon: TrendingUp    },
+            { label: 'Present Days',    value: stats.present,            bg: 'bg-emerald-50', text: 'text-emerald-700', icon: CheckCircle2  },
+            { label: 'Absent Days',     value: stats.absent,             bg: 'bg-rose-50',    text: 'text-rose-700',   icon: XCircle       },
+            { label: 'Half Days',       value: stats.halfDay,            bg: 'bg-amber-50',   text: 'text-amber-700',  icon: Clock3        },
+            { label: 'Leave Days',      value: stats.leave,              bg: 'bg-blue-50',    text: 'text-blue-700',   icon: CalendarDays  },
+            { label: 'Avg Hours/Day',   value: `${stats.avgHours}h`,     bg: 'bg-violet-50',  text: 'text-violet-700', icon: Clock3        },
+          ].map(s => {
+            const Icon = s.icon;
+            return (
+              <div key={s.label} className={`rounded-xl ${s.bg} p-4 flex flex-col gap-2 border border-white shadow-sm`}>
+                <Icon className={`h-5 w-5 ${s.text}`} />
+                <p className={`text-2xl font-bold ${s.text}`}>{s.value}</p>
+                <p className="text-xs text-slate-500 font-medium leading-tight">{s.label}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── Two-column: Recent Attendance + Leave History ─────────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        {/* Recent Attendance (2/3 width) */}
+        <div className="lg:col-span-2 rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+            <h3 className="font-bold text-slate-700 flex items-center gap-2">
+              <ClipboardList className="h-4 w-4 text-primary" /> Recent Attendance
+            </h3>
+            <span className="text-xs text-slate-400">Last {recentRecords.length} records</span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-slate-50 border-b border-slate-100">
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Date</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Status</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Check In</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Check Out</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Hours</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {recentRecords.length === 0 ? (
+                  <tr><td colSpan={5} className="py-12 text-center text-slate-400 text-sm">No attendance records found.</td></tr>
+                ) : (
+                  recentRecords.map(rec => (
+                    <tr key={rec.id} className="hover:bg-slate-50 transition-colors">
+                      <td className="px-5 py-3 font-medium text-slate-700">{fmtShort(rec.date)}</td>
+                      <td className="px-5 py-3"><StatusBadge status={rec.status} /></td>
+                      <td className="px-5 py-3 font-mono text-slate-600 text-xs">
+                        {rec.check_in
+                          ? <span className="flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />{rec.check_in.slice(0, 5)}</span>
+                          : <span className="text-slate-300">—</span>}
+                      </td>
+                      <td className="px-5 py-3 font-mono text-slate-600 text-xs">
+                        {rec.check_out
+                          ? <span className="flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-rose-400" />{rec.check_out.slice(0, 5)}</span>
+                          : rec.check_in ? <span className="text-amber-500 text-xs font-semibold">Active ●</span>
+                          : <span className="text-slate-300">—</span>}
+                      </td>
+                      <td className="px-5 py-3 text-slate-600">
+                        {rec.working_hours != null && rec.working_hours > 0
+                          ? <span className="font-semibold">{rec.working_hours}h</span>
+                          : <span className="text-slate-300">—</span>}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Leave History (1/3 width) */}
+        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-slate-100">
+            <h3 className="font-bold text-slate-700 flex items-center gap-2">
+              <CalendarDays className="h-4 w-4 text-primary" /> Leave History
+            </h3>
+          </div>
+          <div className="divide-y divide-slate-50">
+            {empLeaves.length === 0 ? (
+              <div className="py-12 text-center text-slate-400 text-sm">No leave records found.</div>
+            ) : (
+              empLeaves.map(lv => (
+                <div key={lv.id} className="px-5 py-4 hover:bg-slate-50 transition-colors">
+                  <div className="flex items-start justify-between gap-2 mb-1">
+                    <p className="font-semibold text-slate-700 text-sm">{lv.leave_type}</p>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border flex-shrink-0 ${LEAVE_STATUS_STYLE[lv.status]}`}>
+                      {lv.status}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500">
+                    {fmtShort(lv.start_date)}
+                    {lv.start_date !== lv.end_date && <> → {fmtShort(lv.end_date)}</>}
+                  </p>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
