@@ -7,8 +7,8 @@
 @layer base {
   :root {
     /* ── LIGHT MODE COLOR SYSTEM (PREMIUM LILAC-LAVENDER) ── */
-    --background:   260 75% 94%;       /* #ECE6FF - Soft Lilac Backdrop */
-    --foreground:   262 24% 28%;       /* #3E3B4F - Dark Lilac Slate */
+    --background:   260 30% 97%;       /* #F4F2FB - Near-white with faint lilac */
+    --foreground:   262 24% 28%;       /* #3E3B4F */
 
     --card:         0 0% 100%;        /* #FFFFFF */
     --card-foreground: 262 24% 28%;
@@ -49,8 +49,8 @@
     
     --navbar-bg: #FFFFFF;
     
-    --table-header-bg: #F2EEFB;
-    --table-row-hover-bg: #FAF7FF;
+    --table-header-bg: #F8F7FE;
+    --table-row-hover-bg: #F5F3FF;
 
     --primary-hover: #C4B4FC;
     --secondary-hover: #E2DBFD;

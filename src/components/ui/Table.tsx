@@ -8,7 +8,7 @@ interface TableHeadProps extends React.ThHTMLAttributes<HTMLTableCellElement> {}
 
 export const Table: React.FC<TableProps> = ({ children, className = '', ...props }) => {
   return (
-    <div className="relative w-full overflow-auto rounded-lg border border-border">
+    <div className="relative w-full overflow-auto">
       <table className={`w-full caption-bottom text-sm border-collapse bg-card ${className}`} {...props}>
         {children}
       </table>

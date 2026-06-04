@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { useData } from '../../context/DataContext';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
+import { LiveCalendar } from '../../components/ui/LiveCalendar';
 import {
   Users,
   UserCheck,
@@ -29,9 +30,22 @@ import {
 } from 'recharts';
 
 export const AdminDashboard: React.FC = () => {
-  const { employees, attendance, leaveRequests, activities } = useData();
+  const { employees, attendance, leaveRequests, activities, holidays } = useData();
 
   const todayStr = new Date().toISOString().split('T')[0];
+
+  // Build calendar lookup maps for LiveCalendar
+  const attendanceByDate = useMemo(() => {
+    const map: Record<string, { status: string }> = {};
+    attendance.forEach(a => { map[a.date] = { status: a.status }; });
+    return map;
+  }, [attendance]);
+
+  const holidayByDate = useMemo(() => {
+    const map: Record<string, string> = {};
+    holidays.forEach(h => { map[h.holiday_date] = h.holiday_name; });
+    return map;
+  }, [holidays]);
 
   // Calculate Today's Stats
   const stats = useMemo(() => {
@@ -370,6 +384,20 @@ export const AdminDashboard: React.FC = () => {
             <span>Presence rate by department</span>
             <span>Target: 90%+</span>
           </div>
+        </Card>
+
+        {/* Live Calendar Card (Spans 4) */}
+        <Card className="md:col-span-4 hover:scale-[1.005] hover:shadow-lg transition-all duration-300">
+          <CardHeader className="border-b border-border bg-muted/5 py-4">
+            <CardTitle className="text-sm font-bold uppercase tracking-wider text-foreground">Live Calendar</CardTitle>
+          </CardHeader>
+          <CardContent className="p-4">
+            <LiveCalendar
+              attendanceByDate={attendanceByDate}
+              holidayByDate={holidayByDate}
+              compact={false}
+            />
+          </CardContent>
         </Card>
 
       </div>

@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 import { useToast } from '../../components/ui/Toast';
 import { Modal } from '../../components/ui/Modal';
+import { LiveCalendar } from '../../components/ui/LiveCalendar';
 import {
   Calendar,
   Clock,
@@ -219,6 +220,19 @@ export const EmployeeDashboard: React.FC = () => {
   const predictedRate = totalDaysSoFarPredictor > 0
     ? Math.round(((presentDays + futureDaysPresent + (halfDays * 0.5)) / totalDaysSoFarPredictor) * 100)
     : 0;
+
+  // Build calendar lookup maps
+  const myAttendanceByDate = useMemo(() => {
+    const map: Record<string, { status: string }> = {};
+    myAttendance.forEach(a => { map[a.date] = { status: a.status }; });
+    return map;
+  }, [myAttendance]);
+
+  const holidayByDate = useMemo(() => {
+    const map: Record<string, string> = {};
+    holidays.forEach(h => { map[h.holiday_date] = h.holiday_name; });
+    return map;
+  }, [holidays]);
 
   return (
     <div className="space-y-6">
@@ -518,6 +532,19 @@ export const EmployeeDashboard: React.FC = () => {
               </span>
             </div>
           </div>
+        </div>
+
+        {/* Bento 7: Live Calendar (Full width) */}
+        <div className="md:col-span-12 bg-card border border-border rounded-lg p-6 shadow-card hover:shadow-premium-light transition-all duration-300">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">My Attendance Calendar</h3>
+            <span className="text-[10px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">Live View</span>
+          </div>
+          <LiveCalendar
+            attendanceByDate={myAttendanceByDate}
+            holidayByDate={holidayByDate}
+            compact={false}
+          />
         </div>
 
       </div>
