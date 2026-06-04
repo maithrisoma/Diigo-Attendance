@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import diigoLogo from '../diigo_logo.png';
 import { useAuth } from '../context/AuthContext';
@@ -35,6 +35,12 @@ const PortalForm: React.FC<PortalFormProps> = ({ portal, onSuccess }) => {
   const [forgotInput, setForgotInput] = useState('');
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotError, setForgotError] = useState('');
+
+  useEffect(() => {
+    setEmailOrId('');
+    setPassword('');
+    setErrors({});
+  }, [portal]);
 
   const isAdmin = portal === 'admin';
 
@@ -181,6 +187,7 @@ const PortalForm: React.FC<PortalFormProps> = ({ portal, onSuccess }) => {
 export const Login: React.FC = () => {
   const { isAuthenticated, currentUser } = useAuth();
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<'employee' | 'admin'>('employee');
 
   if (isAuthenticated && currentUser) {
     return <Navigate to={currentUser.role === 'admin' ? '/admin/dashboard' : '/employee/dashboard'} replace />;
@@ -201,55 +208,48 @@ export const Login: React.FC = () => {
         </p>
       </div>
 
-      {/* Two portal cards */}
-      <div className="w-full max-w-4xl z-10 grid grid-cols-1 md:grid-cols-2 gap-6 px-2">
-
-        {/* ── Employee Portal Card ── */}
-        <div className="relative rounded-lg p-7 flex flex-col bg-card border border-border shadow-card">
-          <div className="flex items-center gap-3 mb-1">
-            <div className="h-11 w-11 rounded-lg flex items-center justify-center border border-border bg-muted/10">
-              <UserCircle2 className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <h2 className="font-bold text-lg leading-tight text-foreground font-display">Employee Portal</h2>
-              <p className="text-xs text-muted-foreground">Mark attendance &amp; view records</p>
-            </div>
-          </div>
-
-          <ul className="mt-4 space-y-1.5 text-xs border-t border-border pt-4 text-muted-foreground">
-            {['Check In / Check Out', 'View attendance calendar', 'Apply for leave'].map(f => (
-              <li key={f} className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full flex-shrink-0 bg-primary/40" />
-                {f}
-              </li>
-            ))}
-          </ul>
-
-          <PortalForm portal="employee" onSuccess={handleSuccess} />
+      {/* Centered Login Card */}
+      <div className="w-full max-w-md z-10 bg-card border border-border rounded-[20px] shadow-card overflow-hidden">
+        {/* Tab Headers */}
+        <div className="flex border-b border-border">
+          <button
+            onClick={() => setActiveTab('employee')}
+            className={`flex-1 py-4 text-sm font-bold transition-all duration-200 border-b-2 flex items-center justify-center gap-2 ${
+              activeTab === 'employee'
+                ? 'bg-card text-primary border-primary'
+                : 'bg-muted/5 text-muted-foreground hover:bg-muted/10 border-transparent'
+            }`}
+          >
+            <UserCircle2 className="h-4.5 w-4.5" />
+            <span>Employee Login</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('admin')}
+            className={`flex-1 py-4 text-sm font-bold transition-all duration-200 border-b-2 flex items-center justify-center gap-2 ${
+              activeTab === 'admin'
+                ? 'bg-card text-primary border-primary'
+                : 'bg-muted/5 text-muted-foreground hover:bg-muted/10 border-transparent'
+            }`}
+          >
+            <ShieldCheck className="h-4.5 w-4.5" />
+            <span>HR / Admin Login</span>
+          </button>
         </div>
 
-        {/* ── Admin / HR Portal Card ── */}
-        <div className="relative rounded-lg p-7 flex flex-col bg-card border border-border shadow-card">
-          <div className="flex items-center gap-3 mb-1">
-            <div className="h-11 w-11 rounded-lg flex items-center justify-center border border-border bg-muted/10">
-              <ShieldCheck className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <h2 className="font-bold text-lg leading-tight text-foreground font-display">Admin / HR Portal</h2>
-              <p className="text-xs text-muted-foreground">Manage employees &amp; attendance</p>
-            </div>
+        {/* Card Content Form */}
+        <div className="p-7 flex flex-col">
+          <div className="flex flex-col items-center text-center mb-3">
+            <h2 className="font-bold text-xl leading-tight text-foreground font-display">
+              Login Into Your Dashboard
+            </h2>
+            <p className="text-xs text-muted-foreground mt-1">
+              {activeTab === 'employee'
+                ? 'Mark attendance and access your employee profile'
+                : 'Manage staff records, leaves, approvals, and reports'}
+            </p>
           </div>
 
-          <ul className="mt-4 space-y-1.5 text-xs border-t border-border pt-4 text-muted-foreground">
-            {['Manage employee directory', 'Approve / reject leave requests', 'Generate attendance reports'].map(f => (
-              <li key={f} className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full flex-shrink-0 bg-primary/40" />
-                {f}
-              </li>
-            ))}
-          </ul>
-
-          <PortalForm portal="admin" onSuccess={handleSuccess} />
+          <PortalForm portal={activeTab} onSuccess={handleSuccess} />
         </div>
       </div>
 

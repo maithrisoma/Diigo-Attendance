@@ -7,7 +7,7 @@
 @layer base {
   :root {
     /* ── LIGHT MODE COLOR SYSTEM (PREMIUM INDIGO-LAVENDER) ── */
-    --background:   228 50% 98%;       /* #F8F9FD */
+    --background:   229 63% 94%;       /* #E4E8FA */
     --foreground:   231 23% 32%;      /* #3F4565 */
 
     --card:         0 0% 100%;        /* #FFFFFF */
