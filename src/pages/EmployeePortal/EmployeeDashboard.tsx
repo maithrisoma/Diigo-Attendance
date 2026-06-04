@@ -47,6 +47,24 @@ export const EmployeeDashboard: React.FC = () => {
 
   const todayStr = new Date().toISOString().split('T')[0];
 
+  const myAttendance = useMemo(() => {
+    if (!currentUser) return [];
+    return attendance.filter(a => a.employee_id === currentUser.employee_id);
+  }, [attendance, currentUser]);
+
+  // Build calendar lookup maps
+  const myAttendanceByDate = useMemo(() => {
+    const map: Record<string, { status: string }> = {};
+    myAttendance.forEach(a => { map[a.date] = { status: a.status }; });
+    return map;
+  }, [myAttendance]);
+
+  const holidayByDate = useMemo(() => {
+    const map: Record<string, string> = {};
+    holidays.forEach(h => { map[h.holiday_date] = h.holiday_name; });
+    return map;
+  }, [holidays]);
+
   // Find today's attendance record
   const todayRecord = attendance.find(
     (a) => a.employee_id === currentUser?.employee_id && a.date === todayStr
@@ -175,7 +193,6 @@ export const EmployeeDashboard: React.FC = () => {
   const currentMonthYear = currentTime.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
   // Compute Statistics
-  const myAttendance = attendance.filter(a => a.employee_id === currentUser.employee_id);
   const presentDays = myAttendance.filter(a => a.status === 'Present').length;
   const halfDays = myAttendance.filter(a => a.status === 'Half Day').length;
   const totalCompletedRecords = myAttendance.length;
@@ -221,18 +238,7 @@ export const EmployeeDashboard: React.FC = () => {
     ? Math.round(((presentDays + futureDaysPresent + (halfDays * 0.5)) / totalDaysSoFarPredictor) * 100)
     : 0;
 
-  // Build calendar lookup maps
-  const myAttendanceByDate = useMemo(() => {
-    const map: Record<string, { status: string }> = {};
-    myAttendance.forEach(a => { map[a.date] = { status: a.status }; });
-    return map;
-  }, [myAttendance]);
 
-  const holidayByDate = useMemo(() => {
-    const map: Record<string, string> = {};
-    holidays.forEach(h => { map[h.holiday_date] = h.holiday_name; });
-    return map;
-  }, [holidays]);
 
   return (
     <div className="space-y-6">
