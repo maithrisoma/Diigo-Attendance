@@ -6,7 +6,7 @@
 
 @layer base {
   :root {
-    /* ── LIGHT MODE COLOR SYSTEM (PASTEL LAVENDER) ── */
+    /* ── LIGHT MODE COLOR SYSTEM (PREMIUM INDIGO-LAVENDER) ── */
     --background:   228 50% 98%;       /* #F8F9FD */
     --foreground:   231 23% 32%;      /* #3F4565 */
 
@@ -16,42 +16,42 @@
     --popover:      0 0% 100%;
     --popover-foreground: 231 23% 32%;
 
-    --primary:      234 53% 78%;      /* #A9AFE5 */
+    --primary:      239 84% 67%;      /* #6366F1 - Indigo-Lavender */
     --primary-foreground: 0 0% 100%;  /* #FFFFFF */
 
-    --secondary:    235 61% 86%;      /* #C4C8F0 */
-    --secondary-foreground: 235 48% 61%; /* #6D74C9 */
+    --secondary:    239 80% 94%;      /* #E0E7FF - Soft Lavender-Indigo Fill */
+    --secondary-foreground: 239 84% 67%; /* #6366F1 */
 
     --muted:        218 11% 65%;       /* #9CA3AF */
     --muted-foreground: 218 11% 65%;
 
-    --accent:       235 61% 95%;      /* #F3F4FE */
-    --accent-foreground: 231 23% 32%;
+    --accent:       239 80% 97%;      /* #EEF2FF - Hover Accent */
+    --accent-foreground: 239 84% 67%;
 
     --destructive:  0 84% 60%;        /* #F28B82 */
     --destructive-foreground: 0 0% 100%;
 
     --border:       230 42% 96%;       /* #EEF0FA */
     --input:        230 42% 96%;
-    --ring:         234 53% 78%;
+    --ring:         239 84% 67%;
 
     --radius: 1.25rem;                 /* 20px */
 
     /* Custom Theme Colors */
     --sidebar-bg: #FFFFFF;
-    --sidebar-active-bg: #E7E9FB;
+    --sidebar-active-bg: #E0E7FF;
     --sidebar-text: #3F4565;
-    --sidebar-active-text: #6D74C9;
-    --sidebar-hover: #F3F4FE;
-    --sidebar-icon: #8C93D6;
+    --sidebar-active-text: #4F46E5;
+    --sidebar-hover: #F0F2FF;
+    --sidebar-icon: #8F9BDE;
     
     --navbar-bg: #FFFFFF;
     
     --table-header-bg: #F8F9FD;
     --table-row-hover-bg: #F5F6FE;
 
-    --primary-hover: #9299D8;
-    --secondary-hover: #D8DCF8;
+    --primary-hover: #4F46E5;
+    --secondary-hover: #D2D6FF;
 
     /* Calendar Day Backgrounds (Light) */
     --calendar-present-bg: #EAF8EC;
@@ -76,7 +76,7 @@
   }
 
   [data-theme='dark'] {
-    /* ── DARK MODE COLOR SYSTEM (PASTEL LAVENDER DARK) ── */
+    /* ── DARK MODE COLOR SYSTEM (PREMIUM INDIGO-LAVENDER DARK) ── */
     --background:   235 20% 11%;       /* #161722 */
     --foreground:   228 50% 96%;      /* #F1F3FD */
 
@@ -86,11 +86,11 @@
     --popover:      235 18% 16%;
     --popover-foreground: 228 50% 96%;
 
-    --primary:      234 53% 78%;      /* #A9AFE5 */
+    --primary:      239 84% 75%;      /* #818CF8 */
     --primary-foreground: 235 20% 11%;
 
     --secondary:    235 18% 22%;      /* #2E3043 */
-    --secondary-foreground: 234 53% 78%;
+    --secondary-foreground: 239 84% 75%;
 
     --muted:        231 12% 58%;       /* #9396B0 */
     --muted-foreground: 231 12% 58%;
@@ -103,14 +103,14 @@
 
     --border:       235 15% 24%;
     --input:        235 15% 24%;
-    --ring:         234 53% 78%;
+    --ring:         239 84% 75%;
 
     /* Custom Theme Colors */
     --sidebar-bg: #1F202E;
-    --sidebar-active-bg: #2A2B3D;
+    --sidebar-active-bg: #26283D;
     --sidebar-text: #A2A5B9;
-    --sidebar-active-text: #9FA5EA;
-    --sidebar-hover: #242636;
+    --sidebar-active-text: #818CF8;
+    --sidebar-hover: #212233;
     --sidebar-icon: #747BB5;
     
     --navbar-bg: #1F202E;
@@ -118,8 +118,8 @@
     --table-header-bg: #161722;
     --table-row-hover-bg: #242636;
 
-    --primary-hover: #858CCD;
-    --secondary-hover: #262838;
+    --primary-hover: #6366F1;
+    --secondary-hover: #26283D;
 
     /* Calendar Day Backgrounds (Dark) */
     --calendar-present-bg: #153322;

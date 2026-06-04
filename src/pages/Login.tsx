@@ -197,7 +197,7 @@ export const Login: React.FC = () => {
       <div className="flex flex-col items-center mb-8 text-center z-10">
         <img src={diigoLogo} alt="Diigo Logo" className="h-14 md:h-16 object-contain mb-3 dark:brightness-110" />
         <p className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-          Enterprise Attendance Registry Portal
+          Attendance Registry Portal
         </p>
       </div>
 
@@ -255,7 +255,7 @@ export const Login: React.FC = () => {
 
       {/* Footer */}
       <div className="z-10 mt-10 flex items-center gap-2 text-xs text-muted-foreground">
-        <span>Diigo Attendance &copy; {new Date().getFullYear()} — Enterprise HRMS</span>
+        <span>Diigo Attendance &copy; {new Date().getFullYear()} — HRMS</span>
       </div>
     </div>
   );
