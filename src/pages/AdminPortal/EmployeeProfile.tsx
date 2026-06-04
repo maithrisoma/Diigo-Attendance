@@ -22,12 +22,12 @@ import {
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const AVATAR_GRADIENTS = [
-  'from-[#A9AFE5] to-[#C4C8F0]',
-  'from-[#C4C8F0] to-[#E7E9FB]',
-  'from-[#A9AFE5] to-[#F3F4FE]',
-  'from-[#8C93D6] to-[#A9AFE5]',
-  'from-[#9299D8] to-[#C4C8F0]',
-  'from-[#6D74C9] to-[#9299D8]',
+  'from-[#8B5CF6] to-[#A78BFA]',
+  'from-[#A78BFA] to-[#C084FC]',
+  'from-[#C084FC] to-[#E9D5FF]',
+  'from-[#6D28D9] to-[#8B5CF6]',
+  'from-[#7C3AED] to-[#A78BFA]',
+  'from-[#9F7AEA] to-[#E9D5FF]',
 ];
 const getGradient = (name: string) =>
   AVATAR_GRADIENTS[name.charCodeAt(0) % AVATAR_GRADIENTS.length];

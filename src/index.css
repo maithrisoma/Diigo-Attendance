@@ -6,52 +6,52 @@
 
 @layer base {
   :root {
-    /* ── LIGHT MODE COLOR SYSTEM (PREMIUM INDIGO-LAVENDER) ── */
-    --background:   229 63% 94%;       /* #E4E8FA */
-    --foreground:   231 23% 32%;      /* #3F4565 */
+    /* ── LIGHT MODE COLOR SYSTEM (PREMIUM LILAC-LAVENDER) ── */
+    --background:   260 40% 95%;       /* #F5F2FA - Soft Lilac Backdrop */
+    --foreground:   262 24% 28%;       /* #3E3B4F - Dark Lilac Slate */
 
     --card:         0 0% 100%;        /* #FFFFFF */
-    --card-foreground: 231 23% 32%;
+    --card-foreground: 262 24% 28%;
 
     --popover:      0 0% 100%;
-    --popover-foreground: 231 23% 32%;
+    --popover-foreground: 262 24% 28%;
 
-    --primary:      239 84% 67%;      /* #6366F1 - Indigo-Lavender */
+    --primary:      260 70% 60%;      /* #8B63F5 - Premium Lilac-Purple */
     --primary-foreground: 0 0% 100%;  /* #FFFFFF */
 
-    --secondary:    239 80% 94%;      /* #E0E7FF - Soft Lavender-Indigo Fill */
-    --secondary-foreground: 239 84% 67%; /* #6366F1 */
+    --secondary:    260 60% 90%;      /* #EBE5FC - Soft Lilac Fill */
+    --secondary-foreground: 260 70% 60%; /* #8B63F5 */
 
-    --muted:        218 11% 65%;       /* #9CA3AF */
-    --muted-foreground: 218 11% 65%;
+    --muted:        260 10% 65%;       /* #A29EB2 */
+    --muted-foreground: 260 10% 65%;
 
-    --accent:       239 80% 97%;      /* #EEF2FF - Hover Accent */
-    --accent-foreground: 239 84% 67%;
+    --accent:       260 50% 97%;      /* #FAF7FF - Soft Lilac Hover */
+    --accent-foreground: 260 70% 60%;
 
     --destructive:  0 84% 60%;        /* #F28B82 */
     --destructive-foreground: 0 0% 100%;
 
-    --border:       230 42% 96%;       /* #EEF0FA */
-    --input:        230 42% 96%;
-    --ring:         239 84% 67%;
+    --border:       260 25% 95%;       /* #F2EEFB - Soft Lilac Divider */
+    --input:        260 25% 95%;
+    --ring:         260 70% 60%;
 
     --radius: 1.25rem;                 /* 20px */
 
     /* Custom Theme Colors */
     --sidebar-bg: #FFFFFF;
-    --sidebar-active-bg: #E0E7FF;
-    --sidebar-text: #3F4565;
-    --sidebar-active-text: #4F46E5;
-    --sidebar-hover: #F0F2FF;
-    --sidebar-icon: #8F9BDE;
+    --sidebar-active-bg: #EBE5FC;
+    --sidebar-text: #3E3B4F;
+    --sidebar-active-text: #6D28D9;
+    --sidebar-hover: #FAF7FF;
+    --sidebar-icon: #A78BFA;
     
     --navbar-bg: #FFFFFF;
     
-    --table-header-bg: #F8F9FD;
-    --table-row-hover-bg: #F5F6FE;
+    --table-header-bg: #F5F2FA;
+    --table-row-hover-bg: #F4EFFC;
 
-    --primary-hover: #4F46E5;
-    --secondary-hover: #D2D6FF;
+    --primary-hover: #7C3AED;
+    --secondary-hover: #DDD2FA;
 
     /* Calendar Day Backgrounds (Light) */
     --calendar-present-bg: #EAF8EC;
@@ -76,50 +76,50 @@
   }
 
   [data-theme='dark'] {
-    /* ── DARK MODE COLOR SYSTEM (PREMIUM INDIGO-LAVENDER DARK) ── */
-    --background:   235 20% 11%;       /* #161722 */
-    --foreground:   228 50% 96%;      /* #F1F3FD */
+    /* ── DARK MODE COLOR SYSTEM (PREMIUM LILAC-LAVENDER DARK) ── */
+    --background:   260 30% 10%;       /* #151322 - Deep Lilac Black */
+    --foreground:   260 30% 94%;       /* #ECEAF0 */
 
-    --card:         235 18% 16%;       /* #1F202E */
-    --card-foreground: 228 50% 96%;
+    --card:         260 25% 15%;       /* #201B30 - Dark Lilac Card */
+    --card-foreground: 260 30% 94%;
 
-    --popover:      235 18% 16%;
-    --popover-foreground: 228 50% 96%;
+    --popover:      260 25% 15%;
+    --popover-foreground: 260 30% 94%;
 
-    --primary:      239 84% 75%;      /* #818CF8 */
-    --primary-foreground: 235 20% 11%;
+    --primary:      260 85% 75%;      /* #A78BFA - Glowing Lilac-Lavender */
+    --primary-foreground: 260 30% 10%;
 
-    --secondary:    235 18% 22%;      /* #2E3043 */
-    --secondary-foreground: 239 84% 75%;
+    --secondary:    260 20% 20%;      /* #302947 - Muted Dark Lilac */
+    --secondary-foreground: 260 85% 75%;
 
-    --muted:        231 12% 58%;       /* #9396B0 */
-    --muted-foreground: 231 12% 58%;
+    --muted:        260 12% 58%;       /* #9793A6 */
+    --muted-foreground: 260 12% 58%;
 
-    --accent:       235 18% 22%;
-    --accent-foreground: 228 50% 96%;
+    --accent:       260 20% 20%;
+    --accent-foreground: 260 30% 94%;
 
     --destructive:  0 84% 65%;
     --destructive-foreground: 0 0% 100%;
 
-    --border:       235 15% 24%;
-    --input:        235 15% 24%;
-    --ring:         239 84% 75%;
+    --border:       260 20% 22%;       /* #382F52 - Dark Lilac Border */
+    --input:        260 20% 22%;
+    --ring:         260 85% 75%;
 
     /* Custom Theme Colors */
-    --sidebar-bg: #1F202E;
-    --sidebar-active-bg: #26283D;
-    --sidebar-text: #A2A5B9;
-    --sidebar-active-text: #818CF8;
-    --sidebar-hover: #212233;
-    --sidebar-icon: #747BB5;
+    --sidebar-bg: #201B30;
+    --sidebar-active-bg: #302947;
+    --sidebar-text: #A7A3B7;
+    --sidebar-active-text: #C084FC;
+    --sidebar-hover: #26203B;
+    --sidebar-icon: #A78BFA;
     
-    --navbar-bg: #1F202E;
+    --navbar-bg: #201B30;
     
-    --table-header-bg: #161722;
-    --table-row-hover-bg: #242636;
+    --table-header-bg: #151322;
+    --table-row-hover-bg: #26203B;
 
-    --primary-hover: #6366F1;
-    --secondary-hover: #26283D;
+    --primary-hover: #8B5CF6;
+    --secondary-hover: #302947;
 
     /* Calendar Day Backgrounds (Dark) */
     --calendar-present-bg: #153322;
