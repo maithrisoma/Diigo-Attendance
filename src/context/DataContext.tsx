@@ -44,7 +44,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Load from localStorage on mount, and seed if not present
   useEffect(() => {
-<<<<<<< Updated upstream
     let savedEmployees = localStorage.getItem('employees');
     let savedHolidays = localStorage.getItem('holidays');
     let savedLeaves = localStorage.getItem('leaveRequests');
@@ -66,13 +65,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       savedActivities = null;
       savedAttendance = null;
     }
-=======
-    const savedEmployees = localStorage.getItem('employees');
-    const savedHolidays = localStorage.getItem('holidays');
-    const savedLeaves = localStorage.getItem('leaveRequests');
-    const savedActivities = localStorage.getItem('activities');
-    const savedAttendance = localStorage.getItem('attendance');
->>>>>>> Stashed changes
 
     let parsedEmployees = INITIAL_EMPLOYEES;
     let parsedHolidays = INITIAL_HOLIDAYS;

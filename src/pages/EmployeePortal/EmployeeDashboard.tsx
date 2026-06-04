@@ -255,11 +255,6 @@ export const EmployeeDashboard: React.FC = () => {
     ? Math.round(((presentDays + futureDaysPresent + (halfDays * 0.5)) / totalDaysSoFarPredictor) * 100)
     : 0;
 
-<<<<<<< Updated upstream
-
-
-=======
->>>>>>> Stashed changes
   return (
     <div className="space-y-6">
       
