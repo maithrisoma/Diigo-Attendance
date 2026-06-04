@@ -210,13 +210,8 @@ export const EmployeeHistory: React.FC = () => {
                           </span>
                         ) : '--:--'}
                     </TableCell>
-<<<<<<< Updated upstream
                     <TableCell className="text-right font-semibold font-mono text-sm text-foreground">
-                      {rec.working_hours !== null ? `${rec.working_hours.toFixed(2)}h` : '--'}
-=======
-                    <TableCell className="text-right font-semibold font-mono text-sm text-slate-700">
                       {rec.working_hours !== null && rec.working_hours !== undefined ? `${Number(rec.working_hours).toFixed(2)}h` : '--'}
->>>>>>> Stashed changes
                     </TableCell>
                   </TableRow>
                 ))

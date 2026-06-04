@@ -280,17 +280,10 @@ export const EmployeeProfile: React.FC = () => {
                           : rec.check_in ? <span className="text-[var(--calendar-leave-text)] text-xs font-semibold">Active ●</span>
                           : <span className="text-muted-foreground/30">—</span>}
                       </td>
-<<<<<<< Updated upstream
                       <td className="px-5 py-3 text-muted-foreground">
-                        {rec.working_hours != null && rec.working_hours > 0
-                          ? <span className="font-semibold">{rec.working_hours}h</span>
-                          : <span className="text-muted-foreground/30">—</span>}
-=======
-                      <td className="px-5 py-3 text-slate-600">
                         {rec.working_hours != null && Number(rec.working_hours) > 0
                           ? <span className="font-semibold">{Number(rec.working_hours).toFixed(2)}h</span>
-                          : <span className="text-slate-300">—</span>}
->>>>>>> Stashed changes
+                          : <span className="text-muted-foreground/30">—</span>}
                       </td>
                     </tr>
                   ))

@@ -345,13 +345,8 @@ export const AttendanceCalendar: React.FC = () => {
                         <span className="text-[var(--calendar-present-text)] font-bold animate-pulse">Active</span>
                       ) : '--:--'}
                   </TableCell>
-<<<<<<< Updated upstream
                   <TableCell className="text-right font-mono text-xs text-foreground font-semibold">
-                    {rec.workingHours !== null ? `${rec.workingHours.toFixed(2)}h` : '--'}
-=======
-                  <TableCell className="text-right font-mono text-xs text-slate-700 font-semibold">
                     {rec.workingHours !== null && rec.workingHours !== undefined ? `${Number(rec.workingHours).toFixed(2)}h` : '--'}
->>>>>>> Stashed changes
                   </TableCell>
                 </TableRow>
               ))}
