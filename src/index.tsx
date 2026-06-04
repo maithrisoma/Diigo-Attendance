@@ -6,9 +6,14 @@ import reportWebVitals from './reportWebVitals';
 
 // Instant theme initialization to prevent flash
 (function() {
+  // One-time theme migration to default to Light lilac mode
+  if (!localStorage.getItem('theme-reset-v2')) {
+    localStorage.setItem('theme', 'light');
+    localStorage.setItem('theme-reset-v2', 'true');
+  }
+  
   const saved = localStorage.getItem('theme');
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const isDark = saved === 'dark' || (!saved && prefersDark);
+  const isDark = saved === 'dark';
   
   if (isDark) {
     document.documentElement.classList.add('dark');

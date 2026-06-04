@@ -16,10 +16,15 @@ export const Navbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) =
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    // One-time theme migration to default to Light lilac mode
+    if (!localStorage.getItem('theme-reset-v2')) {
+      localStorage.setItem('theme', 'light');
+      localStorage.setItem('theme-reset-v2', 'true');
+      return 'light';
+    }
     const saved = localStorage.getItem('theme');
     if (saved === 'dark' || saved === 'light') return saved;
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    return prefersDark ? 'dark' : 'light';
+    return 'light';
   });
 
   const toggleTheme = () => {
