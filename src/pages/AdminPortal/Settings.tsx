@@ -140,7 +140,7 @@ export const Settings: React.FC = () => {
               <form onSubmit={handleShiftSave} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex flex-col space-y-1">
-                    <label className="text-xs font-semibold text-slate-700">Standard Check-In</label>
+                    <label className="text-xs font-semibold text-muted-foreground">Standard Check-In</label>
                     <Input
                       type="time"
                       value={shiftTimings.checkInStart}
@@ -149,7 +149,7 @@ export const Settings: React.FC = () => {
                   </div>
 
                   <div className="flex flex-col space-y-1">
-                    <label className="text-xs font-semibold text-slate-700">Standard Check-Out</label>
+                    <label className="text-xs font-semibold text-muted-foreground">Standard Check-Out</label>
                     <Input
                       type="time"
                       value={shiftTimings.checkOutStart}
@@ -160,7 +160,7 @@ export const Settings: React.FC = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex flex-col space-y-1">
-                    <label className="text-xs font-semibold text-slate-700">Grace Period (Minutes)</label>
+                    <label className="text-xs font-semibold text-muted-foreground">Grace Period (Minutes)</label>
                     <Input
                       type="number"
                       value={shiftTimings.gracePeriod}
@@ -169,7 +169,7 @@ export const Settings: React.FC = () => {
                   </div>
 
                   <div className="flex flex-col space-y-1">
-                    <label className="text-xs font-semibold text-slate-700">Half-Day Threshold (Hours)</label>
+                    <label className="text-xs font-semibold text-muted-foreground">Half-Day Threshold (Hours)</label>
                     <Input
                       type="number"
                       step="0.5"
@@ -219,11 +219,11 @@ export const Settings: React.FC = () => {
                     ) : (
                       localHolidays.map((holiday) => (
                         <TableRow key={holiday.id}>
-                          <TableCell className="font-semibold text-slate-900 flex items-center gap-2">
-                            <Milestone className="h-4 w-4 text-violet-500" />
+                          <TableCell className="font-semibold text-foreground flex items-center gap-2">
+                            <Milestone className="h-4 w-4 text-primary" />
                             {holiday.holiday_name}
                           </TableCell>
-                          <TableCell className="font-mono text-xs text-slate-600">
+                          <TableCell className="font-mono text-xs text-muted-foreground">
                             {new Date(holiday.holiday_date).toLocaleDateString('en-US', {
                               weekday: 'short',
                               month: 'short',
@@ -236,7 +236,7 @@ export const Settings: React.FC = () => {
                               variant="ghost"
                               size="icon"
                               onClick={() => handleDeleteHoliday(holiday.id, holiday.holiday_name)}
-                              className="h-8 w-8 text-slate-400 hover:text-rose-600 hover:bg-slate-100"
+                              className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-muted/10"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -257,17 +257,17 @@ export const Settings: React.FC = () => {
             <CardHeader>
               <CardTitle>Access Credentials Policy</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4 text-sm text-slate-600 leading-normal">
+            <CardContent className="space-y-4 text-sm text-foreground/80 leading-normal">
               <p>
                 DAttendance operates on role-based access control (RBAC). Employees possess restricted views of check-ins and history. HR / Admin accounts have full read and write access to directories, approvals, registries, and reports.
               </p>
               
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg flex gap-2">
-                <ShieldCheck className="h-5 w-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+              <div className="p-3 bg-muted/5 border border-border rounded-lg flex gap-2">
+                <ShieldCheck className="h-5 w-5 text-[var(--calendar-present-text)] mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-xs font-semibold text-slate-800">Mock Sandbox Environment</p>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    For verification convenience, password authentication matches any ID with password <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-primary font-bold">password</code>.
+                  <p className="text-xs font-semibold text-foreground">Mock Sandbox Environment</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    For verification convenience, password authentication matches any ID with password <code className="bg-muted/10 px-1 py-0.5 rounded font-mono text-primary font-bold">password</code>.
                   </p>
                 </div>
               </div>

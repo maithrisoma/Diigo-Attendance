@@ -40,12 +40,12 @@ const getInitials = (name: string) =>
 
 // ─── Avatar background gradient by name ──────────────────────────────────────
 const AVATAR_GRADIENTS = [
-  'from-slate-500 to-slate-600',
-  'from-slate-600 to-slate-700',
-  'from-indigo-600/85 to-indigo-700/85',
-  'from-slate-400 to-slate-500',
-  'from-zinc-600 to-zinc-700',
-  'from-slate-700 to-slate-800',
+  'from-indigo-300 to-indigo-400',
+  'from-purple-300 to-purple-400',
+  'from-pink-300 to-pink-400',
+  'from-sky-300 to-sky-400',
+  'from-teal-300 to-teal-400',
+  'from-violet-300 to-violet-400',
 ];
 const getAvatarGradient = (name: string) =>
   AVATAR_GRADIENTS[name.charCodeAt(0) % AVATAR_GRADIENTS.length];
@@ -287,7 +287,7 @@ export const EmployeeDirectory: React.FC = () => {
                 <div
                   key={emp.id}
                   onClick={() => navigate(`/admin/employees/${emp.id}`)}
-                  className="group relative rounded-2xl border border-border bg-card shadow-sm hover:shadow-lg hover:border-primary/40 transition-all duration-200 cursor-pointer overflow-hidden text-foreground"
+                  className="group relative rounded-lg border border-border bg-card shadow-card hover:shadow-premium-light dark:hover:shadow-premium-dark hover:border-primary/40 transition-all duration-300 cursor-pointer overflow-hidden text-foreground"
                 >
                   {/* Top colour banner */}
                   <div className={`h-16 bg-gradient-to-r ${gradient} relative`}>

@@ -27,18 +27,18 @@ const LEAVE_TYPES = [
 ];
 
 const LEAVE_TYPE_META: Record<string, { color: string; bg: string; light: string }> = {
-  'Annual Leave':               { color: 'text-[#047857]',    bg: 'bg-[#047857]',    light: 'bg-[#047857]/10' },
-  'Sick Leave':                 { color: 'text-[#EF4444]',    bg: 'bg-[#EF4444]',    light: 'bg-[#FEE2E2] dark:bg-[#EF4444]/20'    },
-  'Casual Leave':               { color: 'text-[#14B8A6]',    bg: 'bg-[#14B8A6]',    light: 'bg-[#14B8A6]/10' },
-  'Maternity / Paternity Leave':{ color: 'text-[#3B82F6]',    bg: 'bg-[#3B82F6]',    light: 'bg-[#DBEAFE] dark:bg-[#3B82F6]/20'    },
-  'Unpaid Leave':               { color: 'text-[#64748B]',    bg: 'bg-[#64748B]',    light: 'bg-[#F1F5F9] dark:bg-[#64748B]/20'    },
-  'Compensatory Leave':         { color: 'text-[#F59E0B]',    bg: 'bg-[#F59E0B]',    light: 'bg-[#FEF3C7] dark:bg-[#F59E0B]/20'    },
+  'Annual Leave':               { color: 'text-[#6BCB77]',    bg: 'bg-[#6BCB77]',    light: 'bg-[#EAF8EC] dark:bg-[#6BCB77]/20' },
+  'Sick Leave':                 { color: 'text-[#F28B82]',    bg: 'bg-[#F28B82]',    light: 'bg-[#FDECEC] dark:bg-[#F28B82]/20' },
+  'Casual Leave':               { color: 'text-[#F7C873]',    bg: 'bg-[#F7C873]',    light: 'bg-[#FFF6E1] dark:bg-[#F7C873]/20' },
+  'Maternity / Paternity Leave':{ color: 'text-[#8AB4F8]',    bg: 'bg-[#8AB4F8]',    light: 'bg-[#ECF4FF] dark:bg-[#8AB4F8]/20' },
+  'Unpaid Leave':               { color: 'text-[#9CA3AF]',    bg: 'bg-[#9CA3AF]',    light: 'bg-[#F5F5F5] dark:bg-[#9CA3AF]/20' },
+  'Compensatory Leave':         { color: 'text-[#FFD166]',    bg: 'bg-[#FFD166]',    light: 'bg-[#FFF7D6] dark:bg-[#FFD166]/20' },
 };
 
 const STATUS_CFG = {
-  Pending:  { icon: Hourglass,    cls: 'bg-[#FEF3C7] text-[#92400E] border-[#F59E0B]/40'  },
-  Approved: { icon: CheckCircle2, cls: 'bg-[#DCFCE7] text-[#166534] border-[#22C55E]/40'  },
-  Rejected: { icon: XCircle,      cls: 'bg-[#FEE2E2] text-[#991B1B] border-[#EF4444]/40'  },
+  Pending:  { icon: Hourglass,    cls: 'bg-[var(--calendar-leave-bg)] text-[var(--calendar-leave-text)] border-[var(--calendar-leave-border)]'  },
+  Approved: { icon: CheckCircle2, cls: 'bg-[var(--calendar-present-bg)] text-[var(--calendar-present-text)] border-[var(--calendar-present-border)]'  },
+  Rejected: { icon: XCircle,      cls: 'bg-[var(--calendar-absent-bg)] text-[var(--calendar-absent-text)] border-[var(--calendar-absent-border)]'  },
 };
 
 const fmtDate = (d: string) =>
@@ -148,7 +148,7 @@ export const EmployeeLeave: React.FC = () => {
         </div>
         <button
           onClick={() => { resetForm(); setModalOpen(true); }}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition shadow-md"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-[var(--primary-hover)] transition shadow-card"
         >
           <Plus className="h-4 w-4" />
           Apply for Leave
@@ -161,7 +161,7 @@ export const EmployeeLeave: React.FC = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 grid-rows-[auto] gap-4">
 
         {/* ① Big hero stat — spans 2 cols × 2 rows - Styled in corporate brand Navy/Teal */}
-        <div className="col-span-2 row-span-2 relative rounded-xl bg-card border border-border text-foreground p-6 flex flex-col justify-between shadow-sm min-h-[200px]">
+        <div className="col-span-2 row-span-2 relative rounded-lg bg-card border border-border text-foreground p-6 flex flex-col justify-between shadow-card min-h-[200px]">
           <div className="z-10">
             <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 text-primary">
               <PlaneTakeoff className="h-6 w-6" />
@@ -178,7 +178,7 @@ export const EmployeeLeave: React.FC = () => {
             </div>
             <div className="w-px h-8 bg-border" />
             <div className="text-center">
-              <p className="text-2xl font-bold text-[#F59E0B]">{stats.pending}</p>
+              <p className="text-2xl font-bold text-[var(--calendar-leave-text)]">{stats.pending}</p>
               <p className="text-muted-foreground text-[10px] uppercase tracking-wide font-semibold">Pending</p>
             </div>
             <div className="w-px h-8 bg-border" />
@@ -190,25 +190,25 @@ export const EmployeeLeave: React.FC = () => {
         </div>
 
         {/* ② Approved count card - Status specific styling */}
-        <div className="rounded-2xl bg-[#DCFCE7] dark:bg-[#166534]/30 border border-[#22C55E]/40 p-5 flex flex-col justify-between shadow-sm">
-          <CheckCircle2 className="h-7 w-7 text-[#22C55E] mb-3" />
+        <div className="rounded-lg bg-[var(--calendar-present-bg)] border border-[var(--calendar-present-border)] p-5 flex flex-col justify-between shadow-card text-[var(--calendar-present-text)]">
+          <CheckCircle2 className="h-7 w-7 text-[var(--calendar-present-text)] mb-3" />
           <div>
-            <p className="text-3xl font-bold text-[#166534] dark:text-[#22C55E]">{stats.approved}</p>
-            <p className="text-xs text-[#166534] dark:text-[#22C55E]/85 font-semibold mt-0.5">Approved</p>
+            <p className="text-3xl font-bold text-[var(--calendar-present-text)] font-display">{stats.approved}</p>
+            <p className="text-xs text-[var(--calendar-present-text)] opacity-85 font-semibold mt-0.5">Approved</p>
           </div>
         </div>
 
         {/* ③ Pending count card - Status specific styling */}
-        <div className="rounded-2xl bg-[#FEF3C7] dark:bg-[#92400E]/30 border border-[#F59E0B]/40 p-5 flex flex-col justify-between shadow-sm">
-          <Hourglass className="h-7 w-7 text-[#F59E0B] mb-3" />
+        <div className="rounded-lg bg-[var(--calendar-leave-bg)] border border-[var(--calendar-leave-border)] p-5 flex flex-col justify-between shadow-card text-[var(--calendar-leave-text)]">
+          <Hourglass className="h-7 w-7 text-[var(--calendar-leave-text)] mb-3" />
           <div>
-            <p className="text-3xl font-bold text-[#92400E] dark:text-[#F59E0B]">{stats.pending}</p>
-            <p className="text-xs text-[#92400E] dark:text-[#F59E0B]/85 font-semibold mt-0.5">Pending Review</p>
+            <p className="text-3xl font-bold text-[var(--calendar-leave-text)] font-display">{stats.pending}</p>
+            <p className="text-xs text-[var(--calendar-leave-text)] opacity-85 font-semibold mt-0.5">Pending Review</p>
           </div>
         </div>
 
         {/* ④ Leave type breakdown - Progress bar highlights in Teal/Navy */}
-        <div className="col-span-2 rounded-2xl bg-card border border-border p-5 shadow-sm">
+        <div className="col-span-2 rounded-lg bg-card border border-border p-5 shadow-card">
           <div className="flex items-center gap-2 mb-4">
             <TrendingUp className="h-4 w-4 text-primary" />
             <h3 className="font-bold text-foreground text-sm">Leave Type Breakdown</h3>
@@ -237,7 +237,7 @@ export const EmployeeLeave: React.FC = () => {
         </div>
 
         {/* ⑤ Recent requests — spans full 4 cols */}
-        <div className="col-span-4 rounded-2xl bg-card border border-border shadow-sm overflow-hidden">
+        <div className="col-span-4 rounded-lg bg-card border border-border shadow-card overflow-hidden">
           <div className="px-5 py-4 border-b border-border flex items-center justify-between bg-muted/5">
             <div className="flex items-center gap-2">
               <CalendarCheck className="h-4 w-4 text-primary" />
@@ -260,7 +260,7 @@ export const EmployeeLeave: React.FC = () => {
                 return (
                   <div key={lv.id} className="bg-card p-5 hover:bg-muted/10 transition-colors">
                     <div className="flex items-start justify-between gap-2 mb-3">
-                      <div className={`h-9 w-9 rounded-xl ${meta.light} flex items-center justify-center flex-shrink-0`}>
+                      <div className={`h-9 w-9 rounded-lg ${meta.light} flex items-center justify-center flex-shrink-0`}>
                         <CalendarDays className={`h-4 w-4 ${meta.color}`} />
                       </div>
                       <StatusBadge status={lv.status} />
@@ -281,7 +281,7 @@ export const EmployeeLeave: React.FC = () => {
         </div>
 
         {/* ⑥ Info banner — styled in corporate Teal/Navy tints */}
-        <div className="col-span-4 flex items-start gap-3 rounded-2xl border border-border bg-muted/10 px-5 py-4">
+        <div className="col-span-4 flex items-start gap-3 rounded-lg border border-border bg-muted/5 px-5 py-4">
           <Info className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
           <div className="text-xs text-foreground leading-relaxed">
             <span className="font-bold">How it works: </span>

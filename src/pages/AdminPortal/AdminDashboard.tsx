@@ -74,9 +74,9 @@ export const AdminDashboard: React.FC = () => {
   // Donut Chart Data: Attendance Distribution
   const pieData = useMemo(() => {
     return [
-      { name: 'Present', value: stats.present, color: '#10B981' },
-      { name: 'Absent', value: stats.absent, color: '#E88B8B' },
-      { name: 'Leave', value: stats.leave, color: '#F3C969' },
+      { name: 'Present', value: stats.present, color: '#6BCB77' },
+      { name: 'Absent', value: stats.absent, color: '#F28B82' },
+      { name: 'Leave', value: stats.leave, color: '#F7C873' },
     ];
   }, [stats]);
 
@@ -159,16 +159,16 @@ export const AdminDashboard: React.FC = () => {
   const getActivityIcon = (type: string) => {
     switch (type) {
       case 'check_in':
-        return <div className="h-7 w-7 rounded-full bg-[#22C55E]/10 text-[#22C55E] flex items-center justify-center"><UserCheck className="h-4 w-4" /></div>;
+        return <div className="h-7 w-7 rounded-full bg-[var(--calendar-present-bg)] text-[var(--calendar-present-text)] flex items-center justify-center"><UserCheck className="h-4 w-4" /></div>;
       case 'check_out':
-        return <div className="h-7 w-7 rounded-full bg-[#334155]/10 text-[#334155] flex items-center justify-center"><Clock className="h-4 w-4" /></div>;
+        return <div className="h-7 w-7 rounded-full bg-primary/10 text-primary flex items-center justify-center"><Clock className="h-4 w-4" /></div>;
       case 'leave_approve':
-        return <div className="h-7 w-7 rounded-full bg-[#3B82F6]/10 text-[#3B82F6] flex items-center justify-center"><Briefcase className="h-4 w-4" /></div>;
+        return <div className="h-7 w-7 rounded-full bg-[var(--calendar-holiday-bg)] text-[var(--calendar-holiday-text)] flex items-center justify-center"><Briefcase className="h-4 w-4" /></div>;
       case 'leave_reject':
-        return <div className="h-7 w-7 rounded-full bg-[#EF4444]/10 text-[#EF4444] flex items-center justify-center"><UserX className="h-4 w-4" /></div>;
+        return <div className="h-7 w-7 rounded-full bg-[var(--calendar-absent-bg)] text-[var(--calendar-absent-text)] flex items-center justify-center"><UserX className="h-4 w-4" /></div>;
       case 'employee_add':
       default:
-        return <div className="h-7 w-7 rounded-full bg-[#F59E0B]/10 text-[#F59E0B] flex items-center justify-center"><Users className="h-4 w-4" /></div>;
+        return <div className="h-7 w-7 rounded-full bg-[var(--calendar-leave-bg)] text-[var(--calendar-leave-text)] flex items-center justify-center"><Users className="h-4 w-4" /></div>;
     }
   };
 
@@ -281,9 +281,9 @@ export const AdminDashboard: React.FC = () => {
           </CardContent>
           {/* Pie legend */}
           <div className="px-6 pb-4 flex justify-center space-x-6 text-xs font-semibold text-muted-foreground border-t border-border pt-2 bg-muted/5">
-            <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[#22C55E]" /> Present ({stats.present})</div>
-            <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[#EF4444]" /> Absent ({stats.absent})</div>
-            <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[#F59E0B]" /> On Leave ({stats.leave})</div>
+            <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-present" /> Present ({stats.present})</div>
+            <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-absent" /> Absent ({stats.absent})</div>
+            <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-leave" /> On Leave ({stats.leave})</div>
           </div>
         </Card>
 
@@ -297,15 +297,15 @@ export const AdminDashboard: React.FC = () => {
               <AreaChart data={weeklyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorPresent" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#334155" stopOpacity={0.2}/>
-                    <stop offset="95%" stopColor="#334155" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#A9AFE5" stopOpacity={0.2}/>
+                    <stop offset="95%" stopColor="#A9AFE5" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
                 <XAxis dataKey="day" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} />
                 <YAxis stroke="var(--muted-foreground)" fontSize={11} tickLine={false} allowDecimals={false} />
                 <Tooltip contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }} />
-                <Area type="monotone" dataKey="Present" stroke="#334155" fillOpacity={1} fill="url(#colorPresent)" strokeWidth={2.5} />
+                <Area type="monotone" dataKey="Present" stroke="#A9AFE5" fillOpacity={1} fill="url(#colorPresent)" strokeWidth={2.5} />
               </AreaChart>
             </ResponsiveContainer>
           </CardContent>
@@ -362,7 +362,7 @@ export const AdminDashboard: React.FC = () => {
                 <XAxis type="number" domain={[0, 100]} stroke="var(--muted-foreground)" fontSize={10} tickLine={false} />
                 <YAxis dataKey="name" type="category" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} width={80} />
                 <Tooltip contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }} />
-                <Bar dataKey="Attendance Rate (%)" fill="#334155" radius={[0, 4, 4, 0]} barSize={12} />
+                <Bar dataKey="Attendance Rate (%)" fill="#A9AFE5" radius={[0, 4, 4, 0]} barSize={12} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

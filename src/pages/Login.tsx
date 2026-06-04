@@ -134,14 +134,14 @@ const PortalForm: React.FC<PortalFormProps> = ({ portal, onSuccess }) => {
         <Button
           type="submit"
           disabled={loading}
-          className="w-full h-11 rounded-xl font-semibold text-sm flex items-center justify-center gap-2"
+          className="w-full h-11 rounded-lg font-semibold text-sm flex items-center justify-center gap-2"
         >
           <LogIn className="h-4 w-4" />
           {loading ? 'Signing in…' : `Sign in to ${isAdmin ? 'Admin' : 'Employee'} Portal`}
         </Button>
 
         {/* Demo hint */}
-        <div className="rounded-xl p-3 border border-border/80 bg-muted/5 text-[10.5px] leading-relaxed text-muted-foreground">
+        <div className="rounded-lg p-3 border border-border/80 bg-muted/5 text-[10.5px] leading-relaxed text-muted-foreground">
           <span className="font-bold">Demo: </span>
           <code className="font-mono font-semibold text-foreground/80">
             {isAdmin ? 'admin@company.com' : 'employee@company.com'}
@@ -205,7 +205,7 @@ export const Login: React.FC = () => {
       <div className="w-full max-w-4xl z-10 grid grid-cols-1 md:grid-cols-2 gap-6 px-2">
 
         {/* ── Employee Portal Card ── */}
-        <div className="relative rounded-xl p-7 flex flex-col bg-card border border-border shadow-sm">
+        <div className="relative rounded-lg p-7 flex flex-col bg-card border border-border shadow-card">
           <div className="flex items-center gap-3 mb-1">
             <div className="h-11 w-11 rounded-lg flex items-center justify-center border border-border bg-muted/10">
               <UserCircle2 className="h-5 w-5 text-primary" />
@@ -229,7 +229,7 @@ export const Login: React.FC = () => {
         </div>
 
         {/* ── Admin / HR Portal Card ── */}
-        <div className="relative rounded-xl p-7 flex flex-col bg-card border border-border shadow-sm">
+        <div className="relative rounded-lg p-7 flex flex-col bg-card border border-border shadow-card">
           <div className="flex items-center gap-3 mb-1">
             <div className="h-11 w-11 rounded-lg flex items-center justify-center border border-border bg-muted/10">
               <ShieldCheck className="h-5 w-5 text-primary" />

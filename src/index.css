@@ -6,125 +6,141 @@
 
 @layer base {
   :root {
-    /* ── LIGHT MODE COLOR SYSTEM (SLATE ENTERPRISE) ── */
-    --background:   210 40% 98%;       /* #F8FAFC */
-    --foreground:   222 47% 11%;      /* #0F172A */
+    /* ── LIGHT MODE COLOR SYSTEM (PASTEL LAVENDER) ── */
+    --background:   228 50% 98%;       /* #F8F9FD */
+    --foreground:   231 23% 32%;      /* #3F4565 */
 
     --card:         0 0% 100%;        /* #FFFFFF */
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 231 23% 32%;
 
     --popover:      0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 231 23% 32%;
 
-    --primary:      215 16% 27%;      /* #334155 */
+    --primary:      234 53% 78%;      /* #A9AFE5 */
     --primary-foreground: 0 0% 100%;  /* #FFFFFF */
 
-    --secondary:    210 40% 96%;      /* #F1F5F9 */
-    --secondary-foreground: 215 16% 27%; /* #334155 */
+    --secondary:    235 61% 86%;      /* #C4C8F0 */
+    --secondary-foreground: 235 48% 61%; /* #6D74C9 */
 
-    --muted:        215 16% 47%;       /* #64748B */
-    --muted-foreground: 215 16% 47%;
+    --muted:        218 11% 65%;       /* #9CA3AF */
+    --muted-foreground: 218 11% 65%;
 
-    --accent:       210 40% 96%;      /* #F1F5F9 */
-    --accent-foreground: 222 47% 11%;
+    --accent:       235 61% 95%;      /* #F3F4FE */
+    --accent-foreground: 231 23% 32%;
 
-    --destructive:  0 84% 60%;        /* #EF4444 */
+    --destructive:  0 84% 60%;        /* #F28B82 */
     --destructive-foreground: 0 0% 100%;
 
-    --border:       214 32% 91%;       /* #E2E8F0 */
-    --input:        214 32% 91%;
-    --ring:         215 16% 27%;
+    --border:       230 42% 96%;       /* #EEF0FA */
+    --input:        230 42% 96%;
+    --ring:         234 53% 78%;
 
-    --radius: 0.5rem;
+    --radius: 1.25rem;                 /* 20px */
 
     /* Custom Theme Colors */
     --sidebar-bg: #FFFFFF;
-    --sidebar-active-bg: #F1F5F9;
-    --sidebar-text: #0F172A;
-    --sidebar-hover: #F8FAFC;
+    --sidebar-active-bg: #E7E9FB;
+    --sidebar-text: #3F4565;
+    --sidebar-active-text: #6D74C9;
+    --sidebar-hover: #F3F4FE;
+    --sidebar-icon: #8C93D6;
     
     --navbar-bg: #FFFFFF;
     
-    --table-header-bg: #F8FAFC;
-    --table-row-hover-bg: #F8FAFC;
+    --table-header-bg: #F8F9FD;
+    --table-row-hover-bg: #F5F6FE;
+
+    --primary-hover: #9299D8;
+    --secondary-hover: #D8DCF8;
 
     /* Calendar Day Backgrounds (Light) */
-    --calendar-present-bg: #DCFCE7;
-    --calendar-absent-bg: #FEE2E2;
-    --calendar-leave-bg: #FEF3C7;
-    --calendar-holiday-bg: #DBEAFE;
-    --calendar-weekend-bg: #F8FAFC;
+    --calendar-present-bg: #EAF8EC;
+    --calendar-absent-bg: #FDECEC;
+    --calendar-leave-bg: #FFF6E1;
+    --calendar-holiday-bg: #ECF4FF;
+    --calendar-weekend-bg: #F5F5F5;
+    --calendar-halfday-bg: #FFF7D6;
+    --calendar-halfday-text: #B8860B;
+    --calendar-halfday-border: rgba(255, 209, 102, 0.3);
 
-    --calendar-present-text: #166534;
-    --calendar-present-border: rgba(34, 197, 94, 0.3);
-    --calendar-absent-text: #991B1B;
-    --calendar-absent-border: rgba(239, 68, 68, 0.3);
-    --calendar-leave-text: #92400E;
-    --calendar-leave-border: rgba(245, 158, 11, 0.3);
-    --calendar-holiday-text: #1D4ED8;
-    --calendar-holiday-border: rgba(59, 130, 246, 0.3);
-    --calendar-weekend-text: #475569;
-    --calendar-weekend-border: rgba(148, 163, 184, 0.2);
+    --calendar-present-text: #6BCB77;
+    --calendar-present-border: rgba(107, 203, 119, 0.3);
+    --calendar-absent-text: #F28B82;
+    --calendar-absent-border: rgba(242, 139, 130, 0.3);
+    --calendar-leave-text: #F7C873;
+    --calendar-leave-border: rgba(247, 200, 115, 0.3);
+    --calendar-holiday-text: #8AB4F8;
+    --calendar-holiday-border: rgba(138, 180, 248, 0.3);
+    --calendar-weekend-text: #D1D5DB;
+    --calendar-weekend-border: rgba(209, 213, 219, 0.2);
   }
 
   [data-theme='dark'] {
-    /* ── DARK MODE COLOR SYSTEM (SLATE ENTERPRISE) ── */
-    --background:   222 47% 11%;       /* #0F172A */
-    --foreground:   210 40% 98%;      /* #F8FAFC */
+    /* ── DARK MODE COLOR SYSTEM (PASTEL LAVENDER DARK) ── */
+    --background:   235 20% 11%;       /* #161722 */
+    --foreground:   228 50% 96%;      /* #F1F3FD */
 
-    --card:         217 33% 17%;       /* #1E293B */
-    --card-foreground: 210 40% 98%;
+    --card:         235 18% 16%;       /* #1F202E */
+    --card-foreground: 228 50% 96%;
 
-    --popover:      217 33% 17%;
-    --popover-foreground: 210 40% 98%;
+    --popover:      235 18% 16%;
+    --popover-foreground: 228 50% 96%;
 
-    --primary:      210 40% 96%;      /* #F1F5F9 */
-    --primary-foreground: 222 47% 11%; /* #0F172A */
+    --primary:      234 53% 78%;      /* #A9AFE5 */
+    --primary-foreground: 235 20% 11%;
 
-    --secondary:    215 16% 27%;      /* #334155 */
-    --secondary-foreground: 210 40% 96%;
+    --secondary:    235 18% 22%;      /* #2E3043 */
+    --secondary-foreground: 234 53% 78%;
 
-    --muted:        215 16% 47%;       /* #64748B */
-    --muted-foreground: 215 16% 47%;
+    --muted:        231 12% 58%;       /* #9396B0 */
+    --muted-foreground: 231 12% 58%;
 
-    --accent:       215 16% 27%;      /* #334155 */
-    --accent-foreground: 210 40% 98%;
+    --accent:       235 18% 22%;
+    --accent-foreground: 228 50% 96%;
 
-    --destructive:  0 84% 60%;
+    --destructive:  0 84% 65%;
     --destructive-foreground: 0 0% 100%;
 
-    --border:       217 30% 26%;
-    --input:        217 30% 26%;
-    --ring:         210 40% 96%;
+    --border:       235 15% 24%;
+    --input:        235 15% 24%;
+    --ring:         234 53% 78%;
 
     /* Custom Theme Colors */
-    --sidebar-bg: #1E293B;
-    --sidebar-active-bg: #334155;
-    --sidebar-text: #F8FAFC;
-    --sidebar-hover: #0F172A;
+    --sidebar-bg: #1F202E;
+    --sidebar-active-bg: #2A2B3D;
+    --sidebar-text: #A2A5B9;
+    --sidebar-active-text: #9FA5EA;
+    --sidebar-hover: #242636;
+    --sidebar-icon: #747BB5;
     
-    --navbar-bg: #1E293B;
+    --navbar-bg: #1F202E;
     
-    --table-header-bg: #0F172A;
-    --table-row-hover-bg: #0F172A;
+    --table-header-bg: #161722;
+    --table-row-hover-bg: #242636;
+
+    --primary-hover: #858CCD;
+    --secondary-hover: #262838;
 
     /* Calendar Day Backgrounds (Dark) */
-    --calendar-present-bg: #052e16;
-    --calendar-absent-bg: #450a0a;
-    --calendar-leave-bg: #451a03;
-    --calendar-holiday-bg: #1e3a8a;
-    --calendar-weekend-bg: #0F172A;
+    --calendar-present-bg: #153322;
+    --calendar-absent-bg: #3F1F1F;
+    --calendar-leave-bg: #3F2E12;
+    --calendar-holiday-bg: #182845;
+    --calendar-weekend-bg: #1F202E;
 
-    --calendar-present-text: #4ade80;
-    --calendar-present-border: rgba(74, 222, 128, 0.3);
-    --calendar-absent-text: #fca5a5;
+    --calendar-present-text: #86EFAC;
+    --calendar-present-border: rgba(134, 239, 172, 0.3);
+    --calendar-absent-text: #FCA5A5;
     --calendar-absent-border: rgba(252, 165, 165, 0.3);
-    --calendar-leave-text: #fcd34d;
-    --calendar-leave-border: rgba(252, 211, 77, 0.3);
-    --calendar-holiday-text: #93c5fd;
+    --calendar-leave-text: #FDE047;
+    --calendar-leave-border: rgba(253, 224, 71, 0.3);
+    --calendar-holiday-text: #93C5FD;
     --calendar-holiday-border: rgba(147, 197, 253, 0.3);
-    --calendar-weekend-text: #94a3b8;
-    --calendar-weekend-border: rgba(148, 163, 184, 0.2);
+    --calendar-weekend-text: #6B7280;
+    --calendar-weekend-border: rgba(107, 114, 128, 0.2);
+    --calendar-halfday-bg: #3F3512;
+    --calendar-halfday-text: #FFE082;
+    --calendar-halfday-border: rgba(255, 224, 130, 0.3);
   }
 }
 
@@ -165,20 +181,21 @@ header.sticky {
 .cell-leave { background-color: var(--calendar-leave-bg); border-color: var(--calendar-leave-border); color: var(--calendar-leave-text); }
 .cell-holiday { background-color: var(--calendar-holiday-bg); border-color: var(--calendar-holiday-border); color: var(--calendar-holiday-text); }
 .cell-weekend { background-color: var(--calendar-weekend-bg); border-color: var(--calendar-weekend-border); color: var(--calendar-weekend-text); }
+.cell-halfday { background-color: var(--calendar-halfday-bg); border-color: var(--calendar-halfday-border); color: var(--calendar-halfday-text); }
 
 /* ── Soft Shadows ──────────────────────────────────────────────────────── */
 .shadow-premium-light {
-  box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 20px rgba(109, 116, 201, 0.08);
 }
 .shadow-premium-dark {
-  box-shadow: 0 8px 28px -12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
 }
 
 .shadow-card {
-  box-shadow: 0 2px 12px -2px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 20px rgba(109, 116, 201, 0.08);
 }
 [data-theme='dark'] .shadow-card {
-  box-shadow: 0 2px 16px -2px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 /* ── Circular progress ring (used in stats) ────────────────────────────── */
@@ -187,14 +204,16 @@ header.sticky {
 }
 
 /* ── Legend color circles ─────────────────────────────────────────────── */
-.bg-present { background-color: #22C55E; }
-.bg-absent { background-color: #EF4444; }
-.bg-leave { background-color: #F59E0B; }
-.bg-holiday { background-color: #3B82F6; }
-.bg-weekend { background-color: #94A3B8; }
+.bg-present { background-color: #6BCB77; }
+.bg-absent { background-color: #F28B82; }
+.bg-leave { background-color: #F7C873; }
+.bg-holiday { background-color: #8AB4F8; }
+.bg-weekend { background-color: #D1D5DB; }
+.bg-halfday { background-color: #FFD166; }
 
-.text-present { color: #22C55E; }
-.text-absent { color: #EF4444; }
-.text-leave { color: #F59E0B; }
-.text-holiday { color: #3B82F6; }
-.text-weekend { color: #94A3B8; }
+.text-present { color: #6BCB77; }
+.text-absent { color: #F28B82; }
+.text-leave { color: #F7C873; }
+.text-holiday { color: #8AB4F8; }
+.text-weekend { color: #D1D5DB; }
+.text-halfday { color: #FFD166; }

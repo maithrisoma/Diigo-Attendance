@@ -193,29 +193,29 @@ export const AttendanceCalendar: React.FC = () => {
         </div>
 
         {/* Legend */}
-        <div className="flex flex-wrap gap-3 bg-white p-3 rounded-xl border border-[#E2E8F0] shadow-sm text-xs font-semibold text-[#64748B]">
-          <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[#22C55E]" /> Present</div>
-          <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[#EF4444]" /> Absent</div>
-          <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[#F59E0B]" /> Leave / Off</div>
+        <div className="flex flex-wrap gap-3 bg-card p-3 rounded-xl border border-border shadow-card text-xs font-semibold text-foreground/80">
+          <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[var(--calendar-present-text)]" /> Present</div>
+          <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[var(--calendar-absent-text)]" /> Absent</div>
+          <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[var(--calendar-leave-text)]" /> Leave / Off</div>
         </div>
       </div>
 
       {/* Monthly grid calendar */}
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between border-b border-border/50 bg-slate-50/50 pb-4">
+        <CardHeader className="flex flex-row items-center justify-between border-b border-border/50 bg-muted/5 pb-4">
           <CardTitle className="text-base font-semibold font-display">
             {monthNames[currentMonth]} {currentYear}
           </CardTitle>
           <div className="flex space-x-1.5">
             <button
               onClick={handlePrevMonth}
-              className="p-1.5 border border-border hover:bg-slate-100 rounded-lg text-slate-600 transition-colors"
+              className="p-1.5 border border-border bg-card hover:bg-muted/10 rounded-lg text-foreground/85 transition-colors"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
             <button
               onClick={handleNextMonth}
-              className="p-1.5 border border-border hover:bg-slate-100 rounded-lg text-slate-600 transition-colors"
+              className="p-1.5 border border-border bg-card hover:bg-muted/10 rounded-lg text-foreground/85 transition-colors"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
@@ -223,7 +223,7 @@ export const AttendanceCalendar: React.FC = () => {
         </CardHeader>
         <CardContent className="p-4 md:p-6">
           {/* Weekday headers */}
-          <div className="grid grid-cols-7 gap-2 text-center text-xs font-bold text-slate-500 font-display uppercase tracking-wider mb-3">
+          <div className="grid grid-cols-7 gap-2 text-center text-xs font-bold text-muted-foreground font-display uppercase tracking-wider mb-3">
             <div>Sun</div>
             <div>Mon</div>
             <div>Tue</div>
@@ -245,10 +245,10 @@ export const AttendanceCalendar: React.FC = () => {
                     day.dayNumber === null
                       ? 'bg-transparent border-transparent pointer-events-none'
                       : day.isFuture
-                      ? 'bg-slate-50/20 text-slate-300 border-dashed border-slate-200 cursor-not-allowed'
+                      ? 'bg-muted/5 text-muted-foreground/30 border-dashed border-border cursor-not-allowed'
                       : day.isWeekend
-                      ? 'bg-[#F1F5F9] border-[#CBD5E1] text-[#475569] cursor-pointer hover:bg-slate-200/80'
-                      : 'bg-white border-[#E2E8F0] text-[#0F172A] cursor-pointer hover:bg-[#F8FAFC]'
+                      ? 'bg-[var(--calendar-weekend-bg)] border-[var(--calendar-weekend-border)] text-muted-foreground cursor-pointer hover:opacity-85'
+                      : 'bg-card border-border text-foreground cursor-pointer hover:bg-muted/5'
                   } ${isToday ? 'ring-2 ring-primary border-primary' : ''}`}
                 >
                 {day.dayNumber !== null && (
@@ -256,7 +256,7 @@ export const AttendanceCalendar: React.FC = () => {
                     <div className="flex justify-between items-start">
                       <span className="text-xs font-bold font-mono">{day.dayNumber}</span>
                       {day.holidayName && (
-                        <span className="bg-violet-100 text-violet-700 text-[8px] font-bold px-1 rounded truncate max-w-[45px] md:max-w-none">
+                        <span className="bg-[var(--calendar-holiday-bg)] text-[var(--calendar-holiday-text)] border border-[var(--calendar-holiday-border)] text-[8px] font-bold px-1 rounded truncate max-w-[45px] md:max-w-none">
                           {day.holidayName}
                         </span>
                       )}
@@ -264,16 +264,16 @@ export const AttendanceCalendar: React.FC = () => {
                     
                     {!day.isFuture && (
                       <div className="flex flex-col space-y-0.5 md:space-y-1 text-[10px] md:text-xs font-bold font-mono">
-                        <div className="text-[#22C55E] flex items-center gap-1">
-                          <span className="h-1.5 w-1.5 rounded-full bg-[#22C55E] hidden md:block" />
+                        <div className="text-[var(--calendar-present-text)] flex items-center gap-1">
+                          <span className="h-1.5 w-1.5 rounded-full bg-[var(--calendar-present-text)] hidden md:block" />
                           <span>P: {day.present}</span>
                         </div>
-                        <div className="text-[#EF4444] flex items-center gap-1">
-                          <span className="h-1.5 w-1.5 rounded-full bg-[#EF4444] hidden md:block" />
+                        <div className="text-[var(--calendar-absent-text)] flex items-center gap-1">
+                          <span className="h-1.5 w-1.5 rounded-full bg-[var(--calendar-absent-text)] hidden md:block" />
                           <span>A: {day.absent}</span>
                         </div>
-                        <div className="text-[#F59E0B] flex items-center gap-1">
-                          <span className="h-1.5 w-1.5 rounded-full bg-[#F59E0B] hidden md:block" />
+                        <div className="text-[var(--calendar-leave-text)] flex items-center gap-1">
+                          <span className="h-1.5 w-1.5 rounded-full bg-[var(--calendar-leave-text)] hidden md:block" />
                           <span>L: {day.leave}</span>
                         </div>
                       </div>
@@ -309,8 +309,8 @@ export const AttendanceCalendar: React.FC = () => {
             <TableBody>
               {selectedDateDetails.map((rec, i) => (
                 <TableRow key={i}>
-                  <TableCell className="font-semibold text-slate-800">{rec.name}</TableCell>
-                  <TableCell className="text-slate-600 text-xs font-medium">{rec.department}</TableCell>
+                  <TableCell className="font-semibold text-foreground">{rec.name}</TableCell>
+                  <TableCell className="text-muted-foreground text-xs font-medium">{rec.department}</TableCell>
                   <TableCell>
                     <Badge
                       variant={
@@ -327,7 +327,7 @@ export const AttendanceCalendar: React.FC = () => {
                       {rec.status === 'Leave' && rec.isHoliday ? 'Holiday Off' : rec.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="font-mono text-xs text-slate-600">
+                  <TableCell className="font-mono text-xs text-muted-foreground">
                     {rec.checkIn
                       ? new Date(`2000-01-01T${rec.checkIn}`).toLocaleTimeString([], {
                           hour: '2-digit',
@@ -335,17 +335,17 @@ export const AttendanceCalendar: React.FC = () => {
                         })
                       : '--:--'}
                   </TableCell>
-                  <TableCell className="font-mono text-xs text-slate-600">
+                  <TableCell className="font-mono text-xs text-muted-foreground">
                     {rec.checkOut
                       ? new Date(`2000-01-01T${rec.checkOut}`).toLocaleTimeString([], {
                           hour: '2-digit',
                           minute: '2-digit',
                         })
                       : rec.checkIn ? (
-                        <span className="text-emerald-600 font-bold animate-pulse">Active</span>
+                        <span className="text-[var(--calendar-present-text)] font-bold animate-pulse">Active</span>
                       ) : '--:--'}
                   </TableCell>
-                  <TableCell className="text-right font-mono text-xs text-slate-700 font-semibold">
+                  <TableCell className="text-right font-mono text-xs text-foreground font-semibold">
                     {rec.workingHours !== null ? `${rec.workingHours.toFixed(2)}h` : '--'}
                   </TableCell>
                 </TableRow>

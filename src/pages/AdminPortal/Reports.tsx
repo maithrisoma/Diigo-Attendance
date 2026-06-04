@@ -256,7 +256,7 @@ export const Reports: React.FC = () => {
           </div>
 
           <div className="w-full sm:flex-1 relative">
-            <label className="text-xs font-semibold text-slate-700 tracking-wide font-display mb-1.5 block">
+            <label className="text-xs font-semibold text-foreground tracking-wide font-display mb-1.5 block">
               Reference Date
             </label>
             <div className="relative">
@@ -285,20 +285,20 @@ export const Reports: React.FC = () => {
           
           {/* Action buttons toolbar (hidden when printing) */}
           <div className="flex justify-end space-x-3 print:hidden">
-            <Button variant="outline" className="flex items-center space-x-2 text-slate-700 border-slate-300" onClick={handleExportCSV}>
+            <Button variant="outline" className="flex items-center space-x-2 text-foreground border-border" onClick={handleExportCSV}>
               <Download className="h-4 w-4" />
               <span>Export CSV</span>
             </Button>
-            <Button className="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold" onClick={handlePrintPDF}>
+            <Button className="flex items-center space-x-2 bg-primary hover:bg-[var(--primary-hover)] text-primary-foreground font-semibold" onClick={handlePrintPDF}>
               <Printer className="h-4 w-4" />
               <span>Print Report / PDF</span>
             </Button>
           </div>
 
           {/* PRINT-ONLY HEADER */}
-          <div className="hidden print:block text-center space-y-2 border-b border-slate-300 pb-6 mb-4">
-            <h1 className="text-3xl font-bold font-display text-slate-900">DAttendance Summary Report</h1>
-            <p className="text-sm text-slate-500 font-medium capitalize">
+          <div className="hidden print:block text-center space-y-2 border-b border-border pb-6 mb-4">
+            <h1 className="text-3xl font-bold font-display text-foreground">Diigo Attendance Summary Report</h1>
+            <p className="text-sm text-muted-foreground font-medium capitalize">
               Report Range: {reportType} summary around {new Date(selectedDate).toLocaleDateString()} ({reportData.datesCount} working days computed)
             </p>
           </div>
@@ -308,37 +308,37 @@ export const Reports: React.FC = () => {
             <Card>
               <CardContent className="p-6 text-center space-y-1">
                 <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">Overall Rate</p>
-                <p className="text-3xl font-bold text-indigo-600 font-display">{reportData.overallRate}%</p>
+                <p className="text-3xl font-bold text-primary font-display">{reportData.overallRate}%</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardContent className="p-6 text-center space-y-1">
                 <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">Present Logs</p>
-                <p className="text-3xl font-bold text-emerald-600 font-display">{reportData.presentCount}</p>
+                <p className="text-3xl font-bold text-[var(--calendar-present-text)] font-display">{reportData.presentCount}</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardContent className="p-6 text-center space-y-1">
                 <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">Absent Logs</p>
-                <p className="text-3xl font-bold text-rose-600 font-display">{reportData.absentCount}</p>
+                <p className="text-3xl font-bold text-[var(--calendar-absent-text)] font-display">{reportData.absentCount}</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardContent className="p-6 text-center space-y-1">
                 <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">Avg Office hours</p>
-                <p className="text-3xl font-bold text-slate-700 font-display font-mono">{reportData.avgOfficeHours}h</p>
+                <p className="text-3xl font-bold text-foreground font-display font-mono">{reportData.avgOfficeHours}h</p>
               </CardContent>
             </Card>
           </div>
 
           {/* Department Breakdown table */}
           <Card>
-            <CardHeader className="border-b border-slate-100 bg-slate-50/50 py-4">
-              <CardTitle className="text-sm font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
-                <BarChart3 className="h-4 w-4 text-slate-400" />
+            <CardHeader className="border-b border-border bg-muted/5 py-4">
+              <CardTitle className="text-sm font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
+                <BarChart3 className="h-4 w-4 text-muted-foreground" />
                 Department Attendance Breakdown
               </CardTitle>
             </CardHeader>
@@ -356,11 +356,11 @@ export const Reports: React.FC = () => {
                 <TableBody>
                   {reportData.departmentSummaries.map((dept, i) => (
                     <TableRow key={i}>
-                      <TableCell className="font-semibold text-slate-900">{dept.name}</TableCell>
-                      <TableCell className="text-center text-slate-600 font-mono">{dept.employeesCount}</TableCell>
-                      <TableCell className="text-center text-emerald-600 font-mono font-semibold">{dept.present}</TableCell>
-                      <TableCell className="text-center text-rose-600 font-mono font-semibold">{dept.absent}</TableCell>
-                      <TableCell className="text-right font-bold text-slate-700 font-mono">{dept.rate}%</TableCell>
+                      <TableCell className="font-semibold text-foreground">{dept.name}</TableCell>
+                      <TableCell className="text-center text-muted-foreground font-mono">{dept.employeesCount}</TableCell>
+                      <TableCell className="text-center text-[var(--calendar-present-text)] font-mono font-semibold">{dept.present}</TableCell>
+                      <TableCell className="text-center text-[var(--calendar-absent-text)] font-mono font-semibold">{dept.absent}</TableCell>
+                      <TableCell className="text-right font-bold text-foreground font-mono">{dept.rate}%</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -370,9 +370,9 @@ export const Reports: React.FC = () => {
 
           {/* Detail Staff table */}
           <Card>
-            <CardHeader className="border-b border-slate-100 bg-slate-50/50 py-4">
-              <CardTitle className="text-sm font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-slate-400" />
+            <CardHeader className="border-b border-border bg-muted/5 py-4">
+              <CardTitle className="text-sm font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
                 Employee-wise Attendance Metrics
               </CardTitle>
             </CardHeader>
@@ -393,13 +393,13 @@ export const Reports: React.FC = () => {
                 <TableBody>
                   {reportData.employeeSummaries.map((emp) => (
                     <TableRow key={emp.id}>
-                      <TableCell className="font-mono text-xs font-bold text-slate-700">{emp.employee_id}</TableCell>
-                      <TableCell className="font-semibold text-slate-900">{emp.name}</TableCell>
-                      <TableCell className="text-slate-600 text-xs font-medium">{emp.department}</TableCell>
-                      <TableCell className="text-center text-emerald-600 font-mono font-semibold">{emp.present}</TableCell>
-                      <TableCell className="text-center text-rose-600 font-mono font-semibold">{emp.absent}</TableCell>
-                      <TableCell className="text-center text-blue-600 font-mono font-semibold">{emp.leave}</TableCell>
-                      <TableCell className="text-center font-mono text-xs text-slate-600">{emp.avgHours}h</TableCell>
+                      <TableCell className="font-mono text-xs font-bold text-foreground">{emp.employee_id}</TableCell>
+                      <TableCell className="font-semibold text-foreground">{emp.name}</TableCell>
+                      <TableCell className="text-muted-foreground text-xs font-medium">{emp.department}</TableCell>
+                      <TableCell className="text-center text-[var(--calendar-present-text)] font-mono font-semibold">{emp.present}</TableCell>
+                      <TableCell className="text-center text-[var(--calendar-absent-text)] font-mono font-semibold">{emp.absent}</TableCell>
+                      <TableCell className="text-center text-[var(--calendar-holiday-text)] font-mono font-semibold">{emp.leave}</TableCell>
+                      <TableCell className="text-center font-mono text-xs text-muted-foreground">{emp.avgHours}h</TableCell>
                       <TableCell className="text-right">
                         <Badge
                           variant={emp.rate >= 90 ? 'success' : emp.rate >= 75 ? 'warning' : 'danger'}

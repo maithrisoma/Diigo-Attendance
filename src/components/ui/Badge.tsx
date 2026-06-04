@@ -35,14 +35,14 @@ export const Badge: React.FC<BadgeProps> = ({ children, variant = 'default', cla
         return 'bg-[var(--calendar-leave-bg)] text-[var(--calendar-leave-text)] border-[var(--calendar-leave-border)] hover:opacity-90';
       case 'pending':
       case 'Half Day':
-        return 'bg-[var(--calendar-leave-bg)]/80 text-[var(--calendar-leave-text)] border-[var(--calendar-leave-border)]/70 hover:opacity-90';
+        return 'bg-[var(--calendar-halfday-bg)] text-[var(--calendar-halfday-text)] border-[var(--calendar-halfday-border)] hover:opacity-90';
       case 'info':
       case 'Holiday':
         return 'bg-[var(--calendar-holiday-bg)] text-[var(--calendar-holiday-text)] border-[var(--calendar-holiday-border)] hover:opacity-90';
       case 'secondary':
       case 'outline':
       case 'Weekend':
-        return 'bg-[var(--calendar-weekend-bg)] text-[#94A3B8] border-[#CFCFCF]/40 hover:opacity-90';
+        return 'bg-[var(--calendar-weekend-bg)] text-[var(--calendar-weekend-text)] border-[var(--calendar-weekend-border)] hover:opacity-90';
       case 'default':
       default:
         return 'bg-primary text-primary-foreground border-transparent hover:opacity-90';

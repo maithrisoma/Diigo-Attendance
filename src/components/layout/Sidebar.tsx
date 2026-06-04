@@ -86,17 +86,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
             className={({ isActive }) =>
               `flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 relative ${
                 isActive
-                  ? 'bg-secondary text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:bg-muted/5 hover:text-foreground'
+                  ? 'bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)]'
+                  : 'text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-active-text)]'
               }`
             }
           >
             {({ isActive }) => (
               <>
                 {isActive && (
-                  <span className="absolute left-0 top-2.5 bottom-2.5 w-1 rounded-r bg-[#334155] dark:bg-primary-foreground" />
+                  <span className="absolute left-0 top-2.5 bottom-2.5 w-1 rounded-r bg-[var(--sidebar-active-text)]" />
                 )}
-                <link.icon className={`h-4.5 w-4.5 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
+                <link.icon className={`h-4.5 w-4.5 ${isActive ? 'text-[var(--sidebar-active-text)]' : 'text-[var(--sidebar-icon)]'}`} />
                 <span>{link.label}</span>
               </>
             )}
@@ -112,17 +112,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
             className={({ isActive }) =>
               `flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-150 relative ${
                 isActive
-                  ? 'bg-secondary text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:bg-muted/5 hover:text-foreground'
+                  ? 'bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)]'
+                  : 'text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-active-text)]'
               }`
             }
           >
             {({ isActive }) => (
               <>
                 {isActive && (
-                  <span className="absolute left-0 top-2.5 bottom-2.5 w-1 rounded-r bg-[#334155] dark:bg-primary-foreground" />
+                  <span className="absolute left-0 top-2.5 bottom-2.5 w-1 rounded-r bg-[var(--sidebar-active-text)]" />
                 )}
-                <Settings className={`h-4.5 w-4.5 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
+                <Settings className={`h-4.5 w-4.5 ${isActive ? 'text-[var(--sidebar-active-text)]' : 'text-[var(--sidebar-icon)]'}`} />
                 <span>Settings</span>
               </>
             )}

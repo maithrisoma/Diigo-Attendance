@@ -129,7 +129,7 @@ export const EmployeeCalendar: React.FC = () => {
       case 'Absent':
         return 'bg-[var(--calendar-absent-bg)] text-[var(--calendar-absent-text)] border-[var(--calendar-absent-border)] hover:opacity-90';
       case 'Half Day':
-        return 'bg-[var(--calendar-leave-bg)]/80 text-[var(--calendar-leave-text)] border-[var(--calendar-leave-border)]/70 hover:opacity-90';
+        return 'bg-[var(--calendar-halfday-bg)] text-[var(--calendar-halfday-text)] border-[var(--calendar-halfday-border)] hover:opacity-90';
       case 'Leave':
         return 'bg-[var(--calendar-leave-bg)] text-[var(--calendar-leave-text)] border-[var(--calendar-leave-border)] hover:opacity-90';
       case 'Holiday':
@@ -172,19 +172,19 @@ export const EmployeeCalendar: React.FC = () => {
         </div>
 
         {/* Legend */}
-        <div className="flex flex-wrap gap-2.5 bg-white p-3 rounded-xl border border-[#E2E8F0] shadow-sm text-xs font-semibold text-[#64748B]">
-          <div className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-[#22C55E]" /> Present</div>
-          <div className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-[#EF4444]" /> Absent</div>
-          <div className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-[#F59E0B]" /> Leave</div>
-          <div className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-[#FACC15]" /> Half Day</div>
-          <div className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-[#3B82F6]" /> Holiday</div>
-          <div className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-[#CBD5E1]" /> Weekend</div>
+        <div className="flex flex-wrap gap-2.5 bg-card p-3 rounded-lg border border-border shadow-card text-xs font-semibold text-muted-foreground">
+          <div className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-present" /> Present</div>
+          <div className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-absent" /> Absent</div>
+          <div className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-leave" /> Leave</div>
+          <div className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-halfday" /> Half Day</div>
+          <div className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-holiday" /> Holiday</div>
+          <div className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-weekend" /> Weekend</div>
         </div>
       </div>
 
       {/* Main Calendar Card */}
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between border-b border-border/50 bg-slate-50/50 pb-4">
+        <CardHeader className="flex flex-row items-center justify-between border-b border-border/50 bg-muted/5 pb-4">
           <CardTitle className="text-base font-semibold font-display">
             {monthNames[currentMonth]} {currentYear}
           </CardTitle>
@@ -223,7 +223,7 @@ export const EmployeeCalendar: React.FC = () => {
                 <div
                   key={idx}
                   onClick={() => handleDayClick(day)}
-                  className={`h-16 md:h-24 p-2 rounded-xl border flex flex-col justify-between transition-all duration-200 select-none cursor-pointer ${getDayStatusColor(
+                  className={`h-16 md:h-24 p-2 rounded-lg border flex flex-col justify-between transition-all duration-200 select-none cursor-pointer ${getDayStatusColor(
                     day.status
                   )} ${isToday ? 'ring-2 ring-primary border-primary' : ''}`}
                 >

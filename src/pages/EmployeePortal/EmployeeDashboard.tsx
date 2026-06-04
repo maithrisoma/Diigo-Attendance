@@ -227,7 +227,7 @@ export const EmployeeDashboard: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
 
         {/* Bento 1: Unified Shift & Identity Header (Spans 8) */}
-        <div className="md:col-span-8 bg-card border border-border rounded-xl p-6 shadow-sm hover:scale-[1.005] hover:shadow-lg transition-all duration-300 flex flex-col justify-between min-h-[160px]">
+        <div className="md:col-span-8 bg-card border border-border rounded-lg p-6 shadow-card hover:scale-[1.005] hover:shadow-premium-light dark:hover:shadow-premium-dark transition-all duration-300 flex flex-col justify-between min-h-[160px]">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="flex items-center space-x-3.5">
               <div className="h-12 w-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-display font-bold text-lg border border-border shadow-sm">
@@ -274,7 +274,7 @@ export const EmployeeDashboard: React.FC = () => {
                   </span>
                   <button
                     onClick={handleCheckOut}
-                    className="px-5 py-2.5 bg-[#EF4444] hover:bg-red-700 text-white font-bold text-sm rounded-lg transition duration-150 shadow-sm font-display"
+                    className="px-5 py-2.5 bg-[var(--calendar-absent-text)] hover:opacity-95 text-white font-bold text-sm rounded-lg transition duration-150 shadow-sm font-display"
                   >
                     Clock Out
                   </button>
@@ -292,7 +292,7 @@ export const EmployeeDashboard: React.FC = () => {
         </div>
 
         {/* Bento 2: Digital Clock Widget (Spans 4) */}
-        <div className="md:col-span-4 bg-card border border-border rounded-xl p-6 shadow-sm hover:scale-[1.005] hover:shadow-lg transition-all duration-300 flex flex-col justify-between min-h-[160px]">
+        <div className="md:col-span-4 bg-card border border-border rounded-lg p-6 shadow-card hover:scale-[1.005] hover:shadow-premium-light dark:hover:shadow-premium-dark transition-all duration-300 flex flex-col justify-between min-h-[160px]">
           <div className="flex justify-between items-center">
             <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Live Time Clock</span>
             <span className="h-2 w-2 rounded-full bg-primary animate-ping" />
@@ -312,7 +312,7 @@ export const EmployeeDashboard: React.FC = () => {
         </div>
 
         {/* Bento 3: Weekly Streak (Spans 8) */}
-        <div className="md:col-span-8 bg-card border border-border rounded-xl p-6 shadow-sm hover:scale-[1.005] hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+        <div className="md:col-span-8 bg-card border border-border rounded-lg p-6 shadow-card hover:scale-[1.005] hover:shadow-premium-light dark:hover:shadow-premium-dark transition-all duration-300 flex flex-col justify-between">
           <div>
             <h3 className="text-xs font-bold text-foreground uppercase tracking-wider mb-4 text-left">Weekly Status Streak</h3>
             <div className="grid grid-cols-5 gap-4">
@@ -362,20 +362,20 @@ export const EmployeeDashboard: React.FC = () => {
 
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-5 pt-4 border-t border-border text-[10px] text-muted-foreground font-semibold justify-between">
             <div className="flex items-center gap-3">
-              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-[#22C55E]" /> Present</span>
-              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-[#EF4444]" /> Absent</span>
-              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-[#F59E0B]" /> Leave</span>
+              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-present" /> Present</span>
+              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-absent" /> Absent</span>
+              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-leave" /> Leave</span>
             </div>
             <div className="flex items-center gap-3">
-              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-[#EAB308]" /> Half Day</span>
-              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-[#3B82F6]" /> Holiday</span>
-              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-[#94A3B8]" /> Weekend</span>
+              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-halfday" /> Half Day</span>
+              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-holiday" /> Holiday</span>
+              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-weekend" /> Weekend</span>
             </div>
           </div>
         </div>
 
         {/* Bento 4: Quick Actions Grid (Spans 4) */}
-        <div className="md:col-span-4 bg-card border border-border rounded-2xl p-6 shadow-card hover:scale-[1.005] hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+        <div className="md:col-span-4 bg-card border border-border rounded-lg p-6 shadow-card hover:scale-[1.005] hover:shadow-premium-light dark:hover:shadow-premium-dark transition-all duration-300 flex flex-col justify-between">
           <div>
             <h3 className="text-xs font-bold text-foreground uppercase tracking-wider mb-4 text-left">Quick Actions</h3>
             <div className="grid grid-cols-2 gap-3">
@@ -437,7 +437,7 @@ export const EmployeeDashboard: React.FC = () => {
         </div>
 
         {/* Bento 5: Monthly Circular Overview (Spans 8) */}
-        <div className="md:col-span-8 bg-card border border-border rounded-2xl p-6 shadow-card hover:scale-[1.005] hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+        <div className="md:col-span-8 bg-card border border-border rounded-lg p-6 shadow-card hover:scale-[1.005] hover:shadow-premium-light dark:hover:shadow-premium-dark transition-all duration-300 flex flex-col justify-between">
           <h3 className="text-xs font-bold text-foreground uppercase tracking-wider mb-5 text-left">Monthly Overview Metrics</h3>
           <div className="grid grid-cols-3 gap-3">
             <div className="flex flex-col items-center justify-center p-4 bg-muted/5 rounded-xl border border-border/60">
@@ -485,7 +485,7 @@ export const EmployeeDashboard: React.FC = () => {
         </div>
 
         {/* Bento 6: Colleagues & System Info Tip (Spans 4) */}
-        <div className="md:col-span-4 bg-card border border-border rounded-2xl p-6 shadow-card hover:scale-[1.005] hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+        <div className="md:col-span-4 bg-card border border-border rounded-lg p-6 shadow-card hover:scale-[1.005] hover:shadow-premium-light dark:hover:shadow-premium-dark transition-all duration-300 flex flex-col justify-between">
           <div>
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-xs font-bold text-foreground uppercase tracking-wider text-left">Colleagues ({teammatesList.filter(t => t.status === 'Online').length} Online)</h3>
@@ -501,7 +501,7 @@ export const EmployeeDashboard: React.FC = () => {
                     <span className="text-xs font-medium text-foreground truncate max-w-[120px]">{teammate.name}</span>
                   </div>
                   <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
-                    teammate.status === 'Online' ? 'bg-[var(--calendar-present-bg)] text-[#10B981]' : teammate.status === 'On Leave' ? 'bg-[var(--calendar-leave-bg)] text-[#F3C969]' : 'bg-muted text-muted-foreground'
+                    teammate.status === 'Online' ? 'bg-[var(--calendar-present-bg)] text-[var(--calendar-present-text)]' : teammate.status === 'On Leave' ? 'bg-[var(--calendar-leave-bg)] text-[var(--calendar-leave-text)]' : 'bg-muted text-muted-foreground'
                   }`}>
                     {teammate.status}
                   </span>

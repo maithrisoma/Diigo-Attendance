@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useData } from '../../context/DataContext';
+import { Badge } from '../../components/ui/Badge';
 import {
   ArrowLeft,
   Mail,
@@ -21,12 +22,12 @@ import {
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const AVATAR_GRADIENTS = [
-  'from-blue-500 to-cyan-500',
-  'from-violet-500 to-purple-600',
-  'from-rose-500 to-pink-500',
-  'from-amber-500 to-orange-500',
-  'from-emerald-500 to-teal-500',
-  'from-indigo-500 to-blue-500',
+  'from-[#A9AFE5] to-[#C4C8F0]',
+  'from-[#C4C8F0] to-[#E7E9FB]',
+  'from-[#A9AFE5] to-[#F3F4FE]',
+  'from-[#8C93D6] to-[#A9AFE5]',
+  'from-[#9299D8] to-[#C4C8F0]',
+  'from-[#6D74C9] to-[#9299D8]',
 ];
 const getGradient = (name: string) =>
   AVATAR_GRADIENTS[name.charCodeAt(0) % AVATAR_GRADIENTS.length];
@@ -35,29 +36,20 @@ const getInitials = (name: string) =>
   name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
 
 const DEPT_COLORS: Record<string, { bg: string; text: string; dot: string }> = {
-  Engineering:       { bg: 'bg-blue-100',   text: 'text-blue-700',   dot: 'bg-blue-500'   },
-  Marketing:         { bg: 'bg-pink-100',    text: 'text-pink-700',   dot: 'bg-pink-500'   },
-  Sales:             { bg: 'bg-amber-100',   text: 'text-amber-700',  dot: 'bg-amber-500'  },
-  'Human Resources': { bg: 'bg-violet-100',  text: 'text-violet-700', dot: 'bg-violet-500' },
-  Finance:           { bg: 'bg-emerald-100', text: 'text-emerald-700',dot: 'bg-emerald-500'},
+  Engineering:       { bg: 'bg-primary/10',   text: 'text-primary',   dot: 'bg-primary'   },
+  Marketing:         { bg: 'bg-secondary/15',  text: 'text-secondary-foreground',   dot: 'bg-secondary-foreground'   },
+  Sales:             { bg: 'bg-[var(--calendar-leave-bg)]',   text: 'text-[var(--calendar-leave-text)]',  dot: 'bg-[var(--calendar-leave-text)]'  },
+  'Human Resources': { bg: 'bg-[var(--calendar-holiday-bg)]',  text: 'text-[var(--calendar-holiday-text)]', dot: 'bg-[var(--calendar-holiday-text)]' },
+  Finance:           { bg: 'bg-[var(--calendar-present-bg)]', text: 'text-[var(--calendar-present-text)]',dot: 'bg-[var(--calendar-present-text)]'},
 };
 const getDept = (dept: string) =>
-  DEPT_COLORS[dept] ?? { bg: 'bg-slate-100', text: 'text-slate-700', dot: 'bg-slate-500' };
-
-const STATUS_STYLE: Record<string, { label: string; cls: string; dot: string }> = {
-  Present:  { label: 'Present',  cls: 'bg-emerald-50 text-emerald-700 border-emerald-200', dot: 'bg-emerald-500' },
-  Absent:   { label: 'Absent',   cls: 'bg-rose-50 text-rose-700 border-rose-200',          dot: 'bg-rose-500'   },
-  'Half Day':{ label: 'Half Day',cls: 'bg-amber-50 text-amber-700 border-amber-200',        dot: 'bg-amber-500'  },
-  Leave:    { label: 'On Leave', cls: 'bg-blue-50 text-blue-700 border-blue-200',          dot: 'bg-blue-500'   },
-};
+  DEPT_COLORS[dept] ?? { bg: 'bg-muted/10', text: 'text-muted-foreground', dot: 'bg-muted' };
 
 const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
-  const s = STATUS_STYLE[status] ?? STATUS_STYLE.Absent;
   return (
-    <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border ${s.cls}`}>
-      <span className={`h-1.5 w-1.5 rounded-full ${s.dot}`} />
-      {s.label}
-    </span>
+    <Badge variant={status as any}>
+      {status === 'Leave' ? 'On Leave' : status}
+    </Badge>
   );
 };
 
@@ -116,7 +108,7 @@ export const EmployeeProfile: React.FC = () => {
 
   if (!emp) {
     return (
-      <div className="flex flex-col items-center justify-center h-64 text-slate-400 gap-3">
+      <div className="flex flex-col items-center justify-center h-64 text-muted-foreground gap-3">
         <AlertCircle className="h-10 w-10 opacity-40" />
         <p className="font-medium">Employee not found.</p>
         <button onClick={() => navigate('/admin/employees')}
@@ -131,12 +123,6 @@ export const EmployeeProfile: React.FC = () => {
   const dept = getDept(emp.department);
   const recentRecords = empAttendance.slice(0, 15);
 
-  const LEAVE_STATUS_STYLE: Record<string, string> = {
-    Approved: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    Rejected: 'bg-rose-50 text-rose-700 border-rose-200',
-    Pending:  'bg-amber-50 text-amber-700 border-amber-200',
-  };
-
   return (
     <div className="space-y-6">
 
@@ -144,21 +130,21 @@ export const EmployeeProfile: React.FC = () => {
       <div className="flex items-center gap-3">
         <button
           onClick={() => navigate('/admin/employees')}
-          className="flex items-center gap-2 text-sm text-slate-500 hover:text-primary font-medium transition-colors"
+          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary font-medium transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Directory
         </button>
-        <span className="text-slate-300">/</span>
-        <span className="text-sm font-semibold text-slate-700">{emp.name}</span>
+        <span className="text-border">/</span>
+        <span className="text-sm font-semibold text-foreground/80">{emp.name}</span>
       </div>
 
       {/* ── Hero banner + identity card ───────────────────────────────────── */}
-      <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm bg-white">
+      <div className="rounded-2xl overflow-hidden border border-border shadow-card bg-card">
         {/* Gradient banner */}
         <div className={`h-36 bg-gradient-to-r ${grad} relative`}>
           {emp.role === 'admin' && (
-            <span className="absolute top-4 right-4 inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full bg-white/90 text-violet-700">
+            <span className="absolute top-4 right-4 inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full bg-card/90 text-[var(--sidebar-active-text)]">
               <ShieldCheck className="h-3.5 w-3.5" /> HR Admin
             </span>
           )}
@@ -166,14 +152,14 @@ export const EmployeeProfile: React.FC = () => {
 
         <div className="px-6 pb-6">
           {/* Avatar overlapping banner */}
-          <div className={`-mt-14 mb-4 h-24 w-24 rounded-2xl bg-gradient-to-br ${grad} text-white text-3xl font-bold flex items-center justify-center ring-4 ring-white shadow-xl`}>
+          <div className={`-mt-14 mb-4 h-24 w-24 rounded-2xl bg-gradient-to-br ${grad} text-white text-3xl font-bold flex items-center justify-center ring-4 ring-card shadow-xl`}>
             {getInitials(emp.name)}
           </div>
 
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-slate-800 font-display">{emp.name}</h1>
-              <p className="text-slate-500 mt-0.5">{emp.designation}</p>
+              <h1 className="text-2xl font-bold text-foreground font-display">{emp.name}</h1>
+              <p className="text-muted-foreground mt-0.5">{emp.designation}</p>
               <div className="flex flex-wrap items-center gap-2 mt-3">
                 <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full ${dept.bg} ${dept.text}`}>
                   <span className={`h-2 w-2 rounded-full ${dept.dot}`} />
@@ -185,18 +171,18 @@ export const EmployeeProfile: React.FC = () => {
 
             {/* Key info pills */}
             <div className="flex flex-wrap gap-3 text-sm">
-              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 border border-slate-100">
-                <CalendarDays className="h-4 w-4 text-slate-400" />
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted/5 border border-border">
+                <CalendarDays className="h-4 w-4 text-muted-foreground" />
                 <div>
-                  <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wide">Joined</p>
-                  <p className="text-slate-700 font-semibold text-xs">{emp.join_date ? fmtShort(emp.join_date) : '—'}</p>
+                  <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Joined</p>
+                  <p className="text-foreground/80 font-semibold text-xs">{emp.join_date ? fmtShort(emp.join_date) : '—'}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 border border-slate-100">
-                <TrendingUp className="h-4 w-4 text-slate-400" />
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted/5 border border-border">
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
                 <div>
-                  <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wide">Tenure</p>
-                  <p className="text-slate-700 font-semibold text-xs">{tenure}</p>
+                  <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Tenure</p>
+                  <p className="text-foreground/80 font-semibold text-xs">{tenure}</p>
                 </div>
               </div>
             </div>
@@ -214,13 +200,13 @@ export const EmployeeProfile: React.FC = () => {
         ].map(item => {
           const Icon = item.icon;
           return (
-            <div key={item.label} className="flex items-start gap-3 rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
-              <div className="h-9 w-9 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
-                <Icon className="h-4 w-4 text-slate-500" />
+            <div key={item.label} className="flex items-start gap-3 rounded-xl border border-border bg-card p-4 shadow-card">
+              <div className="h-9 w-9 rounded-lg bg-muted/10 flex items-center justify-center flex-shrink-0">
+                <Icon className="h-4 w-4 text-muted-foreground" />
               </div>
               <div className="min-w-0">
-                <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wide">{item.label}</p>
-                <p className={`text-slate-800 font-semibold text-sm truncate ${item.mono ? 'font-mono' : ''}`}>{item.value}</p>
+                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">{item.label}</p>
+                <p className={`text-foreground font-semibold text-sm truncate ${item.mono ? 'font-mono' : ''}`}>{item.value}</p>
               </div>
             </div>
           );
@@ -229,24 +215,24 @@ export const EmployeeProfile: React.FC = () => {
 
       {/* ── Attendance stats ──────────────────────────────────────────────── */}
       <div>
-        <h2 className="text-base font-bold text-slate-700 mb-3 flex items-center gap-2">
+        <h2 className="text-base font-bold text-foreground mb-3 flex items-center gap-2">
           <CalendarCheck className="h-5 w-5 text-primary" /> Attendance Overview
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
           {[
-            { label: 'Attendance Rate', value: `${stats.rate}%`,        bg: 'bg-indigo-50',  text: 'text-indigo-700',  icon: TrendingUp    },
-            { label: 'Present Days',    value: stats.present,            bg: 'bg-emerald-50', text: 'text-emerald-700', icon: CheckCircle2  },
-            { label: 'Absent Days',     value: stats.absent,             bg: 'bg-rose-50',    text: 'text-rose-700',   icon: XCircle       },
-            { label: 'Half Days',       value: stats.halfDay,            bg: 'bg-amber-50',   text: 'text-amber-700',  icon: Clock3        },
-            { label: 'Leave Days',      value: stats.leave,              bg: 'bg-blue-50',    text: 'text-blue-700',   icon: CalendarDays  },
-            { label: 'Avg Hours/Day',   value: `${stats.avgHours}h`,     bg: 'bg-violet-50',  text: 'text-violet-700', icon: Clock3        },
+            { label: 'Attendance Rate', value: `${stats.rate}%`,        bg: 'bg-primary/10',  text: 'text-primary',  icon: TrendingUp    },
+            { label: 'Present Days',    value: stats.present,            bg: 'bg-[var(--calendar-present-bg)]', text: 'text-[var(--calendar-present-text)]', icon: CheckCircle2  },
+            { label: 'Absent Days',     value: stats.absent,             bg: 'bg-[var(--calendar-absent-bg)]',    text: 'text-[var(--calendar-absent-text)]',   icon: XCircle       },
+            { label: 'Half Days',       value: stats.halfDay,            bg: 'bg-[var(--calendar-halfday-bg)]',   text: 'text-[var(--calendar-halfday-text)]',  icon: Clock3        },
+            { label: 'Leave Days',      value: stats.leave,              bg: 'bg-[var(--calendar-leave-bg)]',    text: 'text-[var(--calendar-leave-text)]',   icon: CalendarDays  },
+            { label: 'Avg Hours/Day',   value: `${stats.avgHours}h`,     bg: 'bg-[var(--calendar-holiday-bg)]',  text: 'text-[var(--calendar-holiday-text)]', icon: Clock3        },
           ].map(s => {
             const Icon = s.icon;
             return (
-              <div key={s.label} className={`rounded-xl ${s.bg} p-4 flex flex-col gap-2 border border-white shadow-sm`}>
+              <div key={s.label} className={`rounded-xl ${s.bg} p-4 flex flex-col gap-2 border border-border shadow-card`}>
                 <Icon className={`h-5 w-5 ${s.text}`} />
                 <p className={`text-2xl font-bold ${s.text}`}>{s.value}</p>
-                <p className="text-xs text-slate-500 font-medium leading-tight">{s.label}</p>
+                <p className="text-xs text-muted-foreground font-medium leading-tight">{s.label}</p>
               </div>
             );
           })}
@@ -257,47 +243,47 @@ export const EmployeeProfile: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         {/* Recent Attendance (2/3 width) */}
-        <div className="lg:col-span-2 rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-            <h3 className="font-bold text-slate-700 flex items-center gap-2">
+        <div className="lg:col-span-2 rounded-2xl border border-border bg-card shadow-card overflow-hidden">
+          <div className="px-5 py-4 border-b border-border flex items-center justify-between">
+            <h3 className="font-bold text-foreground flex items-center gap-2">
               <ClipboardList className="h-4 w-4 text-primary" /> Recent Attendance
             </h3>
-            <span className="text-xs text-slate-400">Last {recentRecords.length} records</span>
+            <span className="text-xs text-muted-foreground">Last {recentRecords.length} records</span>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-100">
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Date</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Status</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Check In</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Check Out</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Hours</th>
+                <tr className="bg-muted/5 border-b border-border">
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Date</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Status</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Check In</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Check Out</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Hours</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50">
+              <tbody className="divide-y divide-border">
                 {recentRecords.length === 0 ? (
-                  <tr><td colSpan={5} className="py-12 text-center text-slate-400 text-sm">No attendance records found.</td></tr>
+                  <tr><td colSpan={5} className="py-12 text-center text-muted-foreground text-sm">No attendance records found.</td></tr>
                 ) : (
                   recentRecords.map(rec => (
-                    <tr key={rec.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="px-5 py-3 font-medium text-slate-700">{fmtShort(rec.date)}</td>
+                    <tr key={rec.id} className="hover:bg-muted/5 transition-colors">
+                      <td className="px-5 py-3 font-medium text-foreground">{fmtShort(rec.date)}</td>
                       <td className="px-5 py-3"><StatusBadge status={rec.status} /></td>
-                      <td className="px-5 py-3 font-mono text-slate-600 text-xs">
+                      <td className="px-5 py-3 font-mono text-muted-foreground text-xs">
                         {rec.check_in
-                          ? <span className="flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />{rec.check_in.slice(0, 5)}</span>
-                          : <span className="text-slate-300">—</span>}
+                          ? <span className="flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-[var(--calendar-present-text)]" />{rec.check_in.slice(0, 5)}</span>
+                          : <span className="text-muted-foreground/30">—</span>}
                       </td>
-                      <td className="px-5 py-3 font-mono text-slate-600 text-xs">
+                      <td className="px-5 py-3 font-mono text-muted-foreground text-xs">
                         {rec.check_out
-                          ? <span className="flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-rose-400" />{rec.check_out.slice(0, 5)}</span>
-                          : rec.check_in ? <span className="text-amber-500 text-xs font-semibold">Active ●</span>
-                          : <span className="text-slate-300">—</span>}
+                          ? <span className="flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-[var(--calendar-absent-text)]" />{rec.check_out.slice(0, 5)}</span>
+                          : rec.check_in ? <span className="text-[var(--calendar-leave-text)] text-xs font-semibold">Active ●</span>
+                          : <span className="text-muted-foreground/30">—</span>}
                       </td>
-                      <td className="px-5 py-3 text-slate-600">
+                      <td className="px-5 py-3 text-muted-foreground">
                         {rec.working_hours != null && rec.working_hours > 0
                           ? <span className="font-semibold">{rec.working_hours}h</span>
-                          : <span className="text-slate-300">—</span>}
+                          : <span className="text-muted-foreground/30">—</span>}
                       </td>
                     </tr>
                   ))
@@ -308,25 +294,25 @@ export const EmployeeProfile: React.FC = () => {
         </div>
 
         {/* Leave History (1/3 width) */}
-        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-slate-100">
-            <h3 className="font-bold text-slate-700 flex items-center gap-2">
+        <div className="rounded-2xl border border-border bg-card shadow-card overflow-hidden">
+          <div className="px-5 py-4 border-b border-border">
+            <h3 className="font-bold text-foreground flex items-center gap-2">
               <CalendarDays className="h-4 w-4 text-primary" /> Leave History
             </h3>
           </div>
-          <div className="divide-y divide-slate-50">
+          <div className="divide-y divide-border">
             {empLeaves.length === 0 ? (
-              <div className="py-12 text-center text-slate-400 text-sm">No leave records found.</div>
+              <div className="py-12 text-center text-muted-foreground text-sm">No leave records found.</div>
             ) : (
               empLeaves.map(lv => (
-                <div key={lv.id} className="px-5 py-4 hover:bg-slate-50 transition-colors">
+                <div key={lv.id} className="px-5 py-4 hover:bg-muted/5 transition-colors">
                   <div className="flex items-start justify-between gap-2 mb-1">
-                    <p className="font-semibold text-slate-700 text-sm">{lv.leave_type}</p>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border flex-shrink-0 ${LEAVE_STATUS_STYLE[lv.status]}`}>
+                    <p className="font-semibold text-foreground text-sm">{lv.leave_type}</p>
+                    <Badge variant={lv.status as any}>
                       {lv.status}
-                    </span>
+                    </Badge>
                   </div>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground">
                     {fmtShort(lv.start_date)}
                     {lv.start_date !== lv.end_date && <> → {fmtShort(lv.end_date)}</>}
                   </p>
