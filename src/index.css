@@ -7,21 +7,21 @@
 @layer base {
   :root {
     /* ── LIGHT MODE COLOR SYSTEM (PREMIUM LILAC-LAVENDER) ── */
-    --background:   260 60% 93%;       /* #EAE3FC - Soft Lilac Backdrop matching the screenshot */
+    --background:   260 50% 90%;       /* #E2DAFA - Classic Soft Lilac Page Background */
     --foreground:   262 24% 28%;       /* #3E3B4F */
 
-    --card:         0 0% 100%;        /* #FFFFFF */
+    --card:         260 50% 98%;        /* #FAF9FF - Light Lilac Card Background */
     --card-foreground: 262 24% 28%;
 
-    --popover:      0 0% 100%;
+    --popover:      260 50% 98%;
     --popover-foreground: 262 24% 28%;
 
-    --primary:      260 80% 62%;      /* #8A5CF5 - Vibrant Lilac Primary Background matching the screenshot */
+    --primary:      260 80% 62%;      /* #8A5CF5 - Vibrant Lilac Primary Background */
     --primary-foreground: 0 0% 100%;  /* #FFFFFF - White text for contrast */
     --primary-text: 260 75% 50%;       /* #7045E6 - Readable Lilac text */
     --primary-text-hover: 260 85% 42%; /* #5527CD - Darker Lilac text hover */
 
-    --secondary:    260 60% 88%;      /* #DCD0FC - Soft Lilac Fill */
+    --secondary:    260 60% 92%;      /* #EAE3FC - Soft Lilac Fill */
     --secondary-foreground: 260 75% 50%; /* #7045E6 - Readable Lilac */
 
     --muted:        260 12% 58%;       /* #9793A6 */
@@ -33,24 +33,24 @@
     --destructive:  0 84% 60%;        /* #F28B82 */
     --destructive-foreground: 0 0% 100%;
 
-    --border:       260 40% 86%;       /* #ECE7F9 - Soft Lilac Divider */
-    --input:        260 40% 86%;
+    --border:       260 40% 84%;       /* #E2DBFC - Muted Lilac Divider/Border */
+    --input:        260 40% 84%;
     --ring:         260 80% 62%;
 
     --radius: 1.25rem;                 /* 20px */
 
     /* Custom Theme Colors */
-    --sidebar-bg: #FFFFFF;
-    --sidebar-active-bg: #EDE9FE;
+    --sidebar-bg: #EAE3FC;             /* Lilac Sidebar Background */
+    --sidebar-active-bg: #D9CEFC;      /* Saturated Lilac Active Background */
     --sidebar-text: #3E3B4F;
     --sidebar-active-text: #4C3280;
-    --sidebar-hover: #F5F3FF;
-    --sidebar-icon: #9A86E8;
+    --sidebar-hover: #EDE9FE;          /* Soft Lilac Hover */
+    --sidebar-icon: #8A5CF5;           /* Primary Lilac Icon */
     
-    --navbar-bg: #FFFFFF;
+    --navbar-bg: #EAE3FC;              /* Lilac Navbar Background */
     
-    --table-header-bg: #F8F7FE;
-    --table-row-hover-bg: #F5F3FF;
+    --table-header-bg: #EDE9FE;        /* Soft Lilac Table Header */
+    --table-row-hover-bg: #FAF9FF;      /* Very Light Lilac Table Row Hover */
 
     --primary-hover: #7341EC;          /* #7341EC - Slightly darker primary hover */
     --secondary-hover: #D0C0FC;

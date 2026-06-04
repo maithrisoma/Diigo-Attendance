@@ -294,7 +294,7 @@ export const EmployeeDashboard: React.FC = () => {
                   </span>
                   <button
                     onClick={handleCheckOut}
-                    className="px-5 py-2.5 bg-[var(--calendar-absent-text)] hover:opacity-95 text-white font-bold text-sm rounded-lg transition duration-150 shadow-sm font-display"
+                    className="px-5 py-2.5 bg-primary text-primary-foreground hover:bg-[var(--primary-hover)] font-bold text-sm rounded-lg transition duration-150 shadow-sm font-display"
                   >
                     Clock Out
                   </button>

@@ -191,13 +191,13 @@ export const EmployeeCalendar: React.FC = () => {
           <div className="flex space-x-1.5">
             <button
               onClick={handlePrevMonth}
-              className="p-1.5 border border-border hover:bg-slate-100 rounded-lg text-slate-600 transition-colors"
+              className="p-1.5 border border-border hover:bg-accent hover:text-accent-foreground rounded-lg text-muted-foreground transition-colors"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
             <button
               onClick={handleNextMonth}
-              className="p-1.5 border border-border hover:bg-slate-100 rounded-lg text-slate-600 transition-colors"
+              className="p-1.5 border border-border hover:bg-accent hover:text-accent-foreground rounded-lg text-muted-foreground transition-colors"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
@@ -205,7 +205,7 @@ export const EmployeeCalendar: React.FC = () => {
         </CardHeader>
         <CardContent className="p-4 md:p-6">
           {/* Weekday headers */}
-          <div className="grid grid-cols-7 gap-2 text-center text-xs font-bold text-slate-500 font-display uppercase tracking-wider mb-3">
+          <div className="grid grid-cols-7 gap-2 text-center text-xs font-bold text-muted-foreground font-display uppercase tracking-wider mb-3">
             <div>Sun</div>
             <div>Mon</div>
             <div>Tue</div>

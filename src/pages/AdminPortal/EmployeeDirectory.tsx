@@ -24,11 +24,11 @@ import { Employee } from '../../types';
 
 // ─── Department colour map ───────────────────────────────────────────────────
 const DEPT_COLORS: Record<string, { bg: string; text: string; dot: string }> = {
-  Engineering:      { bg: 'bg-blue-500/10',   text: 'text-blue-600 dark:text-blue-400',   dot: 'bg-blue-500'   },
-  Marketing:        { bg: 'bg-pink-500/10',    text: 'text-pink-600 dark:text-pink-400',   dot: 'bg-pink-500'   },
-  Sales:            { bg: 'bg-amber-500/10',   text: 'text-amber-600 dark:text-amber-400',  dot: 'bg-amber-500'  },
-  'Human Resources':{ bg: 'bg-violet-500/10',  text: 'text-violet-600 dark:text-violet-400', dot: 'bg-violet-500' },
-  Finance:          { bg: 'bg-emerald-500/10', text: 'text-emerald-600 dark:text-emerald-400',dot: 'bg-emerald-500'},
+  Engineering:      { bg: 'bg-primary/10', text: 'text-primary-text', dot: 'bg-primary' },
+  Marketing:        { bg: 'bg-primary/10', text: 'text-primary-text', dot: 'bg-primary' },
+  Sales:            { bg: 'bg-primary/10', text: 'text-primary-text', dot: 'bg-primary' },
+  'Human Resources':{ bg: 'bg-primary/10', text: 'text-primary-text', dot: 'bg-primary' },
+  Finance:          { bg: 'bg-primary/10', text: 'text-primary-text', dot: 'bg-primary' },
 };
 
 const getDeptColor = (dept: string) =>
@@ -40,12 +40,12 @@ const getInitials = (name: string) =>
 
 // ─── Avatar background gradient by name ──────────────────────────────────────
 const AVATAR_GRADIENTS = [
-  'from-indigo-300 to-indigo-400',
-  'from-purple-300 to-purple-400',
-  'from-pink-300 to-pink-400',
-  'from-sky-300 to-sky-400',
-  'from-teal-300 to-teal-400',
   'from-violet-300 to-violet-400',
+  'from-purple-300 to-purple-400',
+  'from-indigo-300 to-indigo-400',
+  'from-violet-400 to-purple-400',
+  'from-purple-400 to-indigo-400',
+  'from-indigo-400 to-violet-400',
 ];
 const getAvatarGradient = (name: string) =>
   AVATAR_GRADIENTS[name.charCodeAt(0) % AVATAR_GRADIENTS.length];

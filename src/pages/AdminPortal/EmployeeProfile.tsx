@@ -36,11 +36,11 @@ const getInitials = (name: string) =>
   name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
 
 const DEPT_COLORS: Record<string, { bg: string; text: string; dot: string }> = {
-  Engineering:       { bg: 'bg-primary/10',   text: 'text-primary',   dot: 'bg-primary'   },
-  Marketing:         { bg: 'bg-secondary/15',  text: 'text-secondary-foreground',   dot: 'bg-secondary-foreground'   },
-  Sales:             { bg: 'bg-[var(--calendar-leave-bg)]',   text: 'text-[var(--calendar-leave-text)]',  dot: 'bg-[var(--calendar-leave-text)]'  },
-  'Human Resources': { bg: 'bg-[var(--calendar-holiday-bg)]',  text: 'text-[var(--calendar-holiday-text)]', dot: 'bg-[var(--calendar-holiday-text)]' },
-  Finance:           { bg: 'bg-[var(--calendar-present-bg)]', text: 'text-[var(--calendar-present-text)]',dot: 'bg-[var(--calendar-present-text)]'},
+  Engineering:       { bg: 'bg-primary/10',   text: 'text-primary-text',   dot: 'bg-primary'   },
+  Marketing:         { bg: 'bg-primary/10',   text: 'text-primary-text',   dot: 'bg-primary'   },
+  Sales:             { bg: 'bg-primary/10',   text: 'text-primary-text',   dot: 'bg-primary'   },
+  'Human Resources': { bg: 'bg-primary/10',   text: 'text-primary-text',   dot: 'bg-primary'   },
+  Finance:           { bg: 'bg-primary/10',   text: 'text-primary-text',   dot: 'bg-primary'   },
 };
 const getDept = (dept: string) =>
   DEPT_COLORS[dept] ?? { bg: 'bg-muted/10', text: 'text-muted-foreground', dot: 'bg-muted' };
