@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import diigoLogo from '../../diigo_logo.png';
 import { useAuth } from '../../context/AuthContext';
 import {
   LayoutDashboard,
@@ -54,14 +55,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
       }`}
     >
       {/* Brand logo */}
-      <div className="h-16 px-6 border-b border-border flex items-center space-x-2.5">
-        <div className="h-9 w-9 rounded-lg flex items-center justify-center bg-primary text-primary-foreground shadow-sm">
-          <Clock className="h-5 w-5" />
-        </div>
-        <span className="font-bold text-lg font-display tracking-tight text-foreground">
-          DAttendance
-        </span>
-        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-muted/10 text-muted-foreground uppercase">
+      <div className="h-16 px-6 border-b border-border flex items-center justify-between">
+        <img src={diigoLogo} alt="Diigo Logo" className="h-8 object-contain dark:brightness-110" />
+        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-muted/10 text-muted-foreground uppercase">
           v1.0
         </span>
       </div>

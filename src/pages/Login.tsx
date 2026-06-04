@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
+import diigoLogo from '../diigo_logo.png';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../components/ui/Toast';
 import { Input } from '../components/ui/Input';
@@ -194,13 +195,10 @@ export const Login: React.FC = () => {
 
       {/* Brand */}
       <div className="flex flex-col items-center mb-8 text-center z-10">
-        <div className="h-12 w-12 rounded-xl flex items-center justify-center border border-border bg-card text-primary mb-4 shadow-sm">
-          <Clock className="h-6 w-6" />
-        </div>
-        <h1 className="text-3xl font-bold tracking-tight font-display text-foreground">
-          DAttendance
-        </h1>
-        <p className="text-sm mt-1 text-muted-foreground">Enterprise Attendance Registry Portal</p>
+        <img src={diigoLogo} alt="Diigo Logo" className="h-14 md:h-16 object-contain mb-3 dark:brightness-110" />
+        <p className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+          Enterprise Attendance Registry Portal
+        </p>
       </div>
 
       {/* Two portal cards */}
@@ -257,7 +255,7 @@ export const Login: React.FC = () => {
 
       {/* Footer */}
       <div className="z-10 mt-10 flex items-center gap-2 text-xs text-muted-foreground">
-        <span>DAttendance &copy; {new Date().getFullYear()} — Enterprise HRMS</span>
+        <span>Diigo Attendance &copy; {new Date().getFullYear()} — Enterprise HRMS</span>
       </div>
     </div>
   );
