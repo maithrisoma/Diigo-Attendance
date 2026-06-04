@@ -56,7 +56,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
     >
       {/* Brand logo */}
       <div className="h-16 px-6 border-b border-border flex items-center justify-between">
-        <img src={diigoLogo} alt="Diigo Logo" className="h-8 object-contain dark:brightness-110" />
+        <img src={diigoLogo} alt="Diigo Logo" className="h-10 object-contain dark:brightness-110" />
         <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-muted/10 text-muted-foreground uppercase">
           v1.0
         </span>

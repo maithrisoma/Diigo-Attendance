@@ -7,7 +7,7 @@
 @layer base {
   :root {
     /* ── LIGHT MODE COLOR SYSTEM (PREMIUM LILAC-LAVENDER) ── */
-    --background:   260 40% 95%;       /* #F5F2FA - Soft Lilac Backdrop */
+    --background:   260 75% 94%;       /* #ECE6FF - Soft Lilac Backdrop */
     --foreground:   262 24% 28%;       /* #3E3B4F - Dark Lilac Slate */
 
     --card:         0 0% 100%;        /* #FFFFFF */
