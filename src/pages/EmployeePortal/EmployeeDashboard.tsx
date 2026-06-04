@@ -45,6 +45,23 @@ export const EmployeeDashboard: React.FC = () => {
     return () => clearInterval(clockTimer);
   }, []);
 
+  const myAttendance = useMemo(() => {
+    if (!currentUser) return [];
+    return attendance.filter(a => a.employee_id === currentUser.employee_id);
+  }, [attendance, currentUser]);
+
+  const myAttendanceByDate = useMemo(() => {
+    const map: Record<string, { status: string }> = {};
+    myAttendance.forEach(a => { map[a.date] = { status: a.status }; });
+    return map;
+  }, [myAttendance]);
+
+  const holidayByDate = useMemo(() => {
+    const map: Record<string, string> = {};
+    holidays.forEach(h => { map[h.holiday_date] = h.holiday_name; });
+    return map;
+  }, [holidays]);
+
   const todayStr = new Date().toISOString().split('T')[0];
 
   const myAttendance = useMemo(() => {
@@ -238,8 +255,11 @@ export const EmployeeDashboard: React.FC = () => {
     ? Math.round(((presentDays + futureDaysPresent + (halfDays * 0.5)) / totalDaysSoFarPredictor) * 100)
     : 0;
 
+<<<<<<< Updated upstream
 
 
+=======
+>>>>>>> Stashed changes
   return (
     <div className="space-y-6">
       

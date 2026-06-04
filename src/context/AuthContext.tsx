@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Employee } from '../types';
+import { INITIAL_EMPLOYEES } from '../utils/mockData';
 
 interface AuthContextType {
   currentUser: Employee | null;
@@ -34,22 +35,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ emailOrId, password }),
-      });
-      const data = await response.json();
-      if (response.ok && data.success) {
-        localStorage.setItem('currentUser', JSON.stringify(data.user));
-        setCurrentUser(data.user);
-        return { success: true, message: data.message || 'Login successful' };
-      } else {
-        return { success: false, message: data.message || 'Login failed' };
+      const savedEmployees = localStorage.getItem('employees');
+      const employeesList: Employee[] = savedEmployees ? JSON.parse(savedEmployees) : INITIAL_EMPLOYEES;
+
+      const user = employeesList.find(
+        e => e.email.toLowerCase() === emailOrId.toLowerCase() || e.employee_id.toLowerCase() === emailOrId.toLowerCase()
+      );
+
+      if (user) {
+        if (password === 'password') {
+          localStorage.setItem('currentUser', JSON.stringify(user));
+          setCurrentUser(user);
+          return { success: true, message: 'Login successful' };
+        } else {
+          return { success: false, message: 'Invalid credentials. Password is "password"' };
+        }
       }
+      return { success: false, message: 'Employee not found.' };
     } catch (err) {
       console.error(err);
-      return { success: false, message: 'Server is currently offline or unreachable.' };
+      return { success: false, message: 'Failed to authenticate locally.' };
     }
   };
 
@@ -60,20 +65,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const forgotPassword = async (emailOrId: string): Promise<{ success: boolean; message: string }> => {
     try {
-      const response = await fetch('/api/auth/forgot-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ emailOrId }),
-      });
-      const data = await response.json();
-      if (response.ok && data.success) {
-        return { success: true, message: data.message };
-      } else {
-        return { success: false, message: data.message || 'Failed to process forgot password request.' };
+      const savedEmployees = localStorage.getItem('employees');
+      const employeesList: Employee[] = savedEmployees ? JSON.parse(savedEmployees) : INITIAL_EMPLOYEES;
+
+      const user = employeesList.find(
+        e => e.email.toLowerCase() === emailOrId.toLowerCase() || e.employee_id.toLowerCase() === emailOrId.toLowerCase()
+      );
+
+      if (user) {
+        return { success: true, message: `Password reset instructions sent to ${user.email}.` };
       }
+      return { success: false, message: 'Employee not found.' };
     } catch (err) {
       console.error(err);
-      return { success: false, message: 'Server is currently offline or unreachable.' };
+      return { success: false, message: 'Failed to process request.' };
     }
   };
 
