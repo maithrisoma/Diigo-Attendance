@@ -1,144 +1,128 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import listPlugin from '@fullcalendar/list';
+import interactionPlugin from '@fullcalendar/interaction';
 import { useData } from '../../context/DataContext';
+import { useAuth } from '../../context/AuthContext';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import { Modal } from '../../components/ui/Modal';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '../../components/ui/Table';
 import { Badge } from '../../components/ui/Badge';
-import { ChevronLeft, ChevronRight, Users, UserCheck, UserX, PlaneTakeoff, Clock, CalendarDays } from 'lucide-react';
+import { Button } from '../../components/ui/Button';
+import { Input } from '../../components/ui/Input';
+import { GoogleCalendarSync } from '../../components/ui/GoogleCalendarSync';
+import {
+  Info,
+  Search,
+  UserCheck,
+  UserX,
+  CalendarCheck,
+  Building2,
+  Mail,
+  Briefcase
+} from 'lucide-react';
 import { AttendanceStatus } from '../../types';
 
+// Helper to add days for exclusive calendar ranges
+const addDays = (dateStr: string, days: number): string => {
+  const date = new Date(dateStr);
+  date.setDate(date.getDate() + days);
+  return date.toISOString().split('T')[0];
+};
+
+// Formatting date strings to nice reading formats
+const formatDate = (dateStr: string): string => {
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+};
+
 export const AttendanceCalendar: React.FC = () => {
-  const { employees, attendance, holidays } = useData();
+  const { employees, attendance, holidays, leaveRequests, announcements } = useData();
+  const { currentUser } = useAuth();
 
-  const [currentMonth, setCurrentMonth] = useState(new Date('2026-06-03').getMonth()); // Default June
-  const [currentYear, setCurrentYear] = useState(new Date('2026-06-03').getFullYear()); // Default 2026
+  const calendarRef = useRef<FullCalendar | null>(null);
 
-  // Selected date modal states
+  // Layout Tab selection
+  const [activeTab, setActiveTab] = useState<'my' | 'company'>('company');
+
+  // Keep track of current view type
+  const [currentView, setCurrentView] = useState<string>('dayGridMonth');
+
+  // Currently focused date for summary panel (defaults to today's active mock date)
+  const [focusedDateStr, setFocusedDateStr] = useState<string>('2026-06-03');
+
+  // Date details modal triggers
   const [detailDate, setDetailDate] = useState<string | null>(null);
-  
-  const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
+  const [modalSearchQuery, setModalSearchQuery] = useState<string>('');
 
-  const handlePrevMonth = () => {
-    if (currentMonth === 0) {
-      setCurrentMonth(11);
-      setCurrentYear(currentYear - 1);
-    } else {
-      setCurrentMonth(currentMonth - 1);
-    }
-  };
+  // Sync focused date when calendar date range updates or tab changes
+  useEffect(() => {
+    setModalSearchQuery('');
+  }, [detailDate]);
 
-  const handleNextMonth = () => {
-    if (currentMonth === 11) {
-      setCurrentMonth(0);
-      setCurrentYear(currentYear + 1);
-    } else {
-      setCurrentMonth(currentMonth + 1);
-    }
-  };
+  // Helper to compute stats for a date YYYY-MM-DD
+  const getDayStats = useMemo(() => {
+    const memoMap: Record<string, { present: number; absent: number; leave: number; isWeekend: boolean; holidayName?: string }> = {};
+    
+    return (dateStr: string) => {
+      if (memoMap[dateStr]) return memoMap[dateStr];
 
-  const getDaysInMonth = (month: number, year: number) => {
-    return new Date(year, month + 1, 0).getDate();
-  };
-
-  const getFirstDayOfMonth = (month: number, year: number) => {
-    return new Date(year, month, 1).getDay();
-  };
-
-  const totalDays = getDaysInMonth(currentMonth, currentYear);
-  const startOffset = getFirstDayOfMonth(currentMonth, currentYear);
-
-  // Compute daily totals for the calendar cells
-  const calendarDays = useMemo(() => {
-    const todayStr = new Date('2026-06-03').toISOString().split('T')[0];
-    const days: Array<{
-      dayNumber: number | null;
-      dateStr: string | null;
-      present: number;
-      absent: number;
-      leave: number;
-      isWeekend: boolean;
-      holidayName?: string;
-      isFuture: boolean;
-    }> = [];
-
-    // Offset padding
-    for (let i = 0; i < startOffset; i++) {
-      days.push({
-        dayNumber: null,
-        dateStr: null,
-        present: 0,
-        absent: 0,
-        leave: 0,
-        isWeekend: false,
-        isFuture: false,
-      });
-    }
-
-    for (let day = 1; day <= totalDays; day++) {
-      const d = new Date(currentYear, currentMonth, day);
-      const dateStr = `${currentYear}-${(currentMonth + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-      const dayOfWeek = d.getDay();
+      const targetDateObj = new Date(dateStr);
+      const dayOfWeek = targetDateObj.getDay();
       const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-      const isFuture = dateStr > todayStr;
-
-      // Find holidays
       const holiday = holidays.find(h => h.holiday_date === dateStr);
-
-      // Find records for this date
       const dayRecords = attendance.filter(a => a.date === dateStr);
 
       let present = 0;
       let absent = 0;
       let leave = 0;
 
-      if (!isFuture) {
-        employees.forEach(emp => {
-          const rec = dayRecords.find(r => r.employee_id === emp.employee_id);
-          if (rec) {
-            if (rec.status === 'Present' || rec.status === 'Half Day') {
-              present++;
-            } else if (rec.status === 'Leave') {
-              leave++;
-            } else {
-              absent++;
-            }
+      employees.forEach(emp => {
+        const rec = dayRecords.find(r => r.employee_id === emp.employee_id);
+        const onLeave = leaveRequests.find(
+          l =>
+            l.employee_id === emp.employee_id &&
+            l.status === 'Approved' &&
+            dateStr >= l.start_date.split('T')[0] &&
+            dateStr <= l.end_date.split('T')[0]
+        );
+
+        if (rec) {
+          if (rec.status === 'Present' || rec.status === 'Half Day') {
+            present++;
+          } else if (rec.status === 'Leave') {
+            leave++;
           } else {
-            if (holiday) {
-              leave++; // Holiday counts as leave/off
-            } else if (isWeekend) {
-              leave++; // Weekend off
-            } else {
-              absent++; // weekday no check-in
-            }
+            absent++;
           }
-        });
-      }
-
-      days.push({
-        dayNumber: day,
-        dateStr,
-        present,
-        absent,
-        leave,
-        isWeekend,
-        holidayName: holiday?.holiday_name,
-        isFuture,
+        } else if (onLeave) {
+          leave++;
+        } else {
+          if (holiday) {
+            leave++;
+          } else if (isWeekend) {
+            leave++;
+          } else {
+            absent++;
+          }
+        }
       });
-    }
 
-    return days;
-  }, [currentMonth, currentYear, employees, attendance, holidays, totalDays, startOffset]);
+      const res = { present, absent, leave, isWeekend, holidayName: holiday?.holiday_name };
+      memoMap[dateStr] = res;
+      return res;
+    };
+  }, [employees, attendance, holidays, leaveRequests]);
 
-  // Click handler to open date details modal
-  const handleDateClick = (day: typeof calendarDays[0]) => {
-    if (!day.dateStr || day.isFuture) return;
-    setDetailDate(day.dateStr);
-  };
+  // 1. Right Side Summary Panel Calculations
+  const summaryStats = useMemo(() => {
+    return getDayStats(focusedDateStr);
+  }, [focusedDateStr, getDayStats]);
 
-  // Generate records inside detail modal for the selected date
+  // 2. Fetch Employee details lists for details modal
   const selectedDateDetails = useMemo(() => {
     if (!detailDate) return [];
 
@@ -147,9 +131,16 @@ export const AttendanceCalendar: React.FC = () => {
     const dayOfWeek = new Date(detailDate).getDay();
     const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
 
-    return employees.map(emp => {
+    const list = employees.map(emp => {
       const rec = dayRecords.find(r => r.employee_id === emp.employee_id);
-      
+      const onLeave = leaveRequests.find(
+        l =>
+          l.employee_id === emp.employee_id &&
+          l.status === 'Approved' &&
+          detailDate >= l.start_date.split('T')[0] &&
+          detailDate <= l.end_date.split('T')[0]
+      );
+
       let status: AttendanceStatus = 'Absent';
       let checkIn: string | null = null;
       let checkOut: string | null = null;
@@ -160,198 +151,496 @@ export const AttendanceCalendar: React.FC = () => {
         checkIn = rec.check_in;
         checkOut = rec.check_out;
         workingHours = rec.working_hours;
+      } else if (onLeave) {
+        status = 'Leave';
       } else if (holiday) {
-        status = 'Leave';
+        status = 'Leave'; // Holiday off
       } else if (isWeekend) {
-        status = 'Leave';
+        status = 'Leave'; // Weekend off
       }
 
       return {
         name: emp.name,
+        employee_id: emp.employee_id,
         department: emp.department,
         status,
         checkIn,
         checkOut,
         workingHours,
         isHoliday: !!holiday,
-        isWeekend,
+        isWeekend
       };
     });
-  }, [detailDate, employees, attendance, holidays]);
+
+    if (modalSearchQuery.trim() !== '') {
+      const q = modalSearchQuery.toLowerCase().trim();
+      return list.filter(
+        item =>
+          item.name.toLowerCase().includes(q) ||
+          item.employee_id.toLowerCase().includes(q) ||
+          item.department.toLowerCase().includes(q) ||
+          item.status.toLowerCase().includes(q)
+      );
+    }
+
+    return list;
+  }, [detailDate, employees, attendance, holidays, leaveRequests, modalSearchQuery]);
+
+  // 3. Construct FullCalendar Events
+  const calendarEvents = useMemo(() => {
+    const events: any[] = [];
+
+    // Map Holidays (Global across both views)
+    holidays.forEach(h => {
+      events.push({
+        id: `hol_${h.id}`,
+        title: `🔵 Holiday: ${h.holiday_name}`,
+        start: h.holiday_date,
+        allDay: true,
+        classNames: ['fc-event-holiday']
+      });
+    });
+
+    if (activeTab === 'my') {
+      // PERSONAL CALENDAR EVENTS
+      if (!currentUser) return events;
+
+      // Personal attendance records
+      const myLogs = attendance.filter(a => a.employee_id === currentUser.employee_id);
+      myLogs.forEach(rec => {
+        let title = '🟢 Present';
+        let clsName = 'fc-event-present';
+        if (rec.status === 'Half Day') {
+          title = '🟡 Half Day';
+          clsName = 'fc-event-halfday';
+        } else if (rec.status === 'Leave') {
+          title = '🟡 On Leave';
+          clsName = 'fc-event-leave';
+        } else if (rec.status === 'Absent') {
+          title = '🔴 Absent';
+          clsName = 'fc-event-absent';
+        }
+
+        events.push({
+          id: `my_att_${rec.id}`,
+          title,
+          start: rec.check_in ? `${rec.date}T${rec.check_in}` : rec.date,
+          end: rec.check_out ? `${rec.date}T${rec.check_out}` : undefined,
+          allDay: !rec.check_in,
+          classNames: [clsName]
+        });
+      });
+
+      // Personal approved leaves
+      const myLeaves = leaveRequests.filter(l => l.employee_id === currentUser.employee_id && l.status === 'Approved');
+      myLeaves.forEach(l => {
+        events.push({
+          id: `my_leave_${l.id}`,
+          title: `🟡 Approved Leave: ${l.leave_type}`,
+          start: l.start_date.split('T')[0],
+          end: addDays(l.end_date.split('T')[0], 1),
+          allDay: true,
+          classNames: ['fc-event-leave']
+        });
+      });
+
+    } else {
+      // COMPANY CALENDAR EVENTS
+      // Announcements
+      announcements.forEach(a => {
+        events.push({
+          id: `ann_${a.id}`,
+          title: `📢 Notice: ${a.title}`,
+          start: a.created_at.split('T')[0],
+          allDay: true,
+          classNames: ['fc-event-announcement']
+        });
+      });
+
+      // Approved leaves
+      leaveRequests.filter(l => l.status === 'Approved').forEach(l => {
+        const empName = employees.find(e => e.employee_id === l.employee_id)?.name || l.employee_id;
+        events.push({
+          id: `leave_${l.id}`,
+          title: `🟡 Leave: ${empName} (${l.leave_type})`,
+          start: l.start_date.split('T')[0],
+          end: addDays(l.end_date.split('T')[0], 1),
+          allDay: true,
+          classNames: ['fc-event-leave']
+        });
+      });
+
+      if (currentView === 'dayGridMonth') {
+        // Month View: Render daily aggregated headcount summaries to keep month grid clean
+        const uniqueDates = Array.from(new Set(attendance.map(a => a.date)));
+        uniqueDates.forEach(dateStr => {
+          const stats = getDayStats(dateStr);
+          if (stats.present > 0) {
+            events.push({
+              id: `agg_pres_${dateStr}`,
+              title: `🟢 Present: ${stats.present}`,
+              start: dateStr,
+              allDay: true,
+              classNames: ['fc-event-present']
+            });
+          }
+          if (stats.leave > 0) {
+            events.push({
+              id: `agg_leave_${dateStr}`,
+              title: `🟡 On Leave: ${stats.leave}`,
+              start: dateStr,
+              allDay: true,
+              classNames: ['fc-event-leave']
+            });
+          }
+          if (stats.absent > 0) {
+            events.push({
+              id: `agg_abs_${dateStr}`,
+              title: `🔴 Absent: ${stats.absent}`,
+              start: dateStr,
+              allDay: true,
+              classNames: ['fc-event-absent']
+            });
+          }
+        });
+      } else {
+        // Week / Day / Agenda views: Render individual employee attendance logs
+        attendance.forEach(rec => {
+          const empName = employees.find(e => e.employee_id === rec.employee_id)?.name || rec.employee_id;
+          let title = `🟢 ${empName} - Present`;
+          let clsName = 'fc-event-present';
+          
+          if (rec.status === 'Half Day') {
+            title = `🟡 ${empName} - Half Day`;
+            clsName = 'fc-event-halfday';
+          } else if (rec.status === 'Leave') {
+            title = `🟡 ${empName} - Leave`;
+            clsName = 'fc-event-leave';
+          } else if (rec.status === 'Absent') {
+            title = `🔴 ${empName} - Absent`;
+            clsName = 'fc-event-absent';
+          }
+
+          events.push({
+            id: `att_${rec.id}`,
+            title,
+            start: rec.check_in ? `${rec.date}T${rec.check_in}` : rec.date,
+            end: rec.check_out ? `${rec.date}T${rec.check_out}` : undefined,
+            allDay: !rec.check_in,
+            classNames: [clsName]
+          });
+        });
+      }
+    }
+
+    return events;
+  }, [activeTab, currentUser, attendance, holidays, leaveRequests, announcements, currentView, employees, getDayStats]);
+
+  // Click date callback
+  const handleDateClick = (arg: any) => {
+    const dateStr = arg.dateStr;
+    setFocusedDateStr(dateStr);
+    
+    if (currentView === 'dayGridMonth') {
+      // Month view drill down: switch to day view
+      const calendarApi = calendarRef.current?.getApi();
+      if (calendarApi) {
+        calendarApi.changeView('timeGridDay', dateStr);
+      }
+    } else {
+      // Non-month views: open detailed table modal
+      setDetailDate(dateStr);
+    }
+  };
+
+  // Click event callback
+  const handleEventClick = (arg: any) => {
+    const eventDate = arg.event.startStr.split('T')[0];
+    setFocusedDateStr(eventDate);
+    setDetailDate(eventDate);
+  };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="space-y-6 text-left">
+      {/* Upper Title Area */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground font-display">
-            Calendar Overview
+            Attendance Calendar
           </h1>
-          <p className="text-xs text-muted-foreground">
-            Monitor daily headcount distributions (Present, Absent, Leaves) directly inside a monthly layout.
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {activeTab === 'my'
+              ? 'View your personal clock timings, leaves, and holidays on an interactive timeline.'
+              : 'Monitor aggregates and individual shifts for leaves, holidays, and daily attendance.'}
           </p>
         </div>
 
-        {/* Legend */}
-        <div className="flex flex-wrap gap-3 bg-card p-3 rounded-xl border border-border shadow-card text-xs font-semibold text-foreground/80">
-          <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[var(--calendar-present-text)]" /> Present</div>
-          <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[var(--calendar-absent-text)]" /> Absent</div>
-          <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[var(--calendar-leave-text)]" /> Leave / Off</div>
+        {/* Tab switcher */}
+        <div className="flex bg-muted/10 p-1 rounded-xl border border-border">
+          <button
+            onClick={() => {
+              setActiveTab('my');
+              setCurrentView('dayGridMonth');
+            }}
+            className={`px-4 py-2 text-xs font-bold rounded-lg transition-all duration-200 ${
+              activeTab === 'my'
+                ? 'bg-[#8B5CF6] text-white shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            My Calendar
+          </button>
+          <button
+            onClick={() => {
+              setActiveTab('company');
+              setCurrentView('dayGridMonth');
+            }}
+            className={`px-4 py-2 text-xs font-bold rounded-lg transition-all duration-200 ${
+              activeTab === 'company'
+                ? 'bg-[#8B5CF6] text-white shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Company Calendar
+          </button>
         </div>
       </div>
 
-      {/* Monthly grid calendar */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between border-b border-border/50 bg-muted/5 pb-4">
-          <CardTitle className="text-base font-semibold font-display">
-            {monthNames[currentMonth]} {currentYear}
-          </CardTitle>
-          <div className="flex space-x-1.5">
-            <button
-              onClick={handlePrevMonth}
-              className="p-1.5 border border-border bg-card hover:bg-muted/10 rounded-lg text-foreground/85 transition-colors"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-            <button
-              onClick={handleNextMonth}
-              className="p-1.5 border border-border bg-card hover:bg-muted/10 rounded-lg text-foreground/85 transition-colors"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
-          </div>
-        </CardHeader>
-        <CardContent className="p-4 md:p-6">
-          {/* Weekday headers */}
-          <div className="grid grid-cols-7 gap-2 text-center text-xs font-bold text-muted-foreground font-display uppercase tracking-wider mb-3">
-            <div>Sun</div>
-            <div>Mon</div>
-            <div>Tue</div>
-            <div>Wed</div>
-            <div>Thu</div>
-            <div>Fri</div>
-            <div>Sat</div>
-          </div>
+      {/* Main Grid: Calendar left (75%), Summary right (25%) */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+        
+        {/* FullCalendar Card */}
+        <div className="lg:col-span-3">
+          <Card className="shadow-premium-light dark:shadow-premium-dark border border-border transition-all duration-300">
+            <CardContent className="p-4">
+              <FullCalendar
+                ref={calendarRef}
+                plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
+                initialView="dayGridMonth"
+                initialDate="2026-06-03"
+                headerToolbar={{
+                  left: 'prev,next today',
+                  center: 'title',
+                  right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+                }}
+                events={calendarEvents}
+                dateClick={handleDateClick}
+                eventClick={handleEventClick}
+                datesSet={(arg) => setCurrentView(arg.view.type)}
+                height="auto"
+                editable={false}
+                selectable={true}
+                dayMaxEvents={3}
+              />
+            </CardContent>
+          </Card>
+        </div>
 
-          {/* Calendar days */}
-          <div className="grid grid-cols-7 gap-2">
-            {calendarDays.map((day, idx) => {
-              const isToday = day.dateStr === '2026-06-03';
-              return (
-                <div
-                  key={idx}
-                  onClick={() => handleDateClick(day)}
-                  className={`h-20 md:h-28 p-2 rounded-xl border flex flex-col justify-between transition-all duration-200 ${
-                    day.dayNumber === null
-                      ? 'bg-transparent border-transparent pointer-events-none'
-                      : day.isFuture
-                      ? 'bg-muted/5 text-muted-foreground/30 border-dashed border-border cursor-not-allowed'
-                      : day.isWeekend
-                      ? 'bg-[var(--calendar-weekend-bg)] border-[var(--calendar-weekend-border)] text-muted-foreground cursor-pointer hover:opacity-85'
-                      : 'bg-card border-border text-foreground cursor-pointer hover:bg-muted/5'
-                  } ${isToday ? 'ring-2 ring-primary border-primary' : ''}`}
-                >
-                {day.dayNumber !== null && (
-                  <>
-                    <div className="flex justify-between items-start">
-                      <span className="text-xs font-bold font-mono">{day.dayNumber}</span>
-                      {day.holidayName && (
-                        <span className="bg-[var(--calendar-holiday-bg)] text-[var(--calendar-holiday-text)] border border-[var(--calendar-holiday-border)] text-[8px] font-bold px-1 rounded truncate max-w-[45px] md:max-w-none">
-                          {day.holidayName}
-                        </span>
-                      )}
-                    </div>
-                    
-                    {!day.isFuture && (
-                      <div className="flex flex-col space-y-0.5 md:space-y-1 text-[10px] md:text-xs font-bold font-mono">
-                        <div className="text-[var(--calendar-present-text)] flex items-center gap-1">
-                          <span className="h-1.5 w-1.5 rounded-full bg-[var(--calendar-present-text)] hidden md:block" />
-                          <span>P: {day.present}</span>
-                        </div>
-                        <div className="text-[var(--calendar-absent-text)] flex items-center gap-1">
-                          <span className="h-1.5 w-1.5 rounded-full bg-[var(--calendar-absent-text)] hidden md:block" />
-                          <span>A: {day.absent}</span>
-                        </div>
-                        <div className="text-[var(--calendar-leave-text)] flex items-center gap-1">
-                          <span className="h-1.5 w-1.5 rounded-full bg-[var(--calendar-leave-text)] hidden md:block" />
-                          <span>L: {day.leave}</span>
-                        </div>
-                      </div>
-                    )}
-                  </>
-                )}
+        {/* Right Side Summary Panel */}
+        <div className="lg:col-span-1 space-y-4">
+          {/* Google Calendar Sync */}
+          <GoogleCalendarSync />
+
+          <Card className="shadow-premium-light dark:shadow-premium-dark border border-border bg-card">
+            <CardHeader className="pb-3 border-b border-border/50 bg-muted/5">
+              <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Daily Breakdown Panel
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 space-y-5">
+              {/* Selected date display */}
+              <div>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Selected Date</p>
+                <p className="text-sm font-bold text-foreground font-display mt-0.5">{formatDate(focusedDateStr)}</p>
+              </div>
+
+              {/* KPI metrics */}
+              <div className="grid grid-cols-2 gap-3.5">
+                <div className="p-3.5 rounded-2xl bg-[#6BCB77]/10 border border-[#6BCB77]/20 text-center">
+                  <p className="text-2xl font-extrabold font-mono text-[#6BCB77]">{summaryStats.present}</p>
+                  <p className="text-[9px] font-bold text-[#6BCB77]/80 uppercase mt-0.5">Present</p>
                 </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
+                <div className="p-3.5 rounded-2xl bg-[#F28B82]/10 border border-[#F28B82]/20 text-center">
+                  <p className="text-2xl font-extrabold font-mono text-[#F28B82]">{summaryStats.absent}</p>
+                  <p className="text-[9px] font-bold text-[#F28B82]/80 uppercase mt-0.5">Absent</p>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-[#F7C873]/10 border border-[#F7C873]/20 text-center">
+                  <p className="text-2xl font-extrabold font-mono text-[#F7C873]">{summaryStats.leave}</p>
+                  <p className="text-[9px] font-bold text-[#F7C873]/80 uppercase mt-0.5">On Leave</p>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-[#8AB4F8]/10 border border-[#8AB4F8]/20 text-center">
+                  <p className="text-2xl font-extrabold font-mono text-[#8AB4F8]">{summaryStats.holidayName ? 1 : 0}</p>
+                  <p className="text-[9px] font-bold text-[#8AB4F8]/80 uppercase mt-0.5">Holiday</p>
+                </div>
+              </div>
 
-      {/* Daily breakdown detail Modal */}
+              {/* Holiday info badge if present */}
+              {summaryStats.holidayName && (
+                <div className="p-3 rounded-xl bg-[#8AB4F8]/10 border border-[#8AB4F8]/20 text-xs text-[#8AB4F8] font-bold flex items-start gap-2 animate-in fade-in slide-in-from-top-1 duration-150">
+                  <Info className="h-4.5 w-4.5 mt-0.5 shrink-0" />
+                  <span>{summaryStats.holidayName}</span>
+                </div>
+              )}
+
+              {/* Modal trigger action */}
+              <Button
+                onClick={() => setDetailDate(focusedDateStr)}
+                className="w-full text-xs font-bold h-10 bg-[#8B5CF6] hover:bg-[#7C3AED] text-white flex items-center justify-center gap-1.5"
+              >
+                <UserCheck className="h-4 w-4" />
+                View Detailed Table
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Indicator Legends */}
+          <Card className="shadow-premium-light dark:shadow-premium-dark border border-border">
+            <CardHeader className="py-3 border-b border-border/50 bg-muted/5">
+              <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Legends
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-3 space-y-2 text-xs font-semibold text-foreground/80">
+              <div className="flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#6BCB77]" /> Present
+                </span>
+                <span className="text-[10px] text-muted-foreground">#6BCB77</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#FFD166]" /> Half Day
+                </span>
+                <span className="text-[10px] text-muted-foreground">#FFD166</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#F28B82]" /> Absent
+                </span>
+                <span className="text-[10px] text-muted-foreground">#F28B82</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#F7C873]" /> Leave
+                </span>
+                <span className="text-[10px] text-muted-foreground">#F7C873</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#8AB4F8]" /> Holiday
+                </span>
+                <span className="text-[10px] text-muted-foreground">#8AB4F8</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+      </div>
+
+      {/* Date detail Modal breakdown list */}
       <Modal
         isOpen={!!detailDate}
         onClose={() => setDetailDate(null)}
-        title={`Attendance Registry: ${detailDate ? new Date(detailDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : ''}`}
+        title={`Staff Attendance Table: ${detailDate ? formatDate(detailDate) : ''}`}
         size="xl"
       >
         <div className="space-y-4">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Employee</TableHead>
-                <TableHead>Department</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Clock In</TableHead>
-                <TableHead>Clock Out</TableHead>
-                <TableHead className="text-right">Working Hours</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {selectedDateDetails.map((rec, i) => (
-                <TableRow key={i}>
-                  <TableCell className="font-semibold text-foreground">{rec.name}</TableCell>
-                  <TableCell className="text-muted-foreground text-xs font-medium">{rec.department}</TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={
-                        rec.status === 'Present'
-                          ? 'success'
-                          : rec.status === 'Half Day'
-                          ? 'warning'
-                          : rec.status === 'Leave'
-                          ? 'info'
-                          : 'danger'
-                      }
-                      className="px-2.5 py-0.5 text-[10.5px] font-semibold"
-                    >
-                      {rec.status === 'Leave' && rec.isHoliday ? 'Holiday Off' : rec.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="font-mono text-xs text-muted-foreground">
-                    {rec.checkIn
-                      ? new Date(`2000-01-01T${rec.checkIn}`).toLocaleTimeString([], {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })
-                      : '--:--'}
-                  </TableCell>
-                  <TableCell className="font-mono text-xs text-muted-foreground">
-                    {rec.checkOut
-                      ? new Date(`2000-01-01T${rec.checkOut}`).toLocaleTimeString([], {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })
-                      : rec.checkIn ? (
-                        <span className="text-[var(--calendar-present-text)] font-bold animate-pulse">Active</span>
-                      ) : '--:--'}
-                  </TableCell>
-                  <TableCell className="text-right font-mono text-xs text-foreground font-semibold">
-                    {rec.workingHours !== null && rec.workingHours !== undefined ? `${Number(rec.workingHours).toFixed(2)}h` : '--'}
-                  </TableCell>
+          {/* Modal filter options */}
+          <div className="flex justify-between items-center gap-4">
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by name, ID, or status..."
+                value={modalSearchQuery}
+                onChange={e => setModalSearchQuery(e.target.value)}
+                className="pl-9 h-9 text-xs"
+              />
+            </div>
+            {detailDate && (
+              <Badge variant="outline" className="font-bold font-mono text-[10px] border-[#8B5CF6]/30 text-[#8B5CF6] px-2.5 py-1">
+                Total Employees: {selectedDateDetails.length}
+              </Badge>
+            )}
+          </div>
+
+          {/* Table Container */}
+          <div className="border border-border rounded-xl overflow-hidden shadow-sm max-h-[350px] overflow-y-auto">
+            <Table>
+              <TableHeader className="bg-muted/10 sticky top-0 z-10">
+                <TableRow>
+                  <TableHead className="py-2.5 text-xs">Employee Name</TableHead>
+                  <TableHead className="py-2.5 text-xs">Employee ID</TableHead>
+                  <TableHead className="py-2.5 text-xs">Department</TableHead>
+                  <TableHead className="py-2.5 text-xs">Status</TableHead>
+                  <TableHead className="py-2.5 text-xs">Clock In</TableHead>
+                  <TableHead className="py-2.5 text-xs">Clock Out</TableHead>
+                  <TableHead className="py-2.5 text-xs text-right">Hours</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {selectedDateDetails.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="h-32 text-center text-muted-foreground text-xs font-semibold">
+                      No records match the active criteria.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  selectedDateDetails.map((rec, i) => (
+                    <TableRow key={i} className="hover:bg-muted/5 transition-colors">
+                      <TableCell className="py-3 font-semibold text-foreground flex items-center gap-2">
+                        <div className="h-7 w-7 rounded-full bg-primary/10 text-primary font-bold text-[10px] flex items-center justify-center">
+                          {rec.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                        </div>
+                        <span className="text-xs">{rec.name}</span>
+                      </TableCell>
+                      <TableCell className="py-3 font-mono text-xs font-bold text-muted-foreground">{rec.employee_id}</TableCell>
+                      <TableCell className="py-3 text-muted-foreground text-xs font-medium">{rec.department}</TableCell>
+                      <TableCell className="py-3">
+                        <Badge
+                          variant={
+                            rec.status === 'Present'
+                              ? 'success'
+                              : rec.status === 'Half Day'
+                              ? 'warning'
+                              : rec.status === 'Leave'
+                              ? 'info'
+                              : 'danger'
+                          }
+                          className="px-2 py-0.5 text-[9px] font-extrabold uppercase"
+                        >
+                          {rec.status === 'Leave' && rec.isHoliday ? 'Holiday Off' : rec.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="py-3 font-mono text-xs text-muted-foreground">
+                        {rec.checkIn
+                          ? new Date(`2000-01-01T${rec.checkIn}`).toLocaleTimeString([], {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })
+                          : '--:--'}
+                      </TableCell>
+                      <TableCell className="py-3 font-mono text-xs text-muted-foreground">
+                        {rec.checkOut
+                          ? new Date(`2000-01-01T${rec.checkOut}`).toLocaleTimeString([], {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })
+                          : rec.checkIn ? (
+                            <span className="text-[var(--calendar-present-text)] font-semibold flex items-center gap-1">
+                              <span className="h-1.5 w-1.5 rounded-full bg-[var(--calendar-present-text)] animate-pulse" />
+                              Active Shift
+                            </span>
+                          ) : '--:--'}
+                      </TableCell>
+                      <TableCell className="py-3 text-right font-mono text-xs text-foreground font-semibold">
+                        {rec.workingHours !== null && rec.workingHours !== undefined ? `${Number(rec.workingHours).toFixed(2)}h` : '--'}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </div>
       </Modal>
     </div>

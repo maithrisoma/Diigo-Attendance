@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useData } from '../../context/DataContext';
+import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../../components/ui/Toast';
 import { Button } from '../../components/ui/Button';
@@ -19,6 +20,9 @@ import {
   CheckCircle2,
   XCircle,
   Clock3,
+  Mail,
+  MoreHorizontal,
+  Briefcase,
 } from 'lucide-react';
 import { Employee } from '../../types';
 
@@ -71,6 +75,7 @@ const StatusChip: React.FC<{ status: string }> = ({ status }) => {
 // ─── Main Component ───────────────────────────────────────────────────────────
 export const EmployeeDirectory: React.FC = () => {
   const { employees, addEmployee, updateEmployee, removeEmployee } = useData();
+  const { currentUser } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -82,6 +87,7 @@ export const EmployeeDirectory: React.FC = () => {
   const [editOpen, setEditOpen]             = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [selectedEmp, setSelectedEmp]       = useState<Employee | null>(null);
+  const [openMenuId, setOpenMenuId]         = useState<string | null>(null);
 
   const [empForm, setEmpForm] = useState<Omit<Employee, 'id' | 'current_status'>>({
     employee_id: '', name: '', email: '', department: 'Engineering', designation: '', role: 'employee',
@@ -101,10 +107,16 @@ export const EmployeeDirectory: React.FC = () => {
     { value: 'Human Resources',  label: 'Human Resources' },
     { value: 'Finance',          label: 'Finance' },
   ];
-  const roleOptions = [
-    { value: 'employee', label: 'Employee' },
-    { value: 'admin',    label: 'HR / Admin' },
-  ];
+  const roleOptions = useMemo(() => {
+    if (currentUser?.role === 'hr') {
+      return [{ value: 'employee', label: 'Employee' }];
+    }
+    return [
+      { value: 'employee', label: 'Employee' },
+      { value: 'hr',       label: 'HR Manager' },
+      { value: 'admin',    label: 'Super Admin' },
+    ];
+  }, [currentUser]);
   const statusOptions = [
     { value: 'all',     label: 'All Statuses' },
     { value: 'Present', label: 'Present' },
@@ -113,8 +125,11 @@ export const EmployeeDirectory: React.FC = () => {
   ];
 
   // ── Filter logic ──────────────────────────────────────────────────────────
-  const filteredEmployees = useMemo(() =>
-    employees.filter(emp => {
+  const filteredEmployees = useMemo(() => {
+    const baseList = currentUser?.role === 'hr'
+      ? employees.filter(e => e.role === 'employee')
+      : employees;
+    return baseList.filter(emp => {
       const q = searchQuery.toLowerCase().trim();
       const matchSearch = q === '' ||
         emp.name.toLowerCase().includes(q) ||
@@ -124,16 +139,21 @@ export const EmployeeDirectory: React.FC = () => {
       const matchDept   = selectedDept   === 'all' || emp.department     === selectedDept;
       const matchStatus = selectedStatus === 'all' || emp.current_status === selectedStatus;
       return matchSearch && matchDept && matchStatus;
-    }),
-  [employees, searchQuery, selectedDept, selectedStatus]);
+    });
+  }, [employees, searchQuery, selectedDept, selectedStatus, currentUser]);
 
   // ── Summary counts ────────────────────────────────────────────────────────
-  const stats = useMemo(() => ({
-    total:   employees.length,
-    present: employees.filter(e => e.current_status === 'Present').length,
-    absent:  employees.filter(e => e.current_status === 'Absent').length,
-    leave:   employees.filter(e => e.current_status === 'Leave').length,
-  }), [employees]);
+  const stats = useMemo(() => {
+    const list = currentUser?.role === 'hr'
+      ? employees.filter(e => e.role === 'employee')
+      : employees;
+    return {
+      total:   list.length,
+      present: list.filter(e => e.current_status === 'Present').length,
+      absent:  list.filter(e => e.current_status === 'Absent').length,
+      leave:   list.filter(e => e.current_status === 'Leave').length,
+    };
+  }, [employees, currentUser]);
 
   // ── Form validation ───────────────────────────────────────────────────────
   const validateForm = () => {
@@ -160,7 +180,8 @@ export const EmployeeDirectory: React.FC = () => {
   const handleAddSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
-    addEmployee(empForm);
+    const finalForm = currentUser?.role === 'hr' ? { ...empForm, role: 'employee' as const } : empForm;
+    addEmployee(finalForm);
     toast(`Added ${empForm.name} successfully!`, 'success');
     setAddOpen(false);
     resetForm();
@@ -169,7 +190,8 @@ export const EmployeeDirectory: React.FC = () => {
   const handleEditSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedEmp || !validateForm()) return;
-    updateEmployee(selectedEmp.id, empForm);
+    const finalForm = currentUser?.role === 'hr' ? { ...empForm, role: 'employee' as const } : empForm;
+    updateEmployee(selectedEmp.id, finalForm);
     toast(`Updated details for ${empForm.name}!`, 'success');
     setEditOpen(false);
     resetForm();
@@ -203,9 +225,11 @@ export const EmployeeDirectory: React.FC = () => {
       {/* ── Header row ─────────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground font-display">Employee Directory</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground font-display">
+            {currentUser?.role === 'hr' ? 'Employee Directory' : 'Staff Directory (HR & Employees)'}
+          </h1>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {filteredEmployees.length} of {employees.length} employees shown
+            {filteredEmployees.length} of {currentUser?.role === 'hr' ? employees.filter(e => e.role === 'employee').length : employees.length} staff members shown
           </p>
         </div>
         <button
@@ -213,14 +237,14 @@ export const EmployeeDirectory: React.FC = () => {
           className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity shadow-md"
         >
           <UserPlus className="h-4 w-4" />
-          Add Employee
+          {currentUser?.role === 'hr' ? 'Add Employee' : 'Add Staff / HR'}
         </button>
       </div>
 
       {/* ── Summary stats strip ────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: 'Total Staff',  value: stats.total,   icon: Users,          cls: 'text-primary',                          bg: 'bg-primary/10' },
+          { label: currentUser?.role === 'hr' ? 'Total Employees' : 'Total Staff',  value: stats.total,   icon: Users,          cls: 'text-primary',                          bg: 'bg-primary/10' },
           { label: 'Present Today',value: stats.present, icon: CheckCircle2,   cls: 'text-[var(--calendar-present-text)]',   bg: 'bg-[var(--calendar-present-bg)]' },
           { label: 'Absent Today', value: stats.absent,  icon: XCircle,        cls: 'text-[var(--calendar-absent-text)]',    bg: 'bg-[var(--calendar-absent-bg)]' },
           { label: 'On Leave',     value: stats.leave,   icon: Clock3,         cls: 'text-[var(--calendar-leave-text)]',     bg: 'bg-[var(--calendar-leave-bg)]' },
@@ -286,59 +310,136 @@ export const EmployeeDirectory: React.FC = () => {
               return (
                 <div
                   key={emp.id}
-                  onClick={() => navigate(`/admin/employees/${emp.id}`)}
-                  className="group relative rounded-lg border border-border bg-card shadow-card hover:shadow-premium-light dark:hover:shadow-premium-dark hover:border-primary/40 transition-all duration-300 cursor-pointer overflow-hidden text-foreground"
+                  onClick={() => navigate(currentUser?.role === 'hr' ? `/hr/employees/${emp.id}` : `/admin/employees/${emp.id}`)}
+                  className="group relative rounded-xl border border-border bg-card p-4 shadow-sm hover:shadow-md hover:border-[#6D74C9]/40 transition-all duration-200 cursor-pointer text-foreground flex flex-col justify-between min-h-[175px] border-t-2 border-t-[#6D74C9]/15"
                 >
-                  {/* Top colour banner */}
-                  <div className={`h-16 bg-gradient-to-r ${gradient} relative`}>
-                    {/* Edit / Delete quick actions */}
-                    <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={e => openEdit(emp, e)}
-                        className="h-7 w-7 rounded-lg bg-card/80 backdrop-blur flex items-center justify-center hover:bg-card transition shadow"
-                        title="Edit"
-                      >
-                        <Edit2 className="h-3.5 w-3.5 text-foreground" />
-                      </button>
-                      {emp.employee_id !== 'HR001' && (
-                        <button
-                          onClick={e => openDelete(emp, e)}
-                          className="h-7 w-7 rounded-lg bg-card/80 backdrop-blur flex items-center justify-center hover:bg-rose-500/10 transition shadow"
-                          title="Remove"
-                        >
-                          <Trash2 className="h-3.5 w-3.5 text-rose-500" />
-                        </button>
-                      )}
+                  {/* Top Row: Avatar, Name, Status Badge */}
+                  <div className="flex items-start justify-between gap-2.5">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      {/* Avatar */}
+                      <div className={`h-9 w-9 rounded-full bg-gradient-to-br ${gradient} text-white text-xs font-bold flex items-center justify-center shrink-0 border border-border/10 shadow-sm`}>
+                        {getInitials(emp.name)}
+                      </div>
+                      
+                      {/* Name and Designation summary */}
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1">
+                          <h3 className="font-bold text-foreground text-sm leading-tight font-display truncate" title={emp.name}>
+                            {emp.name}
+                          </h3>
+                        </div>
+                        {emp.role === 'admin' && (
+                          <span className="text-[9px] font-bold text-primary bg-primary/10 px-1 py-0.5 rounded mt-0.5 inline-block shrink-0">
+                            Super Admin
+                          </span>
+                        )}
+                        {emp.role === 'hr' && (
+                          <span className="text-[9px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-1 py-0.5 rounded mt-0.5 inline-block shrink-0">
+                            HR
+                          </span>
+                        )}
+                      </div>
                     </div>
 
-                    {/* Role badge */}
-                    {emp.role === 'admin' && (
-                      <span className="absolute top-2 left-2 inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-card/90 text-primary">
-                        <ShieldCheck className="h-3 w-3" /> Admin
-                      </span>
-                    )}
+                    {/* Status Badge */}
+                    <div className="shrink-0">
+                      <StatusChip status={emp.current_status} />
+                    </div>
                   </div>
 
-                  {/* Avatar */}
-                  <div className="px-4 pb-4">
-                    <div className={`-mt-8 mb-3 h-14 w-14 rounded-full bg-gradient-to-br ${gradient} text-white text-base font-bold flex items-center justify-center ring-4 ring-card shadow-md`}>
-                      {getInitials(emp.name)}
+                  {/* Middle Row: Designation, Department, Employee ID */}
+                  <div className="mt-3.5 space-y-1.5 flex-1">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Briefcase className="h-3.5 w-3.5 shrink-0 text-[#6D74C9]/70" />
+                      <span className="font-medium text-foreground truncate" title={emp.designation}>{emp.designation}</span>
                     </div>
-
-                    <div className="space-y-2">
-                      <div>
-                        <h3 className="font-bold text-foreground text-sm leading-tight font-display">{emp.name}</h3>
-                        <p className="text-xs text-muted-foreground mt-0.5">{emp.designation}</p>
-                      </div>
-
-                      <span className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full ${dept.bg} ${dept.text}`}>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Building2 className="h-3.5 w-3.5 shrink-0 text-[#6D74C9]/70" />
+                      <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${dept.bg} ${dept.text}`}>
                         <span className={`h-1.5 w-1.5 rounded-full ${dept.dot}`} />
                         {emp.department}
                       </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <CreditCard className="h-3.5 w-3.5 shrink-0 text-[#6D74C9]/70" />
+                      <span className="font-mono font-semibold text-[11px] text-foreground">{emp.employee_id}</span>
+                    </div>
+                  </div>
 
-                      <div className="flex items-center justify-between pt-1 border-t border-border">
-                        <span className="font-mono text-[11px] text-muted-foreground font-medium">{emp.employee_id}</span>
-                        <StatusChip status={emp.current_status} />
+                  {/* Bottom Row: Email & Quick Actions */}
+                  <div className="mt-3.5 pt-3 border-t border-border flex items-center justify-between text-xs gap-2">
+                    {/* Email */}
+                    <div className="flex items-center gap-1.5 text-muted-foreground min-w-0 flex-1">
+                      <Mail className="h-3.5 w-3.5 shrink-0 text-[#6D74C9]/70" />
+                      <span className="truncate text-muted-foreground/90 font-medium" title={emp.email}>{emp.email}</span>
+                    </div>
+
+                    {/* Quick Actions */}
+                    <div className="flex items-center gap-1 shrink-0 relative">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(currentUser?.role === 'hr' ? `/hr/employees/${emp.id}` : `/admin/employees/${emp.id}`);
+                        }}
+                        className="px-2 py-1 rounded text-[#6D74C9] hover:bg-[#6D74C9]/10 font-bold transition-colors"
+                        title="View Profile"
+                      >
+                        View
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openEdit(emp, e);
+                        }}
+                        className="px-2 py-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted/10 font-bold transition-colors"
+                        title="Edit Employee"
+                      >
+                        Edit
+                      </button>
+
+                      {/* More Options Dropdown */}
+                      <div className="relative">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setOpenMenuId(openMenuId === emp.id ? null : emp.id);
+                          }}
+                          className="h-7 w-7 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/10 transition-colors"
+                          title="More Options"
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                        </button>
+
+                        {openMenuId === emp.id && (
+                          <>
+                            <div
+                              className="fixed inset-0 z-10"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setOpenMenuId(null);
+                              }}
+                            />
+                            <div className="absolute right-0 bottom-full mb-1.5 w-40 rounded-lg border border-border bg-card shadow-lg p-1 z-20 animate-in fade-in slide-in-from-bottom-1 duration-150">
+                              {emp.employee_id !== 'HR001' && emp.employee_id !== currentUser?.employee_id && (emp.role === 'employee' || currentUser?.role === 'admin') ? (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setOpenMenuId(null);
+                                    openDelete(emp, e);
+                                  }}
+                                  className="w-full text-left px-2.5 py-1.5 rounded text-xs text-rose-500 hover:bg-rose-500/10 font-semibold flex items-center gap-2 transition-colors"
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                  Remove Employee
+                                </button>
+                              ) : (
+                                <div className="px-2.5 py-1.5 text-xs text-muted-foreground italic">
+                                  No extra actions
+                                </div>
+                              )}
+                            </div>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -350,7 +451,7 @@ export const EmployeeDirectory: React.FC = () => {
       </div>
 
       {/* ── Add Employee Modal ──────────────────────────────────────────────── */}
-      <Modal isOpen={addOpen} onClose={() => setAddOpen(false)} title="Register New Employee" size="md">
+      <Modal isOpen={addOpen} onClose={() => setAddOpen(false)} title={currentUser?.role === 'hr' ? "Register New Employee" : "Register New Staff (HR or Employee)"} size="md">
         <form onSubmit={handleAddSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input label="Employee ID" placeholder="e.g. D07" value={empForm.employee_id}
@@ -366,17 +467,19 @@ export const EmployeeDirectory: React.FC = () => {
             <Input label="Designation" placeholder="e.g. Junior Developer" value={empForm.designation}
               onChange={e => setEmpForm(p => ({ ...p, designation: e.target.value }))} error={formErrors.designation} />
           </div>
-          <Select label="Portal User Role" options={roleOptions} value={empForm.role}
-            onChange={e => setEmpForm(p => ({ ...p, role: e.target.value as 'admin' | 'employee' }))} />
+          {currentUser?.role !== 'hr' && (
+            <Select label="Portal User Role" options={roleOptions} value={empForm.role}
+              onChange={e => setEmpForm(p => ({ ...p, role: e.target.value as 'admin' | 'hr' | 'employee' }))} />
+          )}
           <div className="flex gap-3 pt-3 justify-end">
             <Button type="button" variant="outline" size="sm" onClick={() => setAddOpen(false)}>Cancel</Button>
-            <Button type="submit" size="sm">Register Employee</Button>
+            <Button type="submit" size="sm">{currentUser?.role === 'hr' ? 'Register Employee' : 'Register Staff'}</Button>
           </div>
         </form>
       </Modal>
 
       {/* ── Edit Employee Modal ─────────────────────────────────────────────── */}
-      <Modal isOpen={editOpen} onClose={() => setEditOpen(false)} title="Edit Employee Details" size="md">
+      <Modal isOpen={editOpen} onClose={() => setEditOpen(false)} title={currentUser?.role === 'hr' ? "Edit Employee Details" : "Edit Staff Details"} size="md">
         <form onSubmit={handleEditSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input label="Employee ID" value={empForm.employee_id} disabled
@@ -392,8 +495,10 @@ export const EmployeeDirectory: React.FC = () => {
             <Input label="Designation" placeholder="e.g. Junior Developer" value={empForm.designation}
               onChange={e => setEmpForm(p => ({ ...p, designation: e.target.value }))} error={formErrors.designation} />
           </div>
-          <Select label="Portal User Role" options={roleOptions} value={empForm.role}
-            onChange={e => setEmpForm(p => ({ ...p, role: e.target.value as 'admin' | 'employee' }))} />
+          {currentUser?.role !== 'hr' && (
+            <Select label="Portal User Role" options={roleOptions} value={empForm.role}
+              onChange={e => setEmpForm(p => ({ ...p, role: e.target.value as 'admin' | 'hr' | 'employee' }))} />
+          )}
           <div className="flex gap-3 pt-3 justify-end">
             <Button type="button" variant="outline" size="sm" onClick={() => setEditOpen(false)}>Cancel</Button>
             <Button type="submit" size="sm">Save Changes</Button>
@@ -402,7 +507,7 @@ export const EmployeeDirectory: React.FC = () => {
       </Modal>
 
       {/* ── Delete Confirm Modal ────────────────────────────────────────────── */}
-      <Modal isOpen={deleteConfirmOpen} onClose={() => setDeleteConfirmOpen(false)} title="Remove Employee?" size="sm">
+      <Modal isOpen={deleteConfirmOpen} onClose={() => setDeleteConfirmOpen(false)} title="Remove Staff Member?" size="sm">
         {selectedEmp && (
           <div className="space-y-4">
             <div className="flex items-center gap-3 p-3 rounded-lg bg-rose-50 border border-rose-100">
@@ -415,11 +520,11 @@ export const EmployeeDirectory: React.FC = () => {
               </div>
             </div>
             <p className="text-sm text-slate-600 leading-normal">
-              Are you sure you want to remove this employee? This action <span className="text-rose-600 font-semibold">cannot be undone</span> and all associated attendance records will be deleted.
+              Are you sure you want to remove this staff member? This action <span className="text-rose-600 font-semibold">cannot be undone</span> and all associated attendance records will be deleted.
             </p>
             <div className="flex gap-3 pt-1 justify-end">
               <Button type="button" variant="outline" size="sm" onClick={() => setDeleteConfirmOpen(false)}>Cancel</Button>
-              <Button type="button" variant="destructive" size="sm" onClick={handleDeleteConfirm}>Remove Employee</Button>
+              <Button type="button" variant="destructive" size="sm" onClick={handleDeleteConfirm}>Remove Staff</Button>
             </div>
           </div>
         )}

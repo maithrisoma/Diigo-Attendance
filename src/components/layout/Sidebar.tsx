@@ -15,6 +15,11 @@ import {
   Clock,
   PlaneTakeoff,
   CalendarCheck,
+  ShieldAlert,
+  ShieldCheck,
+  Scroll,
+  Bell,
+  Megaphone,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -27,26 +32,47 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
 
   if (!currentUser) return null;
 
-  const isAdmin = currentUser.role === 'admin';
-
   const adminLinks = [
     { to: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { to: '/admin/employees', label: 'Employees', icon: Users },
+    { to: '/admin/employees', label: 'Employee Management', icon: Users },
+    { to: '/admin/hrs', label: 'HR Management', icon: ShieldAlert },
     { to: '/admin/registry', label: 'Attendance Registry', icon: ClipboardList },
     { to: '/admin/calendar', label: 'Attendance Calendar', icon: CalendarDays },
     { to: '/admin/leaves', label: 'Leave Management', icon: FileText },
     { to: '/admin/holidays', label: 'Holiday Management', icon: CalendarCheck },
-    { to: '/admin/reports', label: 'Attendance Reports', icon: TrendingUp },
+    { to: '/admin/reports', label: 'Reports & Analytics', icon: TrendingUp },
+    { to: '/admin/roles', label: 'Roles & Permissions', icon: ShieldCheck },
+    { to: '/admin/announcements', label: 'Announcements Board', icon: Megaphone },
+    { to: '/admin/settings', label: 'System Settings', icon: Settings },
+    { to: '/admin/activities', label: 'Activity Logs', icon: Scroll },
+    { to: '/admin/notifications', label: 'Notifications', icon: Bell },
+  ];
+
+  const hrLinks = [
+    { to: '/hr/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { to: '/hr/employees', label: 'Employee Management', icon: Users },
+    { to: '/hr/registry', label: 'Attendance Registry', icon: ClipboardList },
+    { to: '/hr/calendar', label: 'Attendance Calendar', icon: CalendarDays },
+    { to: '/hr/leaves', label: 'Leave Management', icon: FileText },
+    { to: '/hr/holidays', label: 'Holiday Management', icon: CalendarCheck },
+    { to: '/hr/reports', label: 'Reports & Analytics', icon: TrendingUp },
+    { to: '/hr/announcements', label: 'Announcements Board', icon: Megaphone },
   ];
 
   const employeeLinks = [
     { to: '/employee/dashboard', label: 'Dashboard',          icon: LayoutDashboard },
+    { to: '/employee/announcements', label: 'Announcements',   icon: Megaphone },
     { to: '/employee/calendar',  label: 'Attendance Calendar',icon: Calendar },
     { to: '/employee/history',   label: 'Attendance History', icon: Clock },
     { to: '/employee/leaves',    label: 'Leave Requests',     icon: PlaneTakeoff },
   ];
 
-  const links = isAdmin ? adminLinks : employeeLinks;
+  let links = employeeLinks;
+  if (currentUser.role === 'admin') {
+    links = adminLinks;
+  } else if (currentUser.role === 'hr') {
+    links = hrLinks;
+  }
 
   return (
     <aside
@@ -105,29 +131,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
       </nav>
 
       {/* Footer controls */}
-      <div className="p-4 border-t border-border space-y-2">
-        {isAdmin && (
-          <NavLink
-            to="/admin/settings"
-            className={({ isActive }) =>
-              `flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-150 relative ${
-                isActive
-                  ? 'bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)]'
-                  : 'text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-active-text)]'
-              }`
-            }
-          >
-            {({ isActive }) => (
-              <>
-                {isActive && (
-                  <span className="absolute left-0 top-2.5 bottom-2.5 w-1 rounded-r bg-[var(--sidebar-active-text)]" />
-                )}
-                <Settings className={`h-4.5 w-4.5 ${isActive ? 'text-[var(--sidebar-active-text)]' : 'text-[var(--sidebar-icon)]'}`} />
-                <span>Settings</span>
-              </>
-            )}
-          </NavLink>
-        )}
+      <div className="p-4 border-t border-border">
         <button
           onClick={logout}
           className="flex items-center space-x-3 w-full px-4 py-2.5 rounded-lg text-sm font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-colors duration-150"

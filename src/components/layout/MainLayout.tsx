@@ -8,13 +8,16 @@ export const MainLayout: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // If not authenticated, redirect to login
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-background flex relative">
+
+      {/* Subtle aurora tint across the whole app */}
+      <div className="app-aurora-tint" aria-hidden="true" />
+
       {/* Sidebar Navigation */}
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
 
@@ -27,11 +30,8 @@ export const MainLayout: React.FC = () => {
       )}
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col md:pl-64 min-h-screen">
-        {/* Navbar */}
+      <div className="flex-1 flex flex-col md:pl-64 min-h-screen relative z-10">
         <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-
-        {/* Scrollable page container */}
         <main className="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto animate-in fade-in duration-300">
           <Outlet />
         </main>

@@ -5,9 +5,10 @@ export interface Employee {
   email: string;
   department: string;
   designation: string;
-  role: 'admin' | 'employee';
+  role: 'admin' | 'hr' | 'employee';
   current_status: 'Present' | 'Absent' | 'Leave';
   join_date?: string; // YYYY-MM-DD
+  status?: string;
 }
 
 export type AttendanceStatus = 'Present' | 'Absent' | 'Leave' | 'Half Day';
@@ -45,4 +46,28 @@ export interface ActivityLog {
   user_name: string;
   message: string;
   timestamp: string; // ISO string
+}
+
+export interface Announcement {
+  id: string;
+  title: string;
+  content: string;
+  category: string;
+  priority: string;
+  target_audience: string;
+  created_by: string;
+  created_at: string;
+  expires_at?: string;
+  is_active: boolean;
+  is_pinned: boolean;
+}
+
+export interface Notification {
+  id: string;
+  user_id: string;
+  title: string;
+  message: string;
+  type: string;
+  is_read: boolean;
+  created_at: string;
 }

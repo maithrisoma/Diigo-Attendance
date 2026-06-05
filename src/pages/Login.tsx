@@ -6,17 +6,17 @@ import { useToast } from '../components/ui/Toast';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { Modal } from '../components/ui/Modal';
+import { AuroraBackground } from '../components/ui/AuroraBackground';
 import {
-  Clock,
   ShieldCheck,
-  UserCircle2,
   KeyRound,
   LogIn,
-  Building2,
-  Leaf,
+  User,
+  Crown,
 } from 'lucide-react';
 
-type Portal = 'employee' | 'admin';
+
+type Portal = 'employee' | 'hr' | 'admin';
 
 interface PortalFormProps {
   portal: Portal;
@@ -42,7 +42,34 @@ const PortalForm: React.FC<PortalFormProps> = ({ portal, onSuccess }) => {
     setErrors({});
   }, [portal]);
 
-  const isAdmin = portal === 'admin';
+  const getFieldsConfig = () => {
+    switch (portal) {
+      case 'admin':
+        return {
+          label: 'Super Admin ID or Email',
+          placeholder: 'e.g. ADM001 or admin@company.com',
+          demoEmail: 'admin@company.com',
+          btnText: loading ? 'Signing in…' : 'Sign In to Super Admin Portal'
+        };
+      case 'hr':
+        return {
+          label: 'HR ID or Email',
+          placeholder: 'e.g. HR001 or hr@company.com',
+          demoEmail: 'hr@company.com',
+          btnText: loading ? 'Signing in…' : 'Sign In to HR Portal'
+        };
+      case 'employee':
+      default:
+        return {
+          label: 'Employee ID or Email',
+          placeholder: 'e.g. EMP001 or employee@company.com',
+          demoEmail: 'employee@company.com',
+          btnText: loading ? 'Signing in…' : 'Sign In to Employee Portal'
+        };
+    }
+  };
+
+  const config = getFieldsConfig();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,15 +87,21 @@ const PortalForm: React.FC<PortalFormProps> = ({ portal, onSuccess }) => {
         const parsed = saved ? JSON.parse(saved) : null;
         const role: string = parsed?.role ?? 'employee';
 
-        if (isAdmin && role !== 'admin') {
-          toast('This account does not have Admin access.', 'error');
-          setErrors({ password: 'Not an Admin account.' });
+        if (portal === 'admin' && role !== 'admin') {
+          toast('This account does not have Super Admin access.', 'error');
+          setErrors({ password: 'Not a Super Admin account.' });
           setLoading(false);
           return;
         }
-        if (!isAdmin && role === 'admin') {
-          toast('Please use the Admin Portal to sign in.', 'error');
-          setErrors({ password: 'Use the Admin portal.' });
+        if (portal === 'hr' && role !== 'hr') {
+          toast('This account does not have HR access.', 'error');
+          setErrors({ password: 'Not an HR account.' });
+          setLoading(false);
+          return;
+        }
+        if (portal === 'employee' && role !== 'employee') {
+          toast('This account does not have Employee access.', 'error');
+          setErrors({ password: 'Not an Employee account.' });
           setLoading(false);
           return;
         }
@@ -112,8 +145,8 @@ const PortalForm: React.FC<PortalFormProps> = ({ portal, onSuccess }) => {
     <>
       <form onSubmit={handleSubmit} className="space-y-4 mt-4">
         <Input
-          label={isAdmin ? 'Admin ID or Email' : 'Employee ID or Email'}
-          placeholder={isAdmin ? 'e.g. HR001 or admin@company.com' : 'e.g. D01 or employee@company.com'}
+          label={config.label}
+          placeholder={config.placeholder}
           value={emailOrId}
           onChange={e => setEmailOrId(e.target.value)}
           error={errors.emailOrId}
@@ -140,17 +173,20 @@ const PortalForm: React.FC<PortalFormProps> = ({ portal, onSuccess }) => {
         <Button
           type="submit"
           disabled={loading}
-          className="w-full h-11 rounded-lg font-semibold text-sm flex items-center justify-center gap-2"
+          style={portal === 'admin' ? { backgroundColor: '#8B5CF6', borderColor: '#8B5CF6' } : undefined}
+          className={`w-full h-11 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 ${
+            portal === 'admin' ? 'hover:bg-[#7C3AED] text-white' : ''
+          }`}
         >
           <LogIn className="h-4 w-4" />
-          {loading ? 'Signing in…' : `Sign in to ${isAdmin ? 'Admin' : 'Employee'} Portal`}
+          {config.btnText}
         </Button>
 
         {/* Demo hint */}
         <div className="rounded-lg p-3 border border-border/80 bg-muted/5 text-[10.5px] leading-relaxed text-muted-foreground">
           <span className="font-bold">Demo: </span>
           <code className="font-mono font-semibold text-foreground/80">
-            {isAdmin ? 'admin@company.com' : 'employee@company.com'}
+            {config.demoEmail}
           </code>
           {' / '}
           <code className="font-mono font-semibold text-foreground/80">password</code>
@@ -187,65 +223,128 @@ const PortalForm: React.FC<PortalFormProps> = ({ portal, onSuccess }) => {
 export const Login: React.FC = () => {
   const { isAuthenticated, currentUser } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'employee' | 'admin'>('employee');
+  const [activeTab, setActiveTab] = useState<Portal>('employee');
 
   if (isAuthenticated && currentUser) {
-    return <Navigate to={currentUser.role === 'admin' ? '/admin/dashboard' : '/employee/dashboard'} replace />;
+    if (currentUser.role === 'admin') {
+      return <Navigate to="/admin/dashboard" replace />;
+    } else if (currentUser.role === 'hr') {
+      return <Navigate to="/hr/dashboard" replace />;
+    } else {
+      return <Navigate to="/employee/dashboard" replace />;
+    }
   }
 
   const handleSuccess = (role: string) => {
-    navigate(role === 'admin' ? '/admin/dashboard' : '/employee/dashboard');
+    if (role === 'admin') {
+      navigate('/admin/dashboard');
+    } else if (role === 'hr') {
+      navigate('/hr/dashboard');
+    } else {
+      navigate('/employee/dashboard');
+    }
   };
 
+  const getHeadingAndDesc = () => {
+    switch (activeTab) {
+      case 'admin':
+        return {
+          heading: 'Login Into Administration Center',
+          desc: 'Manage the entire attendance system, users, permissions, reports, and company settings.'
+        };
+      case 'hr':
+        return {
+          heading: 'Login Into HR Dashboard',
+          desc: 'Access HR dashboard to manage employee records, leaves, and attendance.'
+        };
+      case 'employee':
+      default:
+        return {
+          heading: 'Login Into Your Dashboard',
+          desc: 'Mark attendance and access your employee profile'
+        };
+    }
+  };
+
+  const { heading, desc } = getHeadingAndDesc();
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden bg-background text-foreground transition-colors duration-200">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden text-foreground transition-colors duration-200">
+
+      {/* ── Aurora Full Page Background ── */}
+      <AuroraBackground variant="page" />
 
       {/* Brand */}
       <div className="flex flex-col items-center mb-8 text-center z-10">
-        <img src={diigoLogo} alt="Diigo Logo" className="h-14 md:h-16 object-contain mb-3 dark:brightness-110" />
+        <img src={diigoLogo} alt="Diigo Logo" className="h-14 md:h-16 object-contain mb-3 drop-shadow-lg" />
         <p className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
           Attendance Registry Portal
         </p>
       </div>
 
-      {/* Centered Login Card */}
-      <div className="w-full max-w-md z-10 bg-card border border-border rounded-[20px] shadow-card overflow-hidden">
+      {/* Centered Login Card — Glassmorphism */}
+      <div className="glass-card w-full max-w-md z-10 rounded-[20px] overflow-hidden">
         {/* Tab Headers */}
-        <div className="flex border-b border-border">
+        <div className="flex border-b border-white/20 dark:border-white/10 text-xs sm:text-sm">
+          {/* Employee Tab */}
           <button
+            type="button"
             onClick={() => setActiveTab('employee')}
-            className={`flex-1 py-4 text-sm font-bold transition-all duration-200 border-b-2 flex items-center justify-center gap-2 ${
+            className={`flex-1 py-4 font-bold transition-all duration-200 border-b-2 flex items-center justify-center gap-1.5 ${
               activeTab === 'employee'
-                ? 'bg-card text-primary border-primary'
-                : 'bg-muted/5 text-muted-foreground hover:bg-muted/10 border-transparent'
+                ? 'text-primary border-primary bg-white/20 dark:bg-white/5'
+                : 'text-muted-foreground hover:bg-white/10 border-transparent'
             }`}
           >
-            <UserCircle2 className="h-4.5 w-4.5" />
-            <span>Employee Login</span>
+            <User className="h-4 w-4 shrink-0" />
+            <span className="hidden xs:inline truncate">Employee Login</span>
+            <span className="xs:hidden truncate">Employee</span>
           </button>
+
+          {/* HR Tab */}
           <button
-            onClick={() => setActiveTab('admin')}
-            className={`flex-1 py-4 text-sm font-bold transition-all duration-200 border-b-2 flex items-center justify-center gap-2 ${
-              activeTab === 'admin'
-                ? 'bg-card text-primary border-primary'
-                : 'bg-muted/5 text-muted-foreground hover:bg-muted/10 border-transparent'
+            type="button"
+            onClick={() => setActiveTab('hr')}
+            className={`flex-1 py-4 font-bold transition-all duration-200 border-b-2 flex items-center justify-center gap-1.5 ${
+              activeTab === 'hr'
+                ? 'text-primary border-primary bg-white/20 dark:bg-white/5'
+                : 'text-muted-foreground hover:bg-white/10 border-transparent'
             }`}
           >
-            <ShieldCheck className="h-4.5 w-4.5" />
-            <span>HR / Admin Login</span>
+            <ShieldCheck className="h-4 w-4 shrink-0" />
+            <span className="hidden xs:inline truncate">HR Login</span>
+            <span className="xs:hidden truncate">HR</span>
+          </button>
+
+          {/* Super Admin Tab */}
+          <button
+            type="button"
+            onClick={() => setActiveTab('admin')}
+            className={`flex-1 py-4 font-bold transition-all duration-200 border-b-2 flex items-center justify-center gap-1.5 ${
+              activeTab === 'admin'
+                ? 'text-[#8B5CF6] border-[#8B5CF6] bg-white/20 dark:bg-white/5'
+                : 'text-muted-foreground hover:bg-white/10 border-transparent'
+            }`}
+          >
+            <Crown className="h-4 w-4 shrink-0" />
+            <span className="hidden xs:inline truncate">Super Admin Login</span>
+            <span className="xs:hidden truncate">Super Admin</span>
           </button>
         </div>
 
         {/* Card Content Form */}
         <div className="p-7 flex flex-col">
           <div className="flex flex-col items-center text-center mb-3">
+            {activeTab === 'admin' && (
+              <span className="mb-2 inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#8B5CF6]/10 text-[#8B5CF6] border border-[#8B5CF6]/20 animate-in fade-in zoom-in-95 duration-200">
+                <Crown className="h-3 w-3" /> Super Admin
+              </span>
+            )}
             <h2 className="font-bold text-xl leading-tight text-foreground font-display">
-              Login Into Your Dashboard
+              {heading}
             </h2>
             <p className="text-xs text-muted-foreground mt-1">
-              {activeTab === 'employee'
-                ? 'Mark attendance and access your employee profile'
-                : 'Manage staff records, leaves, approvals, and reports'}
+              {desc}
             </p>
           </div>
 

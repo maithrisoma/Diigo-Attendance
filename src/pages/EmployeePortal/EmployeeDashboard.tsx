@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { AuroraBackground } from '../../components/ui/AuroraBackground';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
@@ -239,7 +240,33 @@ export const EmployeeDashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      
+
+      {/* ── Aurora Welcome Header ── */}
+      <AuroraBackground variant="header">
+        <div className="px-8 py-6 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="h-12 w-12 rounded-full bg-primary/20 text-primary flex items-center justify-center font-display font-bold text-lg border-2 border-primary/30 shadow-md">
+              {currentUser.name.split(' ').map((n: string) => n[0]).join('')}
+            </div>
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-primary/70">
+                Employee Portal
+              </p>
+              <h1 className="text-xl font-bold tracking-tight text-foreground font-display">
+                Welcome back, {currentUser.name.split(' ')[0]} 👋
+              </h1>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {currentUser.designation} • {currentUser.department} • {currentUser.employee_id}
+              </p>
+            </div>
+          </div>
+          <div className="text-right hidden sm:block">
+            <p className="text-[11px] font-semibold text-muted-foreground">{currentMonthYear}</p>
+            <p className="text-xs text-primary font-bold mt-0.5">{currentDayName}</p>
+          </div>
+        </div>
+      </AuroraBackground>
+
       {/* ── Unified Bento Grid Layout ── */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
 

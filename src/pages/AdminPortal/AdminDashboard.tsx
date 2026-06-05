@@ -1,5 +1,7 @@
 import React, { useMemo } from 'react';
+import { AuroraBackground } from '../../components/ui/AuroraBackground';
 import { useData } from '../../context/DataContext';
+import { useAuth } from '../../context/AuthContext';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { LiveCalendar } from '../../components/ui/LiveCalendar';
@@ -31,6 +33,27 @@ import {
 
 export const AdminDashboard: React.FC = () => {
   const { employees, attendance, leaveRequests, activities, holidays } = useData();
+  const { currentUser } = useAuth();
+
+  const isHR = currentUser?.role === 'hr';
+  const isAdmin = currentUser?.role === 'admin';
+
+  const filteredEmployees = useMemo(() => {
+    if (isHR) {
+      return employees.filter((e) => e.role === 'employee');
+    }
+    return employees;
+  }, [employees, isHR]);
+
+  const filteredActivities = useMemo(() => {
+    if (isHR) {
+      return activities.filter((act) => {
+        const msg = act.message.toLowerCase();
+        return !msg.includes('hr') && !msg.includes('holiday');
+      });
+    }
+    return activities;
+  }, [activities, isHR]);
 
   const todayStr = new Date().toISOString().split('T')[0];
 
@@ -49,7 +72,7 @@ export const AdminDashboard: React.FC = () => {
 
   // Calculate Today's Stats
   const stats = useMemo(() => {
-    const total = employees.length;
+    const total = filteredEmployees.length;
     
     // Find today's records
     const todayRecords = attendance.filter((a) => a.date === todayStr);
@@ -58,7 +81,7 @@ export const AdminDashboard: React.FC = () => {
     let absent = 0;
     let leave = 0;
 
-    employees.forEach((emp) => {
+    filteredEmployees.forEach((emp) => {
       const rec = todayRecords.find((r) => r.employee_id === emp.employee_id);
       if (rec) {
         if (rec.status === 'Present' || rec.status === 'Half Day') {
@@ -83,7 +106,7 @@ export const AdminDashboard: React.FC = () => {
       leave,
       attendanceRate,
     };
-  }, [employees, attendance, todayStr]);
+  }, [filteredEmployees, attendance, todayStr]);
 
   // Donut Chart Data: Attendance Distribution
   const pieData = useMemo(() => {
@@ -121,7 +144,7 @@ export const AdminDashboard: React.FC = () => {
       let absent = 0;
       let leave = 0;
 
-      employees.forEach((emp) => {
+      filteredEmployees.forEach((emp) => {
         const rec = dayRecords.find((r) => r.employee_id === emp.employee_id);
         if (rec) {
           if (rec.status === 'Present' || rec.status === 'Half Day') present++;
@@ -141,15 +164,15 @@ export const AdminDashboard: React.FC = () => {
     });
 
     return data;
-  }, [employees, attendance]);
+  }, [filteredEmployees, attendance]);
 
   // Department-wise Bar Chart Data
   const deptData = useMemo(() => {
-    const depts = Array.from(new Set(employees.map((e) => e.department)));
+    const depts = Array.from(new Set(filteredEmployees.map((e) => e.department)));
     const todayRecords = attendance.filter((a) => a.date === todayStr);
 
     return depts.map((dept) => {
-      const deptEmps = employees.filter((e) => e.department === dept);
+      const deptEmps = filteredEmployees.filter((e) => e.department === dept);
       const totalInDept = deptEmps.length;
       let presentInDept = 0;
 
@@ -168,7 +191,7 @@ export const AdminDashboard: React.FC = () => {
         Employees: totalInDept,
       };
     });
-  }, [employees, attendance, todayStr]);
+  }, [filteredEmployees, attendance, todayStr]);
 
   const getActivityIcon = (type: string) => {
     switch (type) {
@@ -188,28 +211,72 @@ export const AdminDashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Welcome Banner */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-foreground font-display">
-          Admin Overview
-        </h1>
-        <p className="text-xs text-muted-foreground">
-          Monitor real-time office presence, track department statistics, and review action activities.
-        </p>
-      </div>
+      {/* ── Aurora Welcome Header ── */}
+      <AuroraBackground variant="header">
+        <div className="px-8 py-7">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-primary/70 mb-1">
+            {isAdmin ? 'Super Admin Portal' : 'HR Portal'}
+          </p>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground font-display">
+            {isAdmin ? 'Super Admin Overview' : 'HR Management Overview'}
+          </h1>
+          <p className="text-xs text-muted-foreground mt-1 max-w-xl">
+            {isAdmin
+              ? 'Monitor global office presence, track employee and HR department statistics, and review audit logs.'
+              : 'Monitor real-time employee office presence, track department statistics, and review action activities.'}
+          </p>
+        </div>
+      </AuroraBackground>
 
       {/* KPI Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-6">
-        <Card className="relative overflow-hidden hover:scale-[1.01] hover:shadow-md transition-all duration-300">
-          <CardContent className="p-6 space-y-2">
-            <div className="flex justify-between items-start">
-              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Total Staff</span>
-              <Users className="h-5 w-5 text-primary" />
-            </div>
-            <p className="text-3xl font-bold text-foreground font-display">{stats.total}</p>
-            <p className="text-[10px] text-muted-foreground font-medium">Registered in system</p>
-          </CardContent>
-        </Card>
+      <div className={`grid grid-cols-2 ${isAdmin ? 'lg:grid-cols-6' : 'lg:grid-cols-5'} gap-6`}>
+        {isAdmin ? (
+          <>
+            <Card className="relative overflow-hidden hover:scale-[1.01] hover:shadow-md transition-all duration-300">
+              <CardContent className="p-6 space-y-2">
+                <div className="flex justify-between items-start">
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Employees</span>
+                  <Users className="h-5 w-5 text-primary" />
+                </div>
+                <p className="text-3xl font-bold text-foreground font-display">{employees.filter(e => e.role === 'employee').length}</p>
+                <p className="text-[10px] text-muted-foreground font-medium">Standard workers</p>
+              </CardContent>
+            </Card>
+
+            <Card className="relative overflow-hidden hover:scale-[1.01] hover:shadow-md transition-all duration-300">
+              <CardContent className="p-6 space-y-2">
+                <div className="flex justify-between items-start">
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">HR Managers</span>
+                  <Briefcase className="h-5 w-5 text-amber-500" />
+                </div>
+                <p className="text-3xl font-bold text-foreground font-display">{employees.filter(e => e.role === 'hr').length}</p>
+                <p className="text-[10px] text-muted-foreground font-medium">HR Administrators</p>
+              </CardContent>
+            </Card>
+
+            <Card className="relative overflow-hidden hover:scale-[1.01] hover:shadow-md transition-all duration-300">
+              <CardContent className="p-6 space-y-2">
+                <div className="flex justify-between items-start">
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Active Staff</span>
+                  <UserCheck className="h-5 w-5 text-emerald-500" />
+                </div>
+                <p className="text-3xl font-bold text-foreground font-display">{employees.filter(e => e.status !== 'Inactive').length}</p>
+                <p className="text-[10px] text-muted-foreground font-medium">Enabled accounts</p>
+              </CardContent>
+            </Card>
+          </>
+        ) : (
+          <Card className="relative overflow-hidden hover:scale-[1.01] hover:shadow-md transition-all duration-300">
+            <CardContent className="p-6 space-y-2">
+              <div className="flex justify-between items-start">
+                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Total Employees</span>
+                <Users className="h-5 w-5 text-primary" />
+              </div>
+              <p className="text-3xl font-bold text-foreground font-display">{stats.total}</p>
+              <p className="text-[10px] text-muted-foreground font-medium">Registered workers</p>
+            </CardContent>
+          </Card>
+        )}
 
         <Card className="border-[var(--calendar-present-border)] bg-[var(--calendar-present-bg)]/40 text-[var(--calendar-present-text)] hover:scale-[1.01] hover:shadow-md transition-all duration-300">
           <CardContent className="p-6 space-y-2">
@@ -251,7 +318,7 @@ export const AdminDashboard: React.FC = () => {
               <TrendingUp className="h-5 w-5 text-primary" />
             </div>
             <p className="text-3xl font-bold text-primary font-display">{stats.attendanceRate}%</p>
-            <p className="text-[10px] text-primary/80 font-medium">Of staff active today</p>
+            <p className="text-[10px] text-primary/80 font-medium">Of active staff</p>
           </CardContent>
         </Card>
       </div>
@@ -336,12 +403,12 @@ export const AdminDashboard: React.FC = () => {
             <Badge variant="outline" className="text-[10px] font-bold">Live Stream</Badge>
           </CardHeader>
           <CardContent className="p-0 overflow-y-auto flex-1 divide-y divide-border">
-            {activities.length === 0 ? (
+            {filteredActivities.length === 0 ? (
               <div className="h-48 flex items-center justify-center text-xs text-muted-foreground">
                 No recent activity logged.
               </div>
             ) : (
-              activities.map((act) => (
+              filteredActivities.map((act) => (
                 <div key={act.id} className="p-4 hover:bg-muted/10 transition-colors flex gap-3 items-start">
                   <div className="flex-shrink-0 mt-0.5">
                     {getActivityIcon(act.type)}

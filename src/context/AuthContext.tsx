@@ -35,26 +35,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     try {
-      const savedEmployees = localStorage.getItem('employees');
-      const employeesList: Employee[] = savedEmployees ? JSON.parse(savedEmployees) : INITIAL_EMPLOYEES;
-
-      const user = employeesList.find(
-        e => e.email.toLowerCase() === emailOrId.toLowerCase() || e.employee_id.toLowerCase() === emailOrId.toLowerCase()
-      );
-
-      if (user) {
-        if (password === 'password') {
-          localStorage.setItem('currentUser', JSON.stringify(user));
-          setCurrentUser(user);
-          return { success: true, message: 'Login successful' };
-        } else {
-          return { success: false, message: 'Invalid credentials. Password is "password"' };
-        }
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ emailOrId, password })
+      });
+      const data = await res.json();
+      if (data.success && data.user) {
+        localStorage.setItem('currentUser', JSON.stringify(data.user));
+        setCurrentUser(data.user);
+        return { success: true, message: data.message || 'Login successful' };
+      } else {
+        return { success: false, message: data.message || 'Invalid credentials' };
       }
-      return { success: false, message: 'Employee not found.' };
     } catch (err) {
       console.error(err);
-      return { success: false, message: 'Failed to authenticate locally.' };
+      return { success: false, message: 'Failed to connect to authentication server.' };
     }
   };
 
@@ -65,17 +61,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const forgotPassword = async (emailOrId: string): Promise<{ success: boolean; message: string }> => {
     try {
-      const savedEmployees = localStorage.getItem('employees');
-      const employeesList: Employee[] = savedEmployees ? JSON.parse(savedEmployees) : INITIAL_EMPLOYEES;
-
-      const user = employeesList.find(
-        e => e.email.toLowerCase() === emailOrId.toLowerCase() || e.employee_id.toLowerCase() === emailOrId.toLowerCase()
-      );
-
-      if (user) {
-        return { success: true, message: `Password reset instructions sent to ${user.email}.` };
+      const res = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ emailOrId })
+      });
+      const data = await res.json();
+      if (data.success) {
+        return { success: true, message: data.message };
       }
-      return { success: false, message: 'Employee not found.' };
+      return { success: false, message: data.message || 'Employee not found.' };
     } catch (err) {
       console.error(err);
       return { success: false, message: 'Failed to process request.' };

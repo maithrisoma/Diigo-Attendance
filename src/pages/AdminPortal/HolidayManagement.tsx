@@ -1,14 +1,25 @@
 import React, { useState, useMemo } from 'react';
 import { useData } from '../../context/DataContext';
 import { useToast } from '../../components/ui/Toast';
-import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '../../components/ui/Table';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
 import { Modal } from '../../components/ui/Modal';
-import { Calendar, Search, Plus, Edit2, Trash2, Milestone, RefreshCw, Check, AlertCircle } from 'lucide-react';
+import { DatePicker } from '../../components/ui/DatePicker';
+import {
+  Plus,
+  Edit2,
+  Trash2,
+  Search,
+  RefreshCw,
+  Check,
+  AlertCircle,
+  CalendarDays,
+  Flag,
+  Star,
+  Repeat,
+} from 'lucide-react';
 import { Holiday } from '../../types';
 
 const HOLIDAY_TYPES = [
@@ -34,21 +45,42 @@ const MONTHS = [
   { value: '11', label: 'December' },
 ];
 
+const TYPE_BADGE_MAP: Record<string, React.ReactNode> = {
+  'National Holiday': (
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-600 border border-rose-500/20">
+      <Flag className="h-3 w-3" />National
+    </span>
+  ),
+  'Festival Holiday': (
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+      <Star className="h-3 w-3" />Festival
+    </span>
+  ),
+  'Company Holiday': (
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+      <CalendarDays className="h-3 w-3" />Company
+    </span>
+  ),
+  'Optional Holiday': (
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-600 border border-amber-500/20">
+      <CalendarDays className="h-3 w-3" />Optional
+    </span>
+  ),
+};
+
 export const HolidayManagement: React.FC = () => {
   const { holidays, addHoliday, updateHoliday, removeHoliday } = useData();
   const { toast } = useToast();
 
-  // Search & Filters State
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('all');
   const [selectedType, setSelectedType] = useState('all');
 
-  // Modals state
   const [addOpen, setAddOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const [selectedHoliday, setSelectedHoliday] = useState<Holiday | null>(null);
 
-  // Forms state
   const [holidayForm, setHolidayForm] = useState<Omit<Holiday, 'id'>>({
     holiday_name: '',
     holiday_date: '',
@@ -57,26 +89,21 @@ export const HolidayManagement: React.FC = () => {
   });
   const [error, setError] = useState('');
 
-  // Suffix formatting
   const fmtDate = (d: string) =>
     new Date(d).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
 
-  // Filtered holidays
+  const getDayName = (d: string) =>
+    new Date(d).toLocaleDateString('en-US', { weekday: 'short' });
+
   const filteredHolidays = useMemo(() => {
     return holidays
-      .filter(h => {
+      .filter((h) => {
         const matchesSearch = h.holiday_name.toLowerCase().includes(searchQuery.toLowerCase().trim());
-        
-        // Month filter match
         let matchesMonth = true;
         if (selectedMonth !== 'all') {
-          const hMonth = new Date(h.holiday_date).getMonth();
-          matchesMonth = hMonth.toString() === selectedMonth;
+          matchesMonth = new Date(h.holiday_date).getMonth().toString() === selectedMonth;
         }
-
-        // Type filter match
         const matchesType = selectedType === 'all' || h.holiday_type === selectedType;
-
         return matchesSearch && matchesMonth && matchesType;
       })
       .sort((a, b) => a.holiday_date.localeCompare(b.holiday_date));
@@ -89,42 +116,31 @@ export const HolidayManagement: React.FC = () => {
   };
 
   const validateForm = () => {
-    if (!holidayForm.holiday_name.trim()) {
-      setError('Holiday Name is required');
-      return false;
-    }
-    if (!holidayForm.holiday_date) {
-      setError('Holiday Date is required');
-      return false;
-    }
+    if (!holidayForm.holiday_name.trim()) { setError('Holiday Name is required'); return false; }
+    if (!holidayForm.holiday_date) { setError('Holiday Date is required'); return false; }
     setError('');
     return true;
+  };
+
+  const applyRecurringLogic = (form: typeof holidayForm) => {
+    const dateObj = new Date(form.holiday_date);
+    const day = dateObj.getDate();
+    const month = dateObj.getMonth();
+    const name = form.holiday_name.toLowerCase();
+    if (
+      (month === 0 && day === 26) || name.includes('republic') ||
+      (month === 7 && day === 15) || name.includes('independence') ||
+      (month === 9 && day === 2) || name.includes('gandhi')
+    ) {
+      return true;
+    }
+    return form.is_recurring;
   };
 
   const handleAddSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
-
-    // Mandatory national holidays check (Republic Day Jan 26, Independence Day Aug 15, Gandhi Jayanti Oct 2)
-    let finalRecurring = holidayForm.is_recurring;
-    const dateObj = new Date(holidayForm.holiday_date);
-    const day = dateObj.getDate();
-    const month = dateObj.getMonth(); // Jan = 0, Aug = 7, Oct = 9
-    const name = holidayForm.holiday_name.toLowerCase();
-
-    const isRepDay = (month === 0 && day === 26) || name.includes('republic');
-    const isIndDay = (month === 7 && day === 15) || name.includes('independence');
-    const isGandhiDay = (month === 9 && day === 2) || name.includes('gandhi');
-
-    if (isRepDay || isIndDay || isGandhiDay) {
-      finalRecurring = true; // force true
-    }
-
-    addHoliday({
-      ...holidayForm,
-      is_recurring: finalRecurring,
-    });
-
+    addHoliday({ ...holidayForm, is_recurring: applyRecurringLogic(holidayForm) });
     toast(`Added holiday "${holidayForm.holiday_name}" successfully!`, 'success');
     setAddOpen(false);
     resetForm();
@@ -133,36 +149,18 @@ export const HolidayManagement: React.FC = () => {
   const handleEditSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedHoliday || !validateForm()) return;
-
-    let finalRecurring = holidayForm.is_recurring;
-    const dateObj = new Date(holidayForm.holiday_date);
-    const day = dateObj.getDate();
-    const month = dateObj.getMonth();
-    const name = holidayForm.holiday_name.toLowerCase();
-
-    const isRepDay = (month === 0 && day === 26) || name.includes('republic');
-    const isIndDay = (month === 7 && day === 15) || name.includes('independence');
-    const isGandhiDay = (month === 9 && day === 2) || name.includes('gandhi');
-
-    if (isRepDay || isIndDay || isGandhiDay) {
-      finalRecurring = true;
-    }
-
-    updateHoliday(selectedHoliday.id, {
-      ...holidayForm,
-      is_recurring: finalRecurring,
-    });
-
+    updateHoliday(selectedHoliday.id, { ...holidayForm, is_recurring: applyRecurringLogic(holidayForm) });
     toast(`Updated holiday "${holidayForm.holiday_name}"!`, 'success');
     setEditOpen(false);
     resetForm();
   };
 
-  const handleDelete = (id: string, name: string) => {
-    if (window.confirm(`Are you sure you want to delete the holiday "${name}"?`)) {
-      removeHoliday(id);
-      toast(`Deleted holiday "${name}"`, 'success');
-    }
+  const handleDeleteConfirm = () => {
+    if (!selectedHoliday) return;
+    removeHoliday(selectedHoliday.id);
+    toast(`Deleted holiday "${selectedHoliday.holiday_name}"`, 'success');
+    setDeleteOpen(false);
+    setSelectedHoliday(null);
   };
 
   const openEdit = (h: Holiday) => {
@@ -176,25 +174,25 @@ export const HolidayManagement: React.FC = () => {
     setEditOpen(true);
   };
 
-  const openAdd = () => {
-    resetForm();
-    setAddOpen(true);
+  const openDelete = (h: Holiday) => {
+    setSelectedHoliday(h);
+    setDeleteOpen(true);
   };
 
   const resetForm = () => {
-    setHolidayForm({
-      holiday_name: '',
-      holiday_date: '',
-      holiday_type: 'Festival Holiday',
-      is_recurring: false,
-    });
+    setHolidayForm({ holiday_name: '', holiday_date: '', holiday_type: 'Festival Holiday', is_recurring: false });
     setSelectedHoliday(null);
     setError('');
   };
 
+  // KPIs
+  const nationalCount = holidays.filter((h) => h.holiday_type === 'National Holiday').length;
+  const festivalCount = holidays.filter((h) => h.holiday_type === 'Festival Holiday').length;
+  const recurringCount = holidays.filter((h) => h.is_recurring).length;
+
   return (
     <div className="space-y-6 text-left">
-      
+
       {/* ── Page Header ── */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -202,275 +200,299 @@ export const HolidayManagement: React.FC = () => {
             Holiday Management
           </h1>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Configure, update, and track corporate and public holidays observed across calendar cycles.
+            Configure, update, and track corporate and public holidays across the calendar.
           </p>
         </div>
-        <Button onClick={openAdd} className="flex items-center gap-1.5 shadow-md">
-          <Plus className="h-4.5 w-4.5" />
-          <span>Add Holiday</span>
-        </Button>
+        <button
+          onClick={() => { resetForm(); setAddOpen(true); }}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity shadow-md"
+        >
+          <Plus className="h-4 w-4" />
+          Add Holiday
+        </button>
+      </div>
+
+      {/* ── KPI Cards ── */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {[
+          { label: 'Total Holidays', value: holidays.length, icon: CalendarDays, color: 'text-primary', bg: 'bg-primary/10' },
+          { label: 'National', value: nationalCount, icon: Flag, color: 'text-rose-600', bg: 'bg-rose-500/10' },
+          { label: 'Festival', value: festivalCount, icon: Star, color: 'text-amber-600', bg: 'bg-amber-500/10' },
+          { label: 'Annual Recurring', value: recurringCount, icon: Repeat, color: 'text-emerald-600', bg: 'bg-emerald-500/10' },
+        ].map((kpi) => (
+          <div
+            key={kpi.label}
+            className="rounded-xl border border-border bg-card p-4 flex items-center gap-3 shadow-sm"
+          >
+            <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${kpi.bg}`}>
+              <kpi.icon className={`h-5 w-5 ${kpi.color}`} />
+            </div>
+            <div>
+              <p className="text-xl font-bold text-foreground leading-none">{kpi.value}</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">{kpi.label}</p>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* ── Search & Filter Toolbar ── */}
-      <Card>
-        <CardContent className="p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 items-end">
-          {/* Search bar */}
-          <div className="w-full relative md:col-span-2">
-            <label className="text-xs font-semibold text-muted-foreground tracking-wide font-display mb-1.5 block">
-              Search Holiday Name
-            </label>
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search holiday name..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
-              />
-            </div>
-          </div>
+      <div className="rounded-xl border border-border bg-card p-4 flex flex-col sm:flex-row gap-3 shadow-sm flex-wrap items-end">
+        {/* Search */}
+        <div className="relative flex-1 min-w-[180px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Search holiday name…"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-9 pr-4 py-2.5 text-sm rounded-lg border border-border bg-muted/5 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+          />
+        </div>
 
-          {/* Month Filter */}
-          <div className="w-full">
-            <Select
-              label="Filter by Month"
-              options={MONTHS}
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-            />
-          </div>
+        {/* Month Filter */}
+        <div className="min-w-[150px]">
+          <Select label="" options={MONTHS} value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} />
+        </div>
 
-          {/* Holiday Type Filter */}
-          <div className="w-full">
-            <Select
-              label="Holiday Type"
-              options={[
-                { value: 'all', label: 'All Types' },
-                ...HOLIDAY_TYPES.map(t => ({ value: t, label: t })),
-              ]}
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
-            />
-          </div>
+        {/* Type Filter */}
+        <div className="min-w-[160px]">
+          <Select
+            label=""
+            options={[{ value: 'all', label: 'All Types' }, ...HOLIDAY_TYPES.map((t) => ({ value: t, label: t }))]}
+            value={selectedType}
+            onChange={(e) => setSelectedType(e.target.value)}
+          />
+        </div>
 
-          {/* Reset Filters button */}
-          <button
-            onClick={handleResetFilters}
-            className="w-full h-10 px-4 py-2 bg-muted/10 hover:bg-muted/20 text-foreground border border-border rounded-lg text-xs font-semibold flex items-center justify-center space-x-2 transition-colors duration-150"
-          >
-            <RefreshCw className="h-3.5 w-3.5" />
-            <span>Reset Filters</span>
-          </button>
-        </CardContent>
-      </Card>
+        {/* Reset */}
+        <button
+          onClick={handleResetFilters}
+          className="h-10 px-4 py-2 bg-muted/10 hover:bg-muted/20 text-foreground border border-border rounded-lg text-xs font-semibold flex items-center gap-2 transition-colors"
+        >
+          <RefreshCw className="h-3.5 w-3.5" />
+          Reset
+        </button>
+      </div>
 
       {/* ── Holidays Table ── */}
-      <Card>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Holiday Name</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Recurring</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+      <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden text-foreground">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-border bg-muted/10 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="py-4 px-6">Holiday Name</th>
+                <th className="py-4 px-6">Date</th>
+                <th className="py-4 px-6">Type</th>
+                <th className="py-4 px-6 text-center">Recurring</th>
+                <th className="py-4 px-6 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border text-sm">
               {filteredHolidays.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="h-36 text-center text-muted-foreground text-sm">
+                <tr>
+                  <td colSpan={5} className="py-14 text-center text-muted-foreground text-xs">
                     No holiday records matched your filters.
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               ) : (
                 filteredHolidays.map((holiday) => (
-                  <TableRow key={holiday.id}>
-                    <TableCell className="font-bold text-foreground flex items-center gap-2">
-                      <Milestone className="h-4.5 w-4.5 text-primary" />
-                      {holiday.holiday_name}
-                    </TableCell>
-                    <TableCell className="font-mono text-xs text-muted-foreground font-medium">
-                      {fmtDate(holiday.holiday_date)}
-                    </TableCell>
-                    <TableCell>
-                      <Badge 
-                        variant={
-                          holiday.holiday_type === 'National Holiday' 
-                            ? 'Holiday' 
-                            : holiday.holiday_type === 'Festival Holiday'
-                            ? 'Leave'
-                            : holiday.holiday_type === 'Company Holiday'
-                            ? 'default'
-                            : 'secondary'
-                        }
-                      >
-                        {holiday.holiday_type || 'Festival Holiday'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
+                  <tr key={holiday.id} className="hover:bg-muted/5 transition-colors">
+                    {/* Holiday Name */}
+                    <td className="py-4 px-6">
+                      <div className="flex items-center gap-3">
+                        <div className="h-9 w-9 rounded-lg bg-primary/10 text-primary font-bold flex items-center justify-center text-xs flex-shrink-0">
+                          <CalendarDays className="h-4 w-4" />
+                        </div>
+                        <p className="font-semibold text-foreground">{holiday.holiday_name}</p>
+                      </div>
+                    </td>
+
+                    {/* Date */}
+                    <td className="py-4 px-6">
+                      <p className="font-mono text-xs text-foreground font-semibold">{fmtDate(holiday.holiday_date)}</p>
+                      <p className="text-[11px] text-muted-foreground">{getDayName(holiday.holiday_date)}</p>
+                    </td>
+
+                    {/* Type */}
+                    <td className="py-4 px-6">
+                      {TYPE_BADGE_MAP[holiday.holiday_type] ?? (
+                        <span className="text-xs text-muted-foreground">{holiday.holiday_type}</span>
+                      )}
+                    </td>
+
+                    {/* Recurring */}
+                    <td className="py-4 px-6 text-center">
                       {holiday.is_recurring ? (
-                        <span className="flex items-center gap-1 text-[11px] font-bold text-[var(--calendar-present-text)] bg-[var(--calendar-present-bg)]/40 border border-[var(--calendar-present-border)] px-2 py-0.5 rounded-full w-max">
-                          <Check className="h-3.5 w-3.5" />
-                          Annual Repeat
+                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full">
+                          <Repeat className="h-3 w-3" />
+                          Annual
                         </span>
                       ) : (
-                        <span className="text-[11px] font-medium text-muted-foreground">One-time Off</span>
+                        <span className="text-[11px] font-medium text-muted-foreground">One-time</span>
                       )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end space-x-1.5">
-                        <Button
-                          variant="ghost"
-                          size="icon"
+                    </td>
+
+                    {/* Actions */}
+                    <td className="py-4 px-6 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
                           onClick={() => openEdit(holiday)}
-                          className="h-8.5 w-8.5 text-muted-foreground hover:text-primary hover:bg-muted/10"
+                          className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-muted/10 transition"
+                          title="Edit"
                         >
                           <Edit2 className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDelete(holiday.id, holiday.holiday_name)}
-                          className="h-8.5 w-8.5 text-muted-foreground hover:text-destructive hover:bg-muted/10"
+                        </button>
+                        <button
+                          onClick={() => openDelete(holiday)}
+                          className="p-1.5 rounded-lg border border-rose-100 text-rose-500 hover:bg-rose-500/10 transition"
+                          title="Delete"
                         >
                           <Trash2 className="h-4 w-4" />
-                        </Button>
+                        </button>
                       </div>
-                    </TableCell>
-                  </TableRow>
+                    </td>
+                  </tr>
                 ))
               )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+            </tbody>
+          </table>
+        </div>
 
-      {/* ── MODALS ── */}
+        {filteredHolidays.length > 0 && (
+          <div className="border-t border-border px-6 py-3 flex items-center justify-between text-xs text-muted-foreground bg-muted/5">
+            <span>
+              Showing <span className="font-semibold text-foreground">{filteredHolidays.length}</span> of{' '}
+              <span className="font-semibold text-foreground">{holidays.length}</span> holidays
+            </span>
+            <span className="font-semibold text-primary">
+              {nationalCount} National · {festivalCount} Festival · {recurringCount} Recurring
+            </span>
+          </div>
+        )}
+      </div>
 
-      {/* Add Holiday Modal */}
-      <Modal isOpen={addOpen} onClose={() => setAddOpen(false)} title="Create Default Holiday" size="sm">
+      {/* ── Add Holiday Modal ── */}
+      <Modal isOpen={addOpen} onClose={() => setAddOpen(false)} title="Add New Holiday" size="sm">
         <form onSubmit={handleAddSubmit} className="space-y-4">
           {error && (
             <div className="p-3 rounded-lg bg-rose-50 border border-rose-100 flex items-start gap-2 text-xs text-rose-700">
-              <AlertCircle className="h-4.5 w-4.5 mt-0.5" />
+              <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
               <span>{error}</span>
             </div>
           )}
-
           <div>
             <label className="text-xs font-bold text-muted-foreground mb-1.5 block">Holiday Name</label>
             <Input
-              placeholder="e.g. Maha Shivaratri"
+              placeholder="e.g. Diwali"
               value={holidayForm.holiday_name}
-              onChange={(e) => setHolidayForm(p => ({ ...p, holiday_name: e.target.value }))}
+              onChange={(e) => setHolidayForm((p) => ({ ...p, holiday_name: e.target.value }))}
             />
           </div>
-
-          <div>
-            <label className="text-xs font-bold text-muted-foreground mb-1.5 block">Holiday Date</label>
-            <Input
-              type="date"
-              value={holidayForm.holiday_date}
-              onChange={(e) => setHolidayForm(p => ({ ...p, holiday_date: e.target.value }))}
-            />
-          </div>
-
+          <DatePicker
+            label="Holiday Date"
+            value={holidayForm.holiday_date}
+            onChange={(val) => setHolidayForm((p) => ({ ...p, holiday_date: val }))}
+          />
           <div>
             <label className="text-xs font-bold text-muted-foreground mb-1.5 block">Holiday Type</label>
             <Select
-              options={HOLIDAY_TYPES.map(t => ({ value: t, label: t }))}
+              options={HOLIDAY_TYPES.map((t) => ({ value: t, label: t }))}
               value={holidayForm.holiday_type}
-              onChange={(e) => setHolidayForm(p => ({ ...p, holiday_type: e.target.value as any }))}
+              onChange={(e) => setHolidayForm((p) => ({ ...p, holiday_type: e.target.value as any }))}
             />
           </div>
-
-          <div className="flex items-center gap-2 pt-1.5">
+          <div className="flex items-center gap-2 pt-1">
             <input
               type="checkbox"
               id="is_recurring_add"
               checked={holidayForm.is_recurring}
-              onChange={(e) => setHolidayForm(p => ({ ...p, is_recurring: e.target.checked }))}
+              onChange={(e) => setHolidayForm((p) => ({ ...p, is_recurring: e.target.checked }))}
               className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
             />
-            <label htmlFor="is_recurring_add" className="text-xs font-bold text-muted-foreground cursor-pointer">
+            <label htmlFor="is_recurring_add" className="text-xs font-semibold text-muted-foreground cursor-pointer">
               Recurring annual holiday
             </label>
           </div>
-
-          <div className="flex justify-end space-x-3 pt-3">
-            <Button type="button" variant="outline" size="sm" onClick={() => setAddOpen(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" size="sm">
-              Add Holiday
-            </Button>
+          <div className="flex justify-end gap-3 pt-3">
+            <Button type="button" variant="outline" size="sm" onClick={() => setAddOpen(false)}>Cancel</Button>
+            <Button type="submit" size="sm">Add Holiday</Button>
           </div>
         </form>
       </Modal>
 
-      {/* Edit Holiday Modal */}
-      <Modal isOpen={editOpen} onClose={() => setEditOpen(false)} title="Update Holiday Record" size="sm">
+      {/* ── Edit Holiday Modal ── */}
+      <Modal isOpen={editOpen} onClose={() => setEditOpen(false)} title="Edit Holiday" size="sm">
         <form onSubmit={handleEditSubmit} className="space-y-4">
           {error && (
             <div className="p-3 rounded-lg bg-rose-50 border border-rose-100 flex items-start gap-2 text-xs text-rose-700">
-              <AlertCircle className="h-4.5 w-4.5 mt-0.5" />
+              <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
               <span>{error}</span>
             </div>
           )}
-
           <div>
             <label className="text-xs font-bold text-muted-foreground mb-1.5 block">Holiday Name</label>
             <Input
               placeholder="e.g. Holi"
               value={holidayForm.holiday_name}
-              onChange={(e) => setHolidayForm(p => ({ ...p, holiday_name: e.target.value }))}
+              onChange={(e) => setHolidayForm((p) => ({ ...p, holiday_name: e.target.value }))}
             />
           </div>
-
-          <div>
-            <label className="text-xs font-bold text-muted-foreground mb-1.5 block">Holiday Date</label>
-            <Input
-              type="date"
-              value={holidayForm.holiday_date}
-              onChange={(e) => setHolidayForm(p => ({ ...p, holiday_date: e.target.value }))}
-            />
-          </div>
-
+          <DatePicker
+            label="Holiday Date"
+            value={holidayForm.holiday_date}
+            onChange={(val) => setHolidayForm((p) => ({ ...p, holiday_date: val }))}
+          />
           <div>
             <label className="text-xs font-bold text-muted-foreground mb-1.5 block">Holiday Type</label>
             <Select
-              options={HOLIDAY_TYPES.map(t => ({ value: t, label: t }))}
+              options={HOLIDAY_TYPES.map((t) => ({ value: t, label: t }))}
               value={holidayForm.holiday_type}
-              onChange={(e) => setHolidayForm(p => ({ ...p, holiday_type: e.target.value as any }))}
+              onChange={(e) => setHolidayForm((p) => ({ ...p, holiday_type: e.target.value as any }))}
             />
           </div>
-
-          <div className="flex items-center gap-2 pt-1.5">
+          <div className="flex items-center gap-2 pt-1">
             <input
               type="checkbox"
               id="is_recurring_edit"
               checked={holidayForm.is_recurring}
-              onChange={(e) => setHolidayForm(p => ({ ...p, is_recurring: e.target.checked }))}
+              onChange={(e) => setHolidayForm((p) => ({ ...p, is_recurring: e.target.checked }))}
               className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
             />
-            <label htmlFor="is_recurring_edit" className="text-xs font-bold text-muted-foreground cursor-pointer">
+            <label htmlFor="is_recurring_edit" className="text-xs font-semibold text-muted-foreground cursor-pointer">
               Recurring annual holiday
             </label>
           </div>
-
-          <div className="flex justify-end space-x-3 pt-3">
-            <Button type="button" variant="outline" size="sm" onClick={() => setEditOpen(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" size="sm">
-              Update Holiday
-            </Button>
+          <div className="flex justify-end gap-3 pt-3">
+            <Button type="button" variant="outline" size="sm" onClick={() => setEditOpen(false)}>Cancel</Button>
+            <Button type="submit" size="sm">Save Changes</Button>
           </div>
         </form>
       </Modal>
 
+      {/* ── Delete Confirmation Modal ── */}
+      <Modal isOpen={deleteOpen} onClose={() => setDeleteOpen(false)} title="Delete Holiday?" size="sm">
+        {selectedHoliday && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-rose-50 border border-rose-100">
+              <div className="h-10 w-10 rounded-lg bg-rose-500/10 text-rose-600 flex items-center justify-center flex-shrink-0">
+                <CalendarDays className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="font-semibold text-slate-800 text-sm">{selectedHoliday.holiday_name}</p>
+                <p className="text-xs text-slate-500">{fmtDate(selectedHoliday.holiday_date)} · {selectedHoliday.holiday_type}</p>
+              </div>
+            </div>
+            <p className="text-sm text-slate-600 leading-normal">
+              Are you sure you want to delete this holiday? This action{' '}
+              <span className="text-rose-600 font-semibold">cannot be undone</span>.
+            </p>
+            <div className="flex gap-3 pt-1 justify-end">
+              <Button type="button" variant="outline" size="sm" onClick={() => setDeleteOpen(false)}>Cancel</Button>
+              <Button type="button" variant="destructive" size="sm" onClick={handleDeleteConfirm}>Delete Holiday</Button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };

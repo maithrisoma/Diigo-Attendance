@@ -1,0 +1,5 @@
+{
+    "chat.edits2.enabled": true,
+    "chat.useClaudeSkills": true,
+    "chat.useNestedAgentsMdFiles": true
+}
