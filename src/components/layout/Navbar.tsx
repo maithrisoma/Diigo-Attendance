@@ -314,7 +314,6 @@ export const Navbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) =
                       );
                     })
                   )}
-                  )}
                 </div>
               </div>
             </>
