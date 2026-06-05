@@ -15,6 +15,7 @@ import {
   CalendarCheck,
   Info,
 } from 'lucide-react';
+import { DatePicker } from '../../components/ui/DatePicker';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const LEAVE_TYPES = [
@@ -340,24 +341,23 @@ export const EmployeeLeave: React.FC = () => {
 
               {/* Date pickers */}
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-muted-foreground mb-1.5 uppercase tracking-wide">Start Date</label>
-                  <input type="date" value={startDate} min={today}
-                    onChange={e => { setStartDate(e.target.value); if (e.target.value > endDate) setEndDate(e.target.value); }}
-                    className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition
-                      ${errors.startDate ? 'border-rose-400 bg-rose-50 dark:bg-rose-950/20' : 'border-border bg-muted/10'}`}
-                  />
-                  {errors.startDate && <p className="text-[11px] text-rose-500 mt-1">{errors.startDate}</p>}
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-muted-foreground mb-1.5 uppercase tracking-wide">End Date</label>
-                  <input type="date" value={endDate} min={startDate}
-                    onChange={e => setEndDate(e.target.value)}
-                    className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition
-                      ${errors.endDate ? 'border-rose-400 bg-rose-50 dark:bg-rose-950/20' : 'border-border bg-muted/10'}`}
-                  />
-                  {errors.endDate && <p className="text-[11px] text-rose-500 mt-1">{errors.endDate}</p>}
-                </div>
+                <DatePicker
+                  label="Start Date"
+                  value={startDate}
+                  minDate={today}
+                  onChange={(val) => {
+                    setStartDate(val);
+                    if (val > endDate) setEndDate(val);
+                  }}
+                  error={errors.startDate}
+                />
+                <DatePicker
+                  label="End Date"
+                  value={endDate}
+                  minDate={startDate}
+                  onChange={(val) => setEndDate(val)}
+                  error={errors.endDate}
+                />
               </div>
 
               {/* Duration preview */}

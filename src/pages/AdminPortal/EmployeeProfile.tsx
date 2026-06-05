@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useData } from '../../context/DataContext';
+import { useAuth } from '../../context/AuthContext';
 import { Badge } from '../../components/ui/Badge';
 import {
   ArrowLeft,
@@ -65,6 +66,11 @@ export const EmployeeProfile: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { employees, attendance, leaveRequests } = useData();
+  const { currentUser } = useAuth();
+
+  const backPath = useMemo(() => {
+    return currentUser?.role === 'hr' ? '/hr/employees' : '/admin/employees';
+  }, [currentUser]);
 
   const emp = useMemo(() => employees.find(e => e.id === id), [employees, id]);
 
@@ -111,7 +117,7 @@ export const EmployeeProfile: React.FC = () => {
       <div className="flex flex-col items-center justify-center h-64 text-muted-foreground gap-3">
         <AlertCircle className="h-10 w-10 opacity-40" />
         <p className="font-medium">Employee not found.</p>
-        <button onClick={() => navigate('/admin/employees')}
+        <button onClick={() => navigate(backPath)}
           className="text-sm text-primary font-semibold hover:underline">
           ← Back to Directory
         </button>
@@ -129,7 +135,7 @@ export const EmployeeProfile: React.FC = () => {
       {/* ── Back button + breadcrumb ──────────────────────────────────────── */}
       <div className="flex items-center gap-3">
         <button
-          onClick={() => navigate('/admin/employees')}
+          onClick={() => navigate(backPath)}
           className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary font-medium transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -144,8 +150,13 @@ export const EmployeeProfile: React.FC = () => {
         {/* Gradient banner */}
         <div className={`h-36 bg-gradient-to-r ${grad} relative`}>
           {emp.role === 'admin' && (
-            <span className="absolute top-4 right-4 inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full bg-card/90 text-[var(--sidebar-active-text)]">
-              <ShieldCheck className="h-3.5 w-3.5" /> HR Admin
+            <span className="absolute top-4 right-4 inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full bg-card/90 text-primary">
+              <ShieldCheck className="h-3.5 w-3.5" /> Super Admin
+            </span>
+          )}
+          {emp.role === 'hr' && (
+            <span className="absolute top-4 right-4 inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full bg-card/90 text-amber-600 dark:text-amber-400">
+              <ShieldCheck className="h-3.5 w-3.5" /> HR Manager
             </span>
           )}
         </div>

@@ -8,7 +8,7 @@ import { ToastProvider } from './components/ui/Toast';
 
 // Layout
 import { MainLayout } from './components/layout/MainLayout';
-import { AdminRoute, EmployeeRoute } from './components/layout/RouteGuards';
+import { AdminRoute, HRRoute, EmployeeRoute } from './components/layout/RouteGuards';
 
 // Pages
 import { Login } from './pages/Login';
@@ -18,8 +18,9 @@ import { EmployeeDashboard } from './pages/EmployeePortal/EmployeeDashboard';
 import { EmployeeCalendar } from './pages/EmployeePortal/EmployeeCalendar';
 import { EmployeeHistory } from './pages/EmployeePortal/EmployeeHistory';
 import { EmployeeLeave } from './pages/EmployeePortal/EmployeeLeave';
+import { EmployeeAnnouncements } from './pages/EmployeePortal/EmployeeAnnouncements';
 
-// Admin Portal Pages
+// Admin/HR Portal Pages
 import { AdminDashboard } from './pages/AdminPortal/AdminDashboard';
 import { EmployeeDirectory } from './pages/AdminPortal/EmployeeDirectory';
 import { EmployeeProfile } from './pages/AdminPortal/EmployeeProfile';
@@ -31,6 +32,13 @@ import { Reports } from './pages/AdminPortal/Reports';
 import { Settings } from './pages/AdminPortal/Settings';
 import { Analytics } from './pages/AdminPortal/Analytics';
 import { Payroll } from './pages/AdminPortal/Payroll';
+import { AnnouncementsBoard } from './pages/AdminPortal/AnnouncementsBoard';
+
+// New Super Admin Portal Pages
+import { HRManagement } from './pages/AdminPortal/HRManagement';
+import { RoleManagement } from './pages/AdminPortal/RoleManagement';
+import { ActivityLogs } from './pages/AdminPortal/ActivityLogs';
+import { NotificationsPage } from './pages/AdminPortal/NotificationsPage';
 
 // Helper component for root route redirect
 const RootRedirect: React.FC = () => {
@@ -42,6 +50,8 @@ const RootRedirect: React.FC = () => {
 
   if (currentUser.role === 'admin') {
     return <Navigate to="/admin/dashboard" replace />;
+  } else if (currentUser.role === 'hr') {
+    return <Navigate to="/hr/dashboard" replace />;
   } else {
     return <Navigate to="/employee/dashboard" replace />;
   }
@@ -95,8 +105,90 @@ function App() {
                     </EmployeeRoute>
                   }
                 />
+                <Route
+                  path="employee/announcements"
+                  element={
+                    <EmployeeRoute>
+                      <EmployeeAnnouncements />
+                    </EmployeeRoute>
+                  }
+                />
 
-                {/* Admin/HR Portal Guarded Routes */}
+                {/* HR Portal Guarded Routes */}
+                <Route
+                  path="hr/dashboard"
+                  element={
+                    <HRRoute>
+                      <AdminDashboard />
+                    </HRRoute>
+                  }
+                />
+                <Route
+                  path="hr/employees"
+                  element={
+                    <HRRoute>
+                      <EmployeeDirectory />
+                    </HRRoute>
+                  }
+                />
+                <Route
+                  path="hr/employees/:id"
+                  element={
+                    <HRRoute>
+                      <EmployeeProfile />
+                    </HRRoute>
+                  }
+                />
+                <Route
+                  path="hr/registry"
+                  element={
+                    <HRRoute>
+                      <AttendanceRegistry />
+                    </HRRoute>
+                  }
+                />
+                <Route
+                  path="hr/calendar"
+                  element={
+                    <HRRoute>
+                      <AttendanceCalendar />
+                    </HRRoute>
+                  }
+                />
+                <Route
+                  path="hr/leaves"
+                  element={
+                    <HRRoute>
+                      <LeaveManagement />
+                    </HRRoute>
+                  }
+                />
+                <Route
+                  path="hr/reports"
+                  element={
+                    <HRRoute>
+                      <Reports />
+                    </HRRoute>
+                  }
+                />
+                <Route
+                  path="hr/announcements"
+                  element={
+                    <HRRoute>
+                      <AnnouncementsBoard />
+                    </HRRoute>
+                  }
+                />
+                <Route
+                  path="hr/holidays"
+                  element={
+                    <HRRoute>
+                      <HolidayManagement />
+                    </HRRoute>
+                  }
+                />
+
+                {/* Super Admin Portal Guarded Routes */}
                 <Route
                   path="admin/dashboard"
                   element={
@@ -118,6 +210,14 @@ function App() {
                   element={
                     <AdminRoute>
                       <EmployeeProfile />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="admin/hrs"
+                  element={
+                    <AdminRoute>
+                      <HRManagement />
                     </AdminRoute>
                   }
                 />
@@ -162,6 +262,14 @@ function App() {
                   }
                 />
                 <Route
+                  path="admin/roles"
+                  element={
+                    <AdminRoute>
+                      <RoleManagement />
+                    </AdminRoute>
+                  }
+                />
+                <Route
                   path="admin/settings"
                   element={
                     <AdminRoute>
@@ -178,10 +286,34 @@ function App() {
                   }
                 />
                 <Route
+                  path="admin/activities"
+                  element={
+                    <AdminRoute>
+                      <ActivityLogs />
+                    </AdminRoute>
+                  }
+                />
+                <Route
                   path="admin/payroll"
                   element={
                     <AdminRoute>
                       <Payroll />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="admin/notifications"
+                  element={
+                    <AdminRoute>
+                      <NotificationsPage />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="admin/announcements"
+                  element={
+                    <AdminRoute>
+                      <AnnouncementsBoard />
                     </AdminRoute>
                   }
                 />

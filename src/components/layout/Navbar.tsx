@@ -1,7 +1,24 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
-import { Menu, Bell, ChevronDown, User, Search, Clock } from 'lucide-react';
+import {
+  Menu,
+  Bell,
+  ChevronDown,
+  Check,
+  User,
+  Sun,
+  Moon,
+  Megaphone,
+  PlaneTakeoff,
+  CalendarCheck,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Search,
+  Clock
+} from 'lucide-react';
 
 interface NavbarProps {
   sidebarOpen: boolean;
@@ -10,7 +27,7 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) => {
   const { currentUser, logout } = useAuth();
-  const { activities, leaveRequests } = useData();
+  const { notifications, markNotificationRead, markAllNotificationsRead } = useData();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [time, setTime] = useState(new Date());
@@ -20,17 +37,91 @@ export const Navbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) =
     return () => clearInterval(timer);
   }, []);
 
+  const navigate = useNavigate();
+
+  const unreadNotificationsCount = notifications.filter((n) => !n.is_read).length;
+  const [prevUnreadCount, setPrevUnreadCount] = useState(unreadNotificationsCount);
+  const [wiggle, setWiggle] = useState(false);
+
+  useEffect(() => {
+    if (unreadNotificationsCount > prevUnreadCount) {
+      setWiggle(true);
+      const t = setTimeout(() => setWiggle(false), 600);
+      return () => clearTimeout(t);
+    }
+    setPrevUnreadCount(unreadNotificationsCount);
+  }, [unreadNotificationsCount, prevUnreadCount]);
+
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    if (!localStorage.getItem('theme-reset-v2')) {
+      localStorage.setItem('theme', 'light');
+      localStorage.setItem('theme-reset-v2', 'true');
+      return 'light';
+    }
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark' || saved === 'light') return saved;
+    return 'light';
+  });
+
+  const toggleTheme = () => {
+    const nextTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(nextTheme);
+    if (nextTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    document.documentElement.setAttribute('data-theme', nextTheme);
+    localStorage.setItem('theme', nextTheme);
+  };
+
   const formattedTime = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
   const formattedDate = time.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
 
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case 'Leave Approval':
+        return <CheckCircle className="h-4 w-4 text-emerald-500" />;
+      case 'Leave Rejection':
+        return <XCircle className="h-4 w-4 text-rose-500" />;
+      case 'Holiday Notice':
+        return <CalendarCheck className="h-4 w-4 text-blue-500" />;
+      case 'New Announcement':
+      case 'Policy Update':
+      case 'Holiday Announcement':
+        return <Megaphone className="h-4 w-4 text-indigo-500" />;
+      default:
+        return <AlertCircle className="h-4 w-4 text-amber-500" />;
+    }
+  };
+
+  const handleNotificationClick = async (not: any) => {
+    setShowNotifications(false);
+    if (!not.is_read) {
+      await markNotificationRead(not.id);
+    }
+
+    const role = currentUser?.role;
+    const type = not.type;
+
+    if (type === 'Leave Approval' || type === 'Leave Rejection') {
+      if (role === 'admin') navigate('/admin/leaves');
+      else if (role === 'hr') navigate('/hr/leaves');
+      else navigate('/employee/leaves');
+    } else if (type === 'Holiday Notice') {
+      if (role === 'admin') navigate('/admin/holidays');
+      else if (role === 'hr') navigate('/hr/holidays');
+      else navigate('/employee/calendar');
+    } else {
+      // Announcements
+      if (role === 'admin') navigate('/admin/announcements');
+      else if (role === 'hr') navigate('/hr/announcements');
+      else navigate('/employee/announcements');
+    }
+  };
+
   if (!currentUser) return null;
 
-  const isAdmin = currentUser.role === 'admin';
-  const pendingLeavesCount = isAdmin ? leaveRequests.filter(r => r.status === 'Pending').length : 0;
-  const relevantActivities = isAdmin
-    ? activities.slice(0, 5)
-    : activities.filter(act => act.message.includes(currentUser.name)).slice(0, 5);
-  const totalNotifications = pendingLeavesCount + relevantActivities.length;
   const initials = currentUser.name.split(' ').map(n => n[0]).join('');
 
   return (
@@ -51,7 +142,6 @@ export const Navbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) =
         >
           <Menu className="h-5 w-5" />
         </button>
-
         {/* Search */}
         <div className="hidden md:flex items-center relative w-72">
           <Search className="absolute left-3.5 h-4 w-4" style={{ color: '#C4B5FD' }} />
@@ -92,20 +182,39 @@ export const Navbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) =
           <span className="text-[10px] opacity-70">{formattedDate}</span>
         </div>
 
+        {/* Theme Toggle */}
+        <button
+          onClick={toggleTheme}
+          className="p-2 rounded-full transition-all hover:bg-lilac-200/60 flex items-center justify-center"
+          title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
+          style={{ color: '#8B5CF6' }}
+        >
+          {theme === 'light' ? (
+            <Moon className="h-5 w-5 transition-transform duration-300 hover:rotate-12 text-[#334155]" />
+          ) : (
+            <Sun className="h-5 w-5 transition-transform duration-300 hover:rotate-45 text-amber-400" />
+          )}
+        </button>
+
         {/* Bell */}
         <div className="relative">
           <button
-            onClick={() => { setShowNotifications(!showNotifications); setShowProfileMenu(false); }}
-            className="relative p-2 rounded-full transition-all hover:bg-lilac-200/60"
+            onClick={() => {
+              setShowNotifications(!showNotifications);
+              setShowProfileMenu(false);
+            }}
+            className={`relative p-2 rounded-full transition-all hover:bg-lilac-200/60 ${
+              wiggle ? 'animate-wiggle text-primary' : ''
+            }`}
             style={{ color: '#8B5CF6' }}
           >
             <Bell className="h-5 w-5" />
-            {totalNotifications > 0 && (
+            {unreadNotificationsCount > 0 && (
               <span
                 className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold text-white"
                 style={{ background: 'linear-gradient(135deg,#A78BFA,#7C3AED)' }}
               >
-                {totalNotifications}
+                {unreadNotificationsCount}
               </span>
             )}
           </button>
@@ -121,48 +230,90 @@ export const Navbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) =
                   backdropFilter: 'blur(20px)',
                 }}
               >
+                {/* Header */}
                 <div
                   className="px-5 py-4 flex items-center justify-between border-b"
                   style={{ borderColor: '#DDD6FE', background: '#F7F2FF' }}
                 >
                   <h3 className="font-bold text-sm" style={{ color: '#4C1D95' }}>Notifications</h3>
-                  {totalNotifications > 0 && (
-                    <span
-                      className="text-xs font-semibold px-2.5 py-0.5 rounded-full"
-                      style={{ background: '#EDE9FE', color: '#7C3AED' }}
-                    >
-                      {totalNotifications} New
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {unreadNotificationsCount > 0 && (
+                      <span
+                        className="text-xs font-semibold px-2.5 py-0.5 rounded-full"
+                        style={{ background: '#EDE9FE', color: '#7C3AED' }}
+                      >
+                        {unreadNotificationsCount} New
+                      </span>
+                    )}
+                    {unreadNotificationsCount > 0 && (
+                      <button
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          await markAllNotificationsRead();
+                        }}
+                        className="text-[10px] hover:underline font-bold"
+                        style={{ color: '#7C3AED' }}
+                      >
+                        Mark all read
+                      </button>
+                    )}
+                  </div>
                 </div>
+
+                {/* Notification Items */}
                 <div className="max-h-72 overflow-y-auto divide-y" style={{ borderColor: '#EDE9FE' }}>
-                  {isAdmin && pendingLeavesCount > 0 && (
-                    <div className="p-3" style={{ background: '#F2EBFF' }}>
-                      <p className="text-xs font-bold" style={{ color: '#6D28D9' }}>Pending Actions</p>
-                      <p className="text-xs mt-0.5" style={{ color: '#7C3AED' }}>
-                        {pendingLeavesCount} leave requests need approval.
-                      </p>
-                    </div>
-                  )}
-                  {relevantActivities.length === 0 ? (
+                  {notifications.length === 0 ? (
                     <div className="p-6 text-center text-xs" style={{ color: '#9879E9' }}>
-                      No recent activities.
+                      No notifications available.
                     </div>
                   ) : (
-                    relevantActivities.map(act => (
-                      <div key={act.id} className="p-3 flex gap-2 hover:bg-lilac-50 transition-colors">
+                    notifications.map((not) => {
+                      const isUnread = !not.is_read;
+                      return (
                         <div
-                          className="h-2 w-2 rounded-full mt-1.5 flex-shrink-0"
-                          style={{ background: '#A78BFA' }}
-                        />
-                        <div>
-                          <p className="text-xs leading-relaxed" style={{ color: '#4C1D95' }}>{act.message}</p>
-                          <p className="text-[10px] mt-0.5" style={{ color: '#9879E9' }}>
-                            {new Date(act.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          </p>
+                          key={not.id}
+                          onClick={() => handleNotificationClick(not)}
+                          className="p-3 cursor-pointer transition-colors flex gap-2.5 items-start text-left hover:bg-lilac-50"
+                          style={{ background: isUnread ? 'rgba(196,181,253,0.1)' : 'transparent' }}
+                        >
+                          <div className="mt-0.5 p-1 rounded" style={{ background: 'rgba(196,181,253,0.2)' }}>
+                            {getNotificationIcon(not.type)}
+                          </div>
+                          
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-1">
+                              <p
+                                className="text-xs leading-relaxed"
+                                style={{
+                                  color: '#4C1D95',
+                                  fontWeight: isUnread ? 'bold' : 'normal',
+                                }}
+                              >
+                                {not.title}
+                              </p>
+                              {isUnread && (
+                                <span
+                                  className="h-1.5 w-1.5 rounded-full flex-shrink-0 mt-1.5"
+                                  style={{ background: '#8B5CF6' }}
+                                />
+                              )}
+                            </div>
+                            <p className="text-[11px] line-clamp-2 mt-0.5" style={{ color: '#6D5A9C' }}>
+                              {not.message}
+                            </p>
+                            <p className="text-[9px] mt-1" style={{ color: '#9879E9' }}>
+                              {new Date(not.created_at).toLocaleDateString([], {
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    ))
+                      );
+                    })
+                  )}
                   )}
                 </div>
               </div>
@@ -170,6 +321,7 @@ export const Navbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) =
           )}
         </div>
 
+        {/* Divider */}
         <div className="h-6 w-px" style={{ background: '#DDD6FE' }} />
 
         {/* Profile */}
@@ -191,6 +343,7 @@ export const Navbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) =
             <ChevronDown className="h-3.5 w-3.5" style={{ color: '#C4B5FD' }} />
           </button>
 
+          {/* Dropdown Menu */}
           {showProfileMenu && (
             <>
               <div className="fixed inset-0 z-30" onClick={() => setShowProfileMenu(false)} />

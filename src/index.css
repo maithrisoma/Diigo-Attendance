@@ -329,3 +329,536 @@ header.sticky {
 
 /* ── Ring progress ── */
 .ring-progress { transform: rotate(-90deg); }
+
+/* ── Custom Wiggle Animation ── */
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  15% { transform: rotate(-15deg); }
+  30% { transform: rotate(12deg); }
+  45% { transform: rotate(-10deg); }
+  60% { transform: rotate(8deg); }
+  75% { transform: rotate(-4deg); }
+}
+.animate-wiggle {
+  animation: wiggle 0.6s ease-in-out;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* ── PREMIUM AURORA BACKGROUND SYSTEM                                     ── */
+/* ── Inspired by Apple/Linear/Vercel — Fluid, Elegant, 60fps             ── */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Keyframes ── */
+
+/* Base background gradient slow drift */
+@keyframes aurora-base-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Individual blob animations — each unique path */
+@keyframes aurora-1 {
+  0%   { transform: translate(0%, 0%)   scale(1)    rotate(0deg); }
+  25%  { transform: translate(8%, -12%) scale(1.06) rotate(15deg); }
+  50%  { transform: translate(-6%, -20%) scale(0.94) rotate(-8deg); }
+  75%  { transform: translate(-14%, -8%) scale(1.04) rotate(20deg); }
+  100% { transform: translate(0%, 0%)   scale(1)    rotate(0deg); }
+}
+@keyframes aurora-2 {
+  0%   { transform: translate(0%, 0%)   scale(1)    rotate(0deg); }
+  33%  { transform: translate(-10%, 14%) scale(1.08) rotate(-12deg); }
+  66%  { transform: translate(7%, 18%)  scale(0.93) rotate(10deg); }
+  100% { transform: translate(0%, 0%)   scale(1)    rotate(0deg); }
+}
+@keyframes aurora-3 {
+  0%   { transform: translate(0%, 0%)   scale(1)    rotate(0deg); }
+  20%  { transform: translate(14%, 6%)  scale(0.92) rotate(18deg); }
+  50%  { transform: translate(8%, -16%) scale(1.1)  rotate(-6deg); }
+  80%  { transform: translate(-7%, 10%) scale(0.97) rotate(14deg); }
+  100% { transform: translate(0%, 0%)   scale(1)    rotate(0deg); }
+}
+@keyframes aurora-4 {
+  0%   { transform: translate(0%, 0%)   scale(1)    rotate(0deg); }
+  40%  { transform: translate(-12%, 8%) scale(0.88) rotate(-20deg); }
+  70%  { transform: translate(5%, 14%)  scale(1.08) rotate(8deg); }
+  100% { transform: translate(0%, 0%)   scale(1)    rotate(0deg); }
+}
+@keyframes aurora-5 {
+  0%   { transform: translate(0%, 0%)   scale(1)    rotate(0deg); }
+  30%  { transform: translate(10%, -10%) scale(1.12) rotate(-14deg); }
+  60%  { transform: translate(-8%, -18%) scale(0.91) rotate(16deg); }
+  100% { transform: translate(0%, 0%)   scale(1)    rotate(0deg); }
+}
+
+/* Grain subtle pulse */
+@keyframes aurora-grain {
+  0%, 100% { opacity: 0.025; }
+  50%       { opacity: 0.04; }
+}
+
+/* ── Aurora Base — Animated Gradient Canvas ── */
+.aurora-base {
+  position: absolute;
+  inset: -20%;
+  border-radius: 50%;
+  background-size: 300% 300%;
+  animation: aurora-base-shift 28s ease-in-out infinite;
+  will-change: background-position;
+}
+
+/* Light mode base */
+.aurora-base {
+  background: linear-gradient(
+    135deg,
+    #F8F5FF 0%,
+    #EDE9FE 18%,
+    #F3EEFF 35%,
+    #EAE3FC 52%,
+    #F0EAFF 68%,
+    #E8E0FC 82%,
+    #F8F5FF 100%
+  );
+}
+/* Dark mode base */
+[data-theme='dark'] .aurora-base {
+  background: linear-gradient(
+    135deg,
+    #0F172A 0%,
+    #131830 18%,
+    #0F172A 35%,
+    #131A2E 52%,
+    #0D1526 68%,
+    #111827 82%,
+    #0F172A 100%
+  );
+}
+
+/* ── Aurora Blobs — Individual Light Beams ── */
+.aurora-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  will-change: transform;
+  transform-origin: center center;
+}
+
+/* Blob 1 — Primary lavender, top-left */
+.aurora-blob-1 {
+  width: 55%;
+  height: 55%;
+  top: -15%;
+  left: -10%;
+  animation: aurora-1 32s ease-in-out infinite;
+  animation-delay: 0s;
+}
+/* Light */
+.aurora-blob-1 {
+  background: radial-gradient(ellipse, rgba(167,139,250,0.12) 0%, rgba(196,181,253,0.06) 50%, transparent 80%);
+}
+/* Dark */
+[data-theme='dark'] .aurora-blob-1 {
+  background: radial-gradient(ellipse, rgba(139,92,246,0.18) 0%, rgba(109,40,217,0.1) 50%, transparent 80%);
+}
+
+/* Blob 2 — Soft violet, right */
+.aurora-blob-2 {
+  width: 50%;
+  height: 60%;
+  top: 20%;
+  right: -12%;
+  animation: aurora-2 38s ease-in-out infinite;
+  animation-delay: -8s;
+}
+/* Light */
+.aurora-blob-2 {
+  background: radial-gradient(ellipse, rgba(196,181,253,0.1) 0%, rgba(221,214,254,0.05) 50%, transparent 80%);
+}
+/* Dark */
+[data-theme='dark'] .aurora-blob-2 {
+  background: radial-gradient(ellipse, rgba(99,102,241,0.16) 0%, rgba(79,70,229,0.08) 50%, transparent 80%);
+}
+
+/* Blob 3 — Indigo/violet, bottom-center */
+.aurora-blob-3 {
+  width: 45%;
+  height: 50%;
+  bottom: -18%;
+  left: 18%;
+  animation: aurora-3 26s ease-in-out infinite;
+  animation-delay: -15s;
+}
+/* Light */
+.aurora-blob-3 {
+  background: radial-gradient(ellipse, rgba(221,214,254,0.08) 0%, rgba(167,139,250,0.04) 50%, transparent 80%);
+}
+/* Dark */
+[data-theme='dark'] .aurora-blob-3 {
+  background: radial-gradient(ellipse, rgba(124,58,237,0.18) 0%, rgba(139,92,246,0.08) 50%, transparent 80%);
+}
+
+/* Blob 4 — Pink-lavender accent, center */
+.aurora-blob-4 {
+  width: 35%;
+  height: 40%;
+  top: 40%;
+  left: 35%;
+  animation: aurora-4 34s ease-in-out infinite;
+  animation-delay: -5s;
+}
+/* Light */
+.aurora-blob-4 {
+  background: radial-gradient(ellipse, rgba(233,213,255,0.09) 0%, rgba(216,180,254,0.04) 50%, transparent 80%);
+}
+/* Dark */
+[data-theme='dark'] .aurora-blob-4 {
+  background: radial-gradient(ellipse, rgba(167,139,250,0.14) 0%, rgba(196,181,253,0.06) 50%, transparent 80%);
+}
+
+/* Blob 5 — Cool periwinkle, top-right */
+.aurora-blob-5 {
+  width: 40%;
+  height: 45%;
+  top: -8%;
+  right: 15%;
+  animation: aurora-5 40s ease-in-out infinite;
+  animation-delay: -22s;
+}
+/* Light */
+.aurora-blob-5 {
+  background: radial-gradient(ellipse, rgba(255,255,255,0.15) 0%, rgba(248,245,255,0.06) 50%, transparent 80%);
+}
+/* Dark */
+[data-theme='dark'] .aurora-blob-5 {
+  background: radial-gradient(ellipse, rgba(196,181,253,0.12) 0%, rgba(167,139,250,0.05) 50%, transparent 80%);
+}
+
+/* ── Mesh overlay for frosted depth ── */
+.aurora-mesh {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+/* Light */
+.aurora-mesh {
+  background:
+    radial-gradient(ellipse 80% 40% at 20% 60%, rgba(255,255,255,0.5) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 30% at 80% 20%, rgba(255,255,255,0.35) 0%, transparent 70%);
+}
+/* Dark */
+[data-theme='dark'] .aurora-mesh {
+  background:
+    radial-gradient(ellipse 80% 40% at 20% 60%, rgba(15,23,42,0.6) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 30% at 80% 20%, rgba(15,23,42,0.4) 0%, transparent 70%);
+}
+
+/* ── Grain texture — premium tactile feel ── */
+.aurora-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  animation: aurora-grain 6s ease-in-out infinite;
+  /* SVG noise pattern */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 128px 128px;
+}
+/* Light grain */
+.aurora-grain { opacity: 0.025; mix-blend-mode: overlay; }
+/* Dark grain */
+[data-theme='dark'] .aurora-grain { opacity: 0.04; mix-blend-mode: screen; }
+
+/* ── Glassmorphism card surface override ── */
+/* Apply .glass-card to cards floating above the aurora */
+.glass-card {
+  background: rgba(255,255,255,0.82) !important;
+  backdrop-filter: blur(20px) saturate(1.8) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(1.8) !important;
+  border: 1px solid rgba(255,255,255,0.55) !important;
+  box-shadow:
+    0 8px 32px rgba(109,116,201,0.1),
+    0 1px 0 rgba(255,255,255,0.8) inset !important;
+}
+[data-theme='dark'] .glass-card {
+  background: rgba(14,20,30,0.72) !important;
+  backdrop-filter: blur(20px) saturate(1.4) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(1.4) !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.4),
+    0 1px 0 rgba(255,255,255,0.05) inset !important;
+}
+
+/* ── Aurora Header strip (for dashboard/page headers) ── */
+.aurora-header {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  margin-bottom: 1.5rem;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .aurora-base,
+  .aurora-blob,
+  .aurora-grain {
+    animation: none !important;
+  }
+}
+
+/* Subtle app layout bg tint — replaces old .app-animated-bg */
+.app-aurora-tint {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  /* Light tint */
+  background: linear-gradient(160deg, rgba(243,238,255,0.6) 0%, rgba(248,245,255,0.3) 100%);
+}
+[data-theme='dark'] .app-aurora-tint {
+  background: linear-gradient(160deg, rgba(15,23,42,0.95) 0%, rgba(13,17,38,0.98) 100%);
+}
+
+
+
+
+/* ── Premium DatePicker / LiveCalendar Lavender Theme ── */
+
+
+
+
+
+
+/* ── Premium DatePicker / LiveCalendar Lavender Theme ── */
+
+/* Popup enter animation */
+@keyframes dp-in {
+  from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)  scale(1); }
+}
+.animate-in.fade-in.slide-in-from-top-2 {
+  animation: dp-in 0.18s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Scrollbar inside year picker */
+.dp-year-grid::-webkit-scrollbar        { width: 4px; }
+.dp-year-grid::-webkit-scrollbar-thumb  { background: #E9DDFC; border-radius: 4px; }
+.dp-year-grid::-webkit-scrollbar-thumb:hover { background: #C4B5FD; }
+
+/* Dark mode overrides for date picker popup */
+[data-theme='dark'] .datepicker-popup {
+  background-color: #1F1B2E !important;
+  border-color: #3B2F5E !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45) !important;
+}
+[data-theme='dark'] .datepicker-popup .dp-cell-selected {
+  background-color: #8B7DFF !important;
+}
+[data-theme='dark'] .datepicker-popup .dp-cell-today {
+  border-color: #8B7DFF !important;
+  color: #C4B5FD !important;
+  background-color: #2A2438 !important;
+}
+
+/* ── FullCalendar Lavender Theme Overrides ── */
+.fc {
+  --fc-border-color: var(--border, #E7E9FB);
+  --fc-button-bg-color: var(--card, #FFFFFF);
+  --fc-button-border-color: var(--border, #E7E9FB);
+  --fc-button-text-color: var(--foreground, #3F4565);
+  --fc-button-hover-bg-color: var(--secondary, #EAE3FC);
+  --fc-button-hover-border-color: var(--primary, #8B5CF6);
+  --fc-button-active-bg-color: var(--primary, #8B5CF6);
+  --fc-button-active-border-color: var(--primary, #8B5CF6);
+  --fc-button-active-text-color: #FFFFFF;
+  --fc-page-bg-color: var(--card, #FFFFFF);
+  
+  font-family: 'Inter', sans-serif;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(109,116,201,0.12);
+  background-color: var(--card, #FFFFFF);
+  border: 1px solid var(--border, #E7E9FB);
+}
+
+[data-theme='dark'] .fc {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.fc .fc-toolbar {
+  padding: 1.25rem;
+  margin-bottom: 0 !important;
+  background-color: var(--card, #FFFFFF);
+  border-bottom: 1px solid var(--border, #E7E9FB);
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.fc .fc-toolbar-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--foreground, #3F4565);
+}
+
+.fc .fc-button {
+  padding: 0.5rem 1.0rem;
+  font-size: 0.825rem;
+  font-weight: 600;
+  border-radius: 8px !important;
+  text-transform: capitalize;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(109,116,201,0.04);
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+  background-color: #8B5CF6 !important;
+  border-color: #8B5CF6 !important;
+  color: #FFFFFF !important;
+}
+
+.fc .fc-button-primary:focus,
+.fc .fc-button-primary:not(:disabled):active:focus {
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2) !important;
+}
+
+.fc .fc-col-header-cell {
+  background-color: var(--table-header-bg, #EDE9FE);
+  padding: 0.75rem 0;
+}
+
+.fc .fc-col-header-cell-cushion {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--foreground, #3F4565);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-decoration: none !important;
+}
+
+.fc .fc-daygrid-day-number {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: var(--foreground, #3F4565);
+  padding: 6px 8px !important;
+  text-decoration: none !important;
+}
+
+.fc .fc-daygrid-day.fc-day-today {
+  background-color: rgba(139, 92, 246, 0.05) !important;
+}
+
+.fc .fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
+  background-color: #8B5CF6;
+  color: #FFFFFF !important;
+  border-radius: 9999px;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 4px;
+  padding: 0 !important;
+}
+
+.fc-event {
+  cursor: pointer;
+  border-radius: 6px !important;
+  padding: 2px 6px !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.fc-event:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+}
+
+/* Event Color Codes */
+.fc-event-present {
+  background-color: #EAF8EC !important;
+  border-left: 3.5px solid #6BCB77 !important;
+  border-top: 0 !important;
+  border-right: 0 !important;
+  border-bottom: 0 !important;
+  color: #2E7D32 !important;
+}
+[data-theme='dark'] .fc-event-present {
+  background-color: #153322 !important;
+  color: #86EFAC !important;
+}
+
+.fc-event-absent {
+  background-color: #FDECEC !important;
+  border-left: 3.5px solid #F28B82 !important;
+  border-top: 0 !important;
+  border-right: 0 !important;
+  border-bottom: 0 !important;
+  color: #C62828 !important;
+}
+[data-theme='dark'] .fc-event-absent {
+  background-color: #3F1F1F !important;
+  color: #FCA5A5 !important;
+}
+
+.fc-event-leave {
+  background-color: #FFF6E1 !important;
+  border-left: 3.5px solid #F7C873 !important;
+  border-top: 0 !important;
+  border-right: 0 !important;
+  border-bottom: 0 !important;
+  color: #EF6C00 !important;
+}
+[data-theme='dark'] .fc-event-leave {
+  background-color: #3F2E12 !important;
+  color: #FDE047 !important;
+}
+
+.fc-event-holiday {
+  background-color: #ECF4FF !important;
+  border-left: 3.5px solid #8AB4F8 !important;
+  border-top: 0 !important;
+  border-right: 0 !important;
+  border-bottom: 0 !important;
+  color: #1565C0 !important;
+}
+[data-theme='dark'] .fc-event-holiday {
+  background-color: #182845 !important;
+  color: #93C5FD !important;
+}
+
+.fc-event-halfday {
+  background-color: #FFF7D6 !important;
+  border-left: 3.5px solid #FFD166 !important;
+  border-top: 0 !important;
+  border-right: 0 !important;
+  border-bottom: 0 !important;
+  color: #B8860B !important;
+}
+[data-theme='dark'] .fc-event-halfday {
+  background-color: #3F3512 !important;
+  color: #FFE082 !important;
+}
+
+.fc-event-announcement {
+  background-color: var(--accent, #F5F2FE) !important;
+  border-left: 3.5px solid #8A5CF5 !important;
+  border-top: 0 !important;
+  border-right: 0 !important;
+  border-bottom: 0 !important;
+  color: #4C3280 !important;
+}
+[data-theme='dark'] .fc-event-announcement {
+  background-color: #26203B !important;
+  color: #C084FC !important;
+}
+
+/* Agenda View Event overrides */
+.fc-list-event {
+  cursor: pointer;
+}

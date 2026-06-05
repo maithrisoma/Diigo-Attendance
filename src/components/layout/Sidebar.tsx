@@ -15,6 +15,13 @@ import {
   PlaneTakeoff,
   BarChart3,
   CreditCard,
+  CalendarDays,
+  CalendarCheck,
+  ShieldAlert,
+  ShieldCheck,
+  Scroll,
+  Bell,
+  Megaphone,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -27,27 +34,50 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
 
   if (!currentUser) return null;
 
-  const isAdmin = currentUser.role === 'admin';
-
   const adminLinks = [
-    { to: '/admin/dashboard',  label: 'Dashboard',       icon: LayoutDashboard },
-    { to: '/admin/registry',   label: 'Attendance',      icon: ClipboardList },
-    { to: '/admin/employees',  label: 'Employees',       icon: Users },
-    { to: '/admin/leaves',     label: 'Leave Mgmt',      icon: FileText },
-    { to: '/admin/analytics',  label: 'Analytics',       icon: BarChart3 },
-    { to: '/admin/reports',    label: 'Reports',         icon: TrendingUp },
-    { to: '/admin/payroll',    label: 'Payroll',         icon: CreditCard },
-    { to: '/admin/settings',   label: 'Settings',        icon: Settings },
+    { to: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { to: '/admin/employees', label: 'Employee Management', icon: Users },
+    { to: '/admin/hrs', label: 'HR Management', icon: ShieldAlert },
+    { to: '/admin/registry', label: 'Attendance Registry', icon: ClipboardList },
+    { to: '/admin/calendar', label: 'Attendance Calendar', icon: CalendarDays },
+    { to: '/admin/leaves', label: 'Leave Management', icon: FileText },
+    { to: '/admin/holidays', label: 'Holiday Management', icon: CalendarCheck },
+    { to: '/admin/reports', label: 'Reports & Analytics', icon: TrendingUp },
+    { to: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
+    { to: '/admin/payroll', label: 'Payroll', icon: CreditCard },
+    { to: '/admin/roles', label: 'Roles & Permissions', icon: ShieldCheck },
+    { to: '/admin/announcements', label: 'Announcements Board', icon: Megaphone },
+    { to: '/admin/settings', label: 'System Settings', icon: Settings },
+    { to: '/admin/activities', label: 'Activity Logs', icon: Scroll },
+    { to: '/admin/notifications', label: 'Notifications', icon: Bell },
+  ];
+
+  const hrLinks = [
+    { to: '/hr/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { to: '/hr/employees', label: 'Employee Management', icon: Users },
+    { to: '/hr/registry', label: 'Attendance Registry', icon: ClipboardList },
+    { to: '/hr/calendar', label: 'Attendance Calendar', icon: CalendarDays },
+    { to: '/hr/leaves', label: 'Leave Management', icon: FileText },
+    { to: '/hr/holidays', label: 'Holiday Management', icon: CalendarCheck },
+    { to: '/hr/reports', label: 'Reports & Analytics', icon: TrendingUp },
+    { to: '/hr/announcements', label: 'Announcements Board', icon: Megaphone },
   ];
 
   const employeeLinks = [
-    { to: '/employee/dashboard', label: 'Dashboard',         icon: LayoutDashboard },
-    { to: '/employee/calendar',  label: 'Calendar',          icon: Calendar },
-    { to: '/employee/history',   label: 'History',           icon: Clock },
-    { to: '/employee/leaves',    label: 'Leave Requests',    icon: PlaneTakeoff },
+    { to: '/employee/dashboard', label: 'Dashboard',          icon: LayoutDashboard },
+    { to: '/employee/announcements', label: 'Announcements',   icon: Megaphone },
+    { to: '/employee/calendar',  label: 'Attendance Calendar',icon: Calendar },
+    { to: '/employee/history',   label: 'Attendance History', icon: Clock },
+    { to: '/employee/leaves',    label: 'Leave Requests',     icon: PlaneTakeoff },
   ];
 
-  const links = isAdmin ? adminLinks : employeeLinks;
+  let links = employeeLinks;
+  if (currentUser.role === 'admin') {
+    links = adminLinks;
+  } else if (currentUser.role === 'hr') {
+    links = hrLinks;
+  }
+
   const initials = currentUser.name.split(' ').map(n => n[0]).join('');
 
   return (
@@ -142,7 +172,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
         ))}
       </nav>
 
-      {/* Sign out */}
+      {/* Footer controls */}
       <div
         className="p-4 border-t"
         style={{ borderColor: 'var(--lilac-border)' }}

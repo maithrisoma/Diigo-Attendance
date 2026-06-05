@@ -13,8 +13,12 @@ export const MainLayout: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex" style={{ background: '#F7F2FF' }}>
-      {/* Sidebar */}
+    <div className="min-h-screen flex relative">
+
+      {/* Subtle aurora tint across the whole app */}
+      <div className="app-aurora-tint" aria-hidden="true" />
+
+      {/* Sidebar Navigation */}
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
 
       {/* Mobile overlay */}
@@ -26,8 +30,8 @@ export const MainLayout: React.FC = () => {
         />
       )}
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col md:pl-64 min-h-screen">
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col md:pl-64 min-h-screen relative z-10">
         <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
         <main className="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto animate-fadeInUp">
           <Outlet />

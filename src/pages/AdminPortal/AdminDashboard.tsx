@@ -1,62 +1,63 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
+import { AuroraBackground } from '../../components/ui/AuroraBackground';
 import { useData } from '../../context/DataContext';
+import { useAuth } from '../../context/AuthContext';
+import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { LiveCalendar } from '../../components/ui/LiveCalendar';
 import {
-  Users, UserCheck, UserX, PlaneTakeoff, TrendingUp, Clock,
-  Briefcase, Plus, FileText, Globe,
+  Users,
+  UserCheck,
+  UserX,
+  PlaneTakeoff,
+  TrendingUp,
+  Clock,
+  Briefcase,
+  AlertCircle,
 } from 'lucide-react';
 import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  BarChart,
+  Bar,
+  Legend,
 } from 'recharts';
-
-const AnimatedCounter: React.FC<{ value: number }> = ({ value }) => {
-  const [display, setDisplay] = useState(0);
-  useEffect(() => {
-    let start = 0;
-    const increment = value / (800 / 16);
-    const timer = setInterval(() => {
-      start += increment;
-      if (start >= value) { clearInterval(timer); setDisplay(value); }
-      else setDisplay(Math.floor(start));
-    }, 16);
-    return () => clearInterval(timer);
-  }, [value]);
-  return <span>{display}</span>;
-};
-
-const LilacKPI: React.FC<{
-  label: string; value: number; sub: string;
-  icon: React.ReactNode; accent?: string;
-}> = ({ label, value, sub, icon, accent = '#8B5CF6' }) => (
-  <div
-    className="glass-card p-6 flex flex-col gap-4 hover:-translate-y-1 transition-all duration-300"
-    style={{ borderColor: 'rgba(216,180,254,0.5)' }}
-  >
-    <div className="flex justify-between items-start">
-      <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: '#9879E9' }}>
-        {label}
-      </span>
-      <span
-        className="p-2 rounded-xl"
-        style={{ background: `${accent}18`, color: accent }}
-      >
-        {icon}
-      </span>
-    </div>
-    <div>
-      <h3 className="text-3xl font-black tracking-tight" style={{ color: accent }}>
-        <AnimatedCounter value={value} />
-      </h3>
-      <p className="text-xs mt-1" style={{ color: '#C4B5FD' }}>{sub}</p>
-    </div>
-  </div>
-);
 
 export const AdminDashboard: React.FC = () => {
   const { employees, attendance, leaveRequests, activities, holidays } = useData();
+  const { currentUser } = useAuth();
+
+  const isHR = currentUser?.role === 'hr';
+  const isAdmin = currentUser?.role === 'admin';
+
+  const filteredEmployees = useMemo(() => {
+    if (isHR) {
+      return employees.filter((e) => e.role === 'employee');
+    }
+    return employees;
+  }, [employees, isHR]);
+
+  const filteredActivities = useMemo(() => {
+    if (isHR) {
+      return activities.filter((act) => {
+        const msg = act.message.toLowerCase();
+        return !msg.includes('hr') && !msg.includes('holiday');
+      });
+    }
+    return activities;
+  }, [activities, isHR]);
+
   const todayStr = new Date().toISOString().split('T')[0];
 
+  // Build calendar lookup maps for LiveCalendar
   const attendanceByDate = useMemo(() => {
     const map: Record<string, { status: string }> = {};
     attendance.forEach(a => { map[a.date] = { status: a.status }; });
@@ -69,299 +70,402 @@ export const AdminDashboard: React.FC = () => {
     return map;
   }, [holidays]);
 
+  // Calculate Today's Stats
   const stats = useMemo(() => {
-    const total = employees.length;
-    const todayRecords = attendance.filter(a => a.date === todayStr);
-    let present = 0, absent = 0, leave = 0, late = 0, remote = 0;
-    employees.forEach(emp => {
-      const rec = todayRecords.find(r => r.employee_id === emp.employee_id);
+    const total = filteredEmployees.length;
+    
+    // Find today's records
+    const todayRecords = attendance.filter((a) => a.date === todayStr);
+
+    let present = 0;
+    let absent = 0;
+    let leave = 0;
+
+    filteredEmployees.forEach((emp) => {
+      const rec = todayRecords.find((r) => r.employee_id === emp.employee_id);
       if (rec) {
         if (rec.status === 'Present' || rec.status === 'Half Day') {
           present++;
-          if (rec.check_in && rec.check_in > '09:15:00') late++;
-          if (emp.department === 'Engineering' || emp.department === 'Design') remote++;
-        } else if (rec.status === 'Leave') leave++;
-        else absent++;
-      } else absent++;
+        } else if (rec.status === 'Leave') {
+          leave++;
+        } else {
+          absent++;
+        }
+      } else {
+        // If no record, default to absent
+        absent++;
+      }
     });
-    return { total, present, absent, leave, late, remote, attendanceRate: total > 0 ? Math.round((present / total) * 100) : 0 };
-  }, [employees, attendance, todayStr]);
 
-  const chartData = useMemo(() => {
-    const data: Array<{ name: string; Present: number; Absent: number }> = [];
-    const today = new Date();
+    const attendanceRate = total > 0 ? Math.round((present / total) * 100) : 0;
+
+    return {
+      total,
+      present,
+      absent,
+      leave,
+      attendanceRate,
+    };
+  }, [filteredEmployees, attendance, todayStr]);
+
+  // Donut Chart Data: Attendance Distribution
+  const pieData = useMemo(() => {
+    return [
+      { name: 'Present', value: stats.present, color: '#6BCB77' },
+      { name: 'Absent', value: stats.absent, color: '#F28B82' },
+      { name: 'Leave', value: stats.leave, color: '#F7C873' },
+    ];
+  }, [stats]);
+
+  // Weekly Trend Area Chart Data
+  const weeklyData = useMemo(() => {
+    // Generate dates of the last 5 weekdays (excluding weekends)
+    const data: Array<{ day: string; Present: number; Absent: number; Leave: number }> = [];
+    const today = new Date('2026-06-03');
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const weekdays: Date[] = [];
+    
     let offset = 0;
-    while (weekdays.length < 7) {
+    while (weekdays.length < 5) {
       const d = new Date(today);
       d.setDate(today.getDate() - offset);
-      if (d.getDay() !== 0 && d.getDay() !== 6) weekdays.unshift(d);
+      const dayOfWeek = d.getDay();
+      if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+        weekdays.unshift(d); // add to start to keep chronological
+      }
       offset++;
     }
-    weekdays.forEach(date => {
-      const dateStr = date.toISOString().split('T')[0];
-      const dayRecords = attendance.filter(a => a.date === dateStr);
-      let present = 0, absent = 0;
-      employees.forEach(emp => {
-        const rec = dayRecords.find(r => r.employee_id === emp.employee_id);
-        if (rec && (rec.status === 'Present' || rec.status === 'Half Day')) present++;
-        else absent++;
-      });
-      data.push({ name: dayNames[date.getDay()], Present: present, Absent: absent });
-    });
-    return data;
-  }, [employees, attendance]);
 
-  const liveStatusList = useMemo(() => {
-    const todayRecords = attendance.filter(a => a.date === todayStr);
-    return employees.map(emp => {
-      const rec = todayRecords.find(r => r.employee_id === emp.employee_id);
-      return { ...emp, status: rec ? rec.status : 'Absent', checkIn: rec?.check_in ?? null, checkOut: rec?.check_out ?? null };
-    }).slice(0, 5);
-  }, [employees, attendance, todayStr]);
+    weekdays.forEach((date) => {
+      const dateStr = date.toISOString().split('T')[0];
+      const dayRecords = attendance.filter((a) => a.date === dateStr);
+      
+      let present = 0;
+      let absent = 0;
+      let leave = 0;
+
+      filteredEmployees.forEach((emp) => {
+        const rec = dayRecords.find((r) => r.employee_id === emp.employee_id);
+        if (rec) {
+          if (rec.status === 'Present' || rec.status === 'Half Day') present++;
+          else if (rec.status === 'Leave') leave++;
+          else absent++;
+        } else {
+          absent++;
+        }
+      });
+
+      data.push({
+        day: dayNames[date.getDay()],
+        Present: present,
+        Absent: absent,
+        Leave: leave,
+      });
+    });
+
+    return data;
+  }, [filteredEmployees, attendance]);
+
+  // Department-wise Bar Chart Data
+  const deptData = useMemo(() => {
+    const depts = Array.from(new Set(filteredEmployees.map((e) => e.department)));
+    const todayRecords = attendance.filter((a) => a.date === todayStr);
+
+    return depts.map((dept) => {
+      const deptEmps = filteredEmployees.filter((e) => e.department === dept);
+      const totalInDept = deptEmps.length;
+      let presentInDept = 0;
+
+      deptEmps.forEach((emp) => {
+        const rec = todayRecords.find((r) => r.employee_id === emp.employee_id);
+        if (rec && (rec.status === 'Present' || rec.status === 'Half Day')) {
+          presentInDept++;
+        }
+      });
+
+      const rate = totalInDept > 0 ? Math.round((presentInDept / totalInDept) * 100) : 0;
+
+      return {
+        name: dept,
+        'Attendance Rate (%)': rate,
+        Employees: totalInDept,
+      };
+    });
+  }, [filteredEmployees, attendance, todayStr]);
 
   const getActivityIcon = (type: string) => {
-    const iconStyle = (bg: string) => ({
-      background: bg, width: 28, height: 28, borderRadius: '50%',
-      display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-    });
     switch (type) {
-      case 'check_in':    return <div style={iconStyle('#EDE9FE')}><UserCheck className="h-3.5 w-3.5" style={{ color: '#8B5CF6' }} /></div>;
-      case 'check_out':   return <div style={iconStyle('#F2EBFF')}><Clock className="h-3.5 w-3.5" style={{ color: '#9879E9' }} /></div>;
-      case 'leave_approve': return <div style={iconStyle('#DDD6FE')}><Briefcase className="h-3.5 w-3.5" style={{ color: '#7C3AED' }} /></div>;
-      case 'leave_reject':  return <div style={iconStyle('#EDE9FE')}><UserX className="h-3.5 w-3.5" style={{ color: '#6D28D9' }} /></div>;
-      default:            return <div style={iconStyle('#F2EBFF')}><Users className="h-3.5 w-3.5" style={{ color: '#A78BFA' }} /></div>;
+      case 'check_in':
+        return <div className="h-7 w-7 rounded-full bg-[var(--calendar-present-bg)] text-[var(--calendar-present-text)] flex items-center justify-center"><UserCheck className="h-4 w-4" /></div>;
+      case 'check_out':
+        return <div className="h-7 w-7 rounded-full bg-primary/10 text-primary flex items-center justify-center"><Clock className="h-4 w-4" /></div>;
+      case 'leave_approve':
+        return <div className="h-7 w-7 rounded-full bg-[var(--calendar-holiday-bg)] text-[var(--calendar-holiday-text)] flex items-center justify-center"><Briefcase className="h-4 w-4" /></div>;
+      case 'leave_reject':
+        return <div className="h-7 w-7 rounded-full bg-[var(--calendar-absent-bg)] text-[var(--calendar-absent-text)] flex items-center justify-center"><UserX className="h-4 w-4" /></div>;
+      case 'employee_add':
+      default:
+        return <div className="h-7 w-7 rounded-full bg-[var(--calendar-leave-bg)] text-[var(--calendar-leave-text)] flex items-center justify-center"><Users className="h-4 w-4" /></div>;
     }
   };
 
-  const pendingLeaves = leaveRequests.filter(r => r.status === 'Pending').length;
-
   return (
-    <div className="space-y-8 pb-12 animate-fadeInUp">
-
-      {/* ── Hero Banner ── */}
-      <div
-        className="relative overflow-hidden rounded-3xl p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6"
-        style={{
-          background: 'linear-gradient(135deg, #7C3AED 0%, #A78BFA 60%, #C4B5FD 100%)',
-          boxShadow: '0 12px 48px rgba(124,58,237,0.30)',
-        }}
-      >
-        <div className="absolute top-0 right-0 h-64 w-64 rounded-full opacity-20"
-          style={{ background: 'radial-gradient(circle, #fff 0%, transparent 70%)', transform: 'translate(30%, -30%)' }} />
-        <div className="absolute bottom-0 left-24 h-32 w-64 rounded-full opacity-10"
-          style={{ background: 'radial-gradient(circle, #fff 0%, transparent 70%)', filter: 'blur(20px)' }} />
-
-        <div className="relative z-10 text-white space-y-2">
-          <span
-            className="inline-block text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full"
-            style={{ background: 'rgba(255,255,255,0.20)', border: '1px solid rgba(255,255,255,0.30)' }}
-          >
-            Admin Dashboard
-          </span>
-          <h2 className="text-2xl font-black tracking-tight" style={{ color: '#fff' }}>
-            Welcome back, HR Director 👋
-          </h2>
-          <p className="text-sm opacity-85">
-            {stats.attendanceRate}% attendance today · {stats.present} of {stats.total} staff present
+    <div className="space-y-6">
+      {/* ── Aurora Welcome Header ── */}
+      <AuroraBackground variant="header">
+        <div className="px-8 py-7">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-primary/70 mb-1">
+            {isAdmin ? 'Super Admin Portal' : 'HR Portal'}
+          </p>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground font-display">
+            {isAdmin ? 'Super Admin Overview' : 'HR Management Overview'}
+          </h1>
+          <p className="text-xs text-muted-foreground mt-1 max-w-xl">
+            {isAdmin
+              ? 'Monitor global office presence, track employee and HR department statistics, and review audit logs.'
+              : 'Monitor real-time employee office presence, track department statistics, and review action activities.'}
           </p>
         </div>
+      </AuroraBackground>
 
-        <div className="flex flex-wrap gap-3 relative z-10">
-          <button
-            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold transition-all hover:scale-105"
-            style={{ background: 'rgba(255,255,255,0.25)', color: '#fff', border: '1.5px solid rgba(255,255,255,0.40)' }}
-          >
-            <Plus className="h-4 w-4" /> Add Employee
-          </button>
-          <button
-            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold transition-all hover:scale-105"
-            style={{ background: 'rgba(255,255,255,0.15)', color: '#fff', border: '1.5px solid rgba(255,255,255,0.25)' }}
-          >
-            <FileText className="h-4 w-4" /> Generate Report
-          </button>
-        </div>
+      {/* KPI Stats Cards */}
+      <div className={`grid grid-cols-2 ${isAdmin ? 'lg:grid-cols-6' : 'lg:grid-cols-5'} gap-6`}>
+        {isAdmin ? (
+          <>
+            <Card className="relative overflow-hidden hover:scale-[1.01] hover:shadow-md transition-all duration-300">
+              <CardContent className="p-6 space-y-2">
+                <div className="flex justify-between items-start">
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Employees</span>
+                  <Users className="h-5 w-5 text-primary" />
+                </div>
+                <p className="text-3xl font-bold text-foreground font-display">{employees.filter(e => e.role === 'employee').length}</p>
+                <p className="text-[10px] text-muted-foreground font-medium">Standard workers</p>
+              </CardContent>
+            </Card>
+
+            <Card className="relative overflow-hidden hover:scale-[1.01] hover:shadow-md transition-all duration-300">
+              <CardContent className="p-6 space-y-2">
+                <div className="flex justify-between items-start">
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">HR Managers</span>
+                  <Briefcase className="h-5 w-5 text-amber-500" />
+                </div>
+                <p className="text-3xl font-bold text-foreground font-display">{employees.filter(e => e.role === 'hr').length}</p>
+                <p className="text-[10px] text-muted-foreground font-medium">HR Administrators</p>
+              </CardContent>
+            </Card>
+
+            <Card className="relative overflow-hidden hover:scale-[1.01] hover:shadow-md transition-all duration-300">
+              <CardContent className="p-6 space-y-2">
+                <div className="flex justify-between items-start">
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Active Staff</span>
+                  <UserCheck className="h-5 w-5 text-emerald-500" />
+                </div>
+                <p className="text-3xl font-bold text-foreground font-display">{employees.filter(e => e.status !== 'Inactive').length}</p>
+                <p className="text-[10px] text-muted-foreground font-medium">Enabled accounts</p>
+              </CardContent>
+            </Card>
+          </>
+        ) : (
+          <Card className="relative overflow-hidden hover:scale-[1.01] hover:shadow-md transition-all duration-300">
+            <CardContent className="p-6 space-y-2">
+              <div className="flex justify-between items-start">
+                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Total Employees</span>
+                <Users className="h-5 w-5 text-primary" />
+              </div>
+              <p className="text-3xl font-bold text-foreground font-display">{stats.total}</p>
+              <p className="text-[10px] text-muted-foreground font-medium">Registered workers</p>
+            </CardContent>
+          </Card>
+        )}
+
+        <Card className="border-[var(--calendar-present-border)] bg-[var(--calendar-present-bg)]/40 text-[var(--calendar-present-text)] hover:scale-[1.01] hover:shadow-md transition-all duration-300">
+          <CardContent className="p-6 space-y-2">
+            <div className="flex justify-between items-start">
+              <span className="text-xs font-semibold text-foreground/80 uppercase tracking-wide">Present Today</span>
+              <UserCheck className="h-5 w-5 text-[var(--calendar-present-text)]" />
+            </div>
+            <p className="text-3xl font-bold text-[var(--calendar-present-text)] font-display">{stats.present}</p>
+            <p className="text-[10px] text-foreground/75 font-medium">Checked-in today</p>
+          </CardContent>
+        </Card>
+
+        <Card className="border-[var(--calendar-absent-border)] bg-[var(--calendar-absent-bg)]/40 text-[var(--calendar-absent-text)] hover:scale-[1.01] hover:shadow-md transition-all duration-300">
+          <CardContent className="p-6 space-y-2">
+            <div className="flex justify-between items-start">
+              <span className="text-xs font-semibold text-foreground/80 uppercase tracking-wide">Absent Today</span>
+              <UserX className="h-5 w-5 text-[var(--calendar-absent-text)]" />
+            </div>
+            <p className="text-3xl font-bold text-[var(--calendar-absent-text)] font-display">{stats.absent}</p>
+            <p className="text-[10px] text-foreground/75 font-medium">No clock-in logged</p>
+          </CardContent>
+        </Card>
+
+        <Card className="border-[var(--calendar-leave-border)] bg-[var(--calendar-leave-bg)]/40 text-[var(--calendar-leave-text)] hover:scale-[1.01] hover:shadow-md transition-all duration-300">
+          <CardContent className="p-6 space-y-2">
+            <div className="flex justify-between items-start">
+              <span className="text-xs font-semibold text-foreground/80 uppercase tracking-wide">On Leave</span>
+              <PlaneTakeoff className="h-5 w-5 text-[var(--calendar-leave-text)]" />
+            </div>
+            <p className="text-3xl font-bold text-[var(--calendar-leave-text)] font-display">{stats.leave}</p>
+            <p className="text-[10px] text-foreground/75 font-medium">Approved leave requests</p>
+          </CardContent>
+        </Card>
+
+        <Card className="border-primary/30 bg-primary/10 col-span-2 lg:col-span-1 text-primary hover:scale-[1.01] hover:shadow-md transition-all duration-300">
+          <CardContent className="p-6 space-y-2">
+            <div className="flex justify-between items-start">
+              <span className="text-xs font-semibold text-primary uppercase tracking-wide">Daily Rate</span>
+              <TrendingUp className="h-5 w-5 text-primary" />
+            </div>
+            <p className="text-3xl font-bold text-primary font-display">{stats.attendanceRate}%</p>
+            <p className="text-[10px] text-primary/80 font-medium">Of active staff</p>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Pending alert */}
-      {pendingLeaves > 0 && (
-        <div
-          className="flex items-center gap-3 px-5 py-3.5 rounded-2xl text-sm font-semibold"
-          style={{ background: 'rgba(237,233,254,0.8)', border: '1.5px solid #C4B5FD', color: '#6D28D9' }}
-        >
-          <PlaneTakeoff className="h-4 w-4" style={{ color: '#8B5CF6' }} />
-          <span>{pendingLeaves} leave request{pendingLeaves > 1 ? 's' : ''} pending your approval</span>
-        </div>
-      )}
-
-      {/* ── KPI Grid ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
-        <LilacKPI label="Total Staff" value={stats.total} sub="Full-time accounts" icon={<Users className="h-4 w-4" />} accent="#6D28D9" />
-        <LilacKPI label="Present Today" value={stats.present} sub="Active in office" icon={<UserCheck className="h-4 w-4" />} accent="#7C3AED" />
-        <LilacKPI label="Late Check-ins" value={stats.late} sub="After 09:15 AM" icon={<Clock className="h-4 w-4" />} accent="#A78BFA" />
-        <LilacKPI label="Out of Office" value={stats.absent} sub="Unregistered today" icon={<UserX className="h-4 w-4" />} accent="#9879E9" />
-        <LilacKPI label="Remote Active" value={stats.remote} sub="Working remotely" icon={<Globe className="h-4 w-4" />} accent="#8B5CF6" />
-      </div>
-
-      {/* ── Main Grid ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-        {/* Area Chart */}
-        <div className="glass-card lg:col-span-8 overflow-hidden">
-          <div
-            className="px-6 py-4 flex items-center justify-between border-b"
-            style={{ borderColor: 'rgba(216,180,254,0.4)', background: 'rgba(242,235,255,0.5)' }}
-          >
-            <div>
-              <h3 className="font-bold text-sm" style={{ color: '#4C1D95' }}>Weekly Attendance Analytics</h3>
-              <p className="text-xs mt-0.5" style={{ color: '#9879E9' }}>Historical workforce attendance</p>
-            </div>
-            <span
-              className="flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full"
-              style={{ background: '#EDE9FE', color: '#7C3AED' }}
-            >
-              <TrendingUp className="h-3.5 w-3.5" /> Live
-            </span>
-          </div>
-          <div className="p-6">
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="gradPresent" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0.0} />
-                    </linearGradient>
-                    <linearGradient id="gradAbsent" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#C4B5FD" stopOpacity={0.2} />
-                      <stop offset="95%" stopColor="#C4B5FD" stopOpacity={0.0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#EDE9FE" />
-                  <XAxis dataKey="name" stroke="#C4B5FD" fontSize={11} tickLine={false} />
-                  <YAxis stroke="#C4B5FD" fontSize={11} tickLine={false} />
-                  <Tooltip
-                    contentStyle={{
-                      background: 'rgba(255,255,255,0.95)', borderColor: '#D8B4FE',
-                      color: '#4C1D95', borderRadius: 16, fontSize: 12,
-                    }}
-                  />
-                  <Area type="monotone" dataKey="Present" stroke="#8B5CF6" fillOpacity={1} fill="url(#gradPresent)" strokeWidth={2.5} />
-                  <Area type="monotone" dataKey="Absent" stroke="#C4B5FD" fillOpacity={1} fill="url(#gradAbsent)" strokeWidth={1.5} />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-
-        {/* Activity Feed */}
-        <div className="glass-card lg:col-span-4 flex flex-col" style={{ maxHeight: 380 }}>
-          <div
-            className="px-5 py-4 flex items-center justify-between border-b flex-shrink-0"
-            style={{ borderColor: 'rgba(216,180,254,0.4)', background: 'rgba(242,235,255,0.5)' }}
-          >
-            <h3 className="font-bold text-sm" style={{ color: '#4C1D95' }}>Activity Feed</h3>
-            <span className="h-2 w-2 rounded-full animate-ping" style={{ background: '#8B5CF6' }} />
-          </div>
-          <div className="overflow-y-auto flex-1 divide-y" style={{ borderColor: 'rgba(216,180,254,0.3)' }}>
-            {activities.length === 0 ? (
-              <div className="py-12 text-center text-sm" style={{ color: '#C4B5FD' }}>No recent activities.</div>
+      {/* ── Unified Bento Grid Layout ── */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+        
+        {/* Bento 1: Donut Chart (Spans 4) */}
+        <Card className="md:col-span-4 hover:scale-[1.005] hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Attendance Share</CardTitle>
+          </CardHeader>
+          <CardContent className="h-64 flex items-center justify-center relative">
+            {stats.total === 0 ? (
+              <span className="text-xs text-muted-foreground">No data today</span>
             ) : (
-              activities.map(act => (
-                <div key={act.id} className="p-4 flex gap-3 hover:bg-lilac-50 transition-colors">
-                  {getActivityIcon(act.type)}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs leading-relaxed font-medium" style={{ color: '#4C1D95' }}>{act.message}</p>
-                    <div className="flex justify-between items-center mt-1 text-[10px]" style={{ color: '#C4B5FD' }}>
-                      <span>{act.user_name}</span>
-                      <span>{new Date(act.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+              <>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={pieData}
+                      innerRadius={60}
+                      outerRadius={80}
+                      paddingAngle={3}
+                      dataKey="value"
+                    >
+                      {pieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }} />
+                  </PieChart>
+                </ResponsiveContainer>
+                {/* Inner Center text */}
+                <div className="absolute flex flex-col items-center justify-center">
+                  <p className="text-2xl font-bold text-foreground">{stats.attendanceRate}%</p>
+                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wide">Present</p>
+                </div>
+              </>
+            )}
+          </CardContent>
+          {/* Pie legend */}
+          <div className="px-6 pb-4 flex justify-center space-x-6 text-xs font-semibold text-muted-foreground border-t border-border pt-2 bg-muted/5">
+            <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-present" /> Present ({stats.present})</div>
+            <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-absent" /> Absent ({stats.absent})</div>
+            <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-leave" /> On Leave ({stats.leave})</div>
+          </div>
+        </Card>
+
+        {/* Bento 2: Weekly Trend Area Chart (Spans 4) */}
+        <Card className="md:col-span-4 hover:scale-[1.005] hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Weekly Trend</CardTitle>
+          </CardHeader>
+          <CardContent className="h-64 pt-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={weeklyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorPresent" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#A9AFE5" stopOpacity={0.2}/>
+                    <stop offset="95%" stopColor="#A9AFE5" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+                <XAxis dataKey="day" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} />
+                <YAxis stroke="var(--muted-foreground)" fontSize={11} tickLine={false} allowDecimals={false} />
+                <Tooltip contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }} />
+                <Area type="monotone" dataKey="Present" stroke="#A9AFE5" fillOpacity={1} fill="url(#colorPresent)" strokeWidth={2.5} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </CardContent>
+          <div className="px-6 pb-4 border-t border-border pt-2 bg-muted/5 flex items-center justify-between text-xs text-muted-foreground font-semibold">
+            <span>Overall presence trend</span>
+            <span className="text-primary flex items-center gap-1"><TrendingUp className="h-3.5 w-3.5" /> Stable</span>
+          </div>
+        </Card>
+
+        {/* Bento 3: Dynamic Activity Log Sidebar Panel (Spans 4, vertically row-span-2) */}
+        <Card className="md:col-span-4 md:row-span-2 flex flex-col h-full overflow-hidden hover:scale-[1.005] hover:shadow-lg transition-all duration-300">
+          <CardHeader className="border-b border-border bg-muted/5 py-4 flex flex-row items-center justify-between">
+            <CardTitle className="text-sm font-bold uppercase tracking-wider text-foreground">Recent Activity Log</CardTitle>
+            <Badge variant="outline" className="text-[10px] font-bold">Live Stream</Badge>
+          </CardHeader>
+          <CardContent className="p-0 overflow-y-auto flex-1 divide-y divide-border">
+            {filteredActivities.length === 0 ? (
+              <div className="h-48 flex items-center justify-center text-xs text-muted-foreground">
+                No recent activity logged.
+              </div>
+            ) : (
+              filteredActivities.map((act) => (
+                <div key={act.id} className="p-4 hover:bg-muted/10 transition-colors flex gap-3 items-start">
+                  <div className="flex-shrink-0 mt-0.5">
+                    {getActivityIcon(act.type)}
+                  </div>
+                  <div className="flex-1 min-w-0 space-y-1">
+                    <p className="text-xs text-foreground leading-relaxed font-semibold">
+                      {act.message}
+                    </p>
+                    <div className="flex justify-between items-center text-[10px] text-muted-foreground font-mono">
+                      <span>By: {act.user_name}</span>
+                      <span>
+                        {new Date(act.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric' })}{' '}
+                        {new Date(act.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
                     </div>
                   </div>
                 </div>
               ))
             )}
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
-        {/* Live Staff Panel */}
-        <div className="glass-card lg:col-span-8 overflow-hidden">
-          <div
-            className="px-6 py-4 flex items-center justify-between border-b"
-            style={{ borderColor: 'rgba(216,180,254,0.4)', background: 'rgba(242,235,255,0.5)' }}
-          >
-            <div>
-              <h3 className="font-bold text-sm" style={{ color: '#4C1D95' }}>Live Staff Status</h3>
-              <p className="text-xs mt-0.5" style={{ color: '#9879E9' }}>Real-time presence tracking</p>
-            </div>
-            <Badge variant="secondary">✓ Synced</Badge>
+        {/* Bento 4: Department Attendance Rate Bar Chart (Spans 8) */}
+        <Card className="md:col-span-8 hover:scale-[1.005] hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Department-wise Presence</CardTitle>
+          </CardHeader>
+          <CardContent className="h-60 pt-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={deptData} layout="vertical" margin={{ top: 0, right: 10, left: 10, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
+                <XAxis type="number" domain={[0, 100]} stroke="var(--muted-foreground)" fontSize={10} tickLine={false} />
+                <YAxis dataKey="name" type="category" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} width={80} />
+                <Tooltip contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }} />
+                <Bar dataKey="Attendance Rate (%)" fill="#A9AFE5" radius={[0, 4, 4, 0]} barSize={12} />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+          <div className="px-6 pb-4 border-t border-border pt-2 bg-muted/5 flex items-center justify-between text-xs text-muted-foreground font-semibold">
+            <span>Presence rate by department</span>
+            <span>Target: 90%+</span>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full table-lilac">
-              <thead>
-                <tr>
-                  <th>Employee</th>
-                  <th>Department</th>
-                  <th>Check In</th>
-                  <th>Check Out</th>
-                  <th className="text-right">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {liveStatusList.map(emp => (
-                  <tr key={emp.id}>
-                    <td>
-                      <div className="flex items-center gap-2.5">
-                        <div
-                          className="h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
-                          style={{ background: 'linear-gradient(135deg,#A78BFA,#8B5CF6)' }}
-                        >
-                          {emp.name.split(' ').map(n => n[0]).join('')}
-                        </div>
-                        <div>
-                          <span className="font-semibold block" style={{ color: '#4C1D95' }}>{emp.name}</span>
-                          <span className="text-[10px]" style={{ color: '#9879E9' }}>{emp.designation}</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td style={{ color: '#6D5A9C' }}>{emp.department}</td>
-                    <td className="font-mono text-[11px]">{emp.checkIn || '—'}</td>
-                    <td className="font-mono text-[11px]">{emp.checkOut || '—'}</td>
-                    <td className="text-right">
-                      <span
-                        className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold"
-                        style={{
-                          background: emp.status === 'Present' ? '#EDE9FE' : emp.status === 'Leave' ? '#DDD6FE' : '#F2EBFF',
-                          color: emp.status === 'Present' ? '#6D28D9' : emp.status === 'Leave' ? '#7C3AED' : '#9879E9',
-                        }}
-                      >
-                        {emp.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        </Card>
 
-        {/* Calendar */}
-        <div className="glass-card lg:col-span-4 overflow-hidden">
-          <div
-            className="px-6 py-4 border-b"
-            style={{ borderColor: 'rgba(216,180,254,0.4)', background: 'rgba(242,235,255,0.5)' }}
-          >
-            <h3 className="font-bold text-sm" style={{ color: '#4C1D95' }}>Corporate Calendar</h3>
-            <p className="text-xs mt-0.5" style={{ color: '#9879E9' }}>Attendance & schedule overview</p>
-          </div>
-          <div className="p-4">
+        {/* Live Calendar Card (Spans 4) */}
+        <Card className="md:col-span-4 hover:scale-[1.005] hover:shadow-lg transition-all duration-300">
+          <CardHeader className="border-b border-border bg-muted/5 py-4">
+            <CardTitle className="text-sm font-bold uppercase tracking-wider text-foreground">Live Calendar</CardTitle>
+          </CardHeader>
+          <CardContent className="p-4">
             <LiveCalendar
               attendanceByDate={attendanceByDate}
               holidayByDate={holidayByDate}
               compact={false}
             />
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
       </div>
     </div>

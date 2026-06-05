@@ -1,122 +1,18 @@
-const { Client, Pool } = require('pg');
-require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
-
-const pgUser = process.env.PGUSER || 'postgres';
-const pgPassword = process.env.PGPASSWORD || 'postgres';
-const pgHost = process.env.PGHOST || 'localhost';
-const pgPort = process.env.PGPORT || 5432;
-const pgDatabase = process.env.PGDATABASE || 'dattendance';
+const prisma = require('../config/db');
 
 async function init() {
-  console.log('Connecting to default postgres database to check/create target database...');
-  const client = new Client({
-    user: pgUser,
-    password: pgPassword,
-    host: pgHost,
-    port: pgPort,
-    database: 'postgres',
-  });
+  console.log('Connecting to database via Prisma...');
 
   try {
-    await client.connect();
-    
-    // Check if database exists
-    const res = await client.query(`SELECT 1 FROM pg_database WHERE datname = $1`, [pgDatabase]);
-    if (res.rowCount === 0) {
-      console.log(`Database "${pgDatabase}" does not exist. Creating...`);
-      await client.query(`CREATE DATABASE "${pgDatabase}"`);
-      console.log(`Database "${pgDatabase}" created successfully.`);
-    } else {
-      console.log(`Database "${pgDatabase}" already exists.`);
-    }
-  } catch (err) {
-    console.error('Error checking or creating database:', err.message);
-    process.exit(1);
-  } finally {
-    await client.end();
-  }
-
-  console.log(`Connecting to database "${pgDatabase}" to run migrations and seed data...`);
-  const pool = new Pool({
-    user: pgUser,
-    password: pgPassword,
-    host: pgHost,
-    port: pgPort,
-    database: pgDatabase,
-  });
-
-  try {
-    // Create Tables
-    console.log('Creating tables...');
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS employees (
-        id VARCHAR(50) PRIMARY KEY,
-        employee_id VARCHAR(50) UNIQUE NOT NULL,
-        name VARCHAR(100) NOT NULL,
-        email VARCHAR(100) UNIQUE NOT NULL,
-        department VARCHAR(100) NOT NULL,
-        designation VARCHAR(100) NOT NULL,
-        role VARCHAR(20) NOT NULL CHECK (role IN ('admin', 'employee')),
-        current_status VARCHAR(20) NOT NULL DEFAULT 'Absent' CHECK (current_status IN ('Present', 'Absent', 'Leave')),
-        join_date DATE NOT NULL DEFAULT CURRENT_DATE,
-        password VARCHAR(255) NOT NULL DEFAULT 'password'
-      );
-    `);
-
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS attendance (
-        id VARCHAR(100) PRIMARY KEY,
-        employee_id VARCHAR(50) REFERENCES employees(employee_id) ON DELETE CASCADE,
-        date DATE NOT NULL,
-        check_in TIME,
-        check_out TIME,
-        status VARCHAR(20) NOT NULL CHECK (status IN ('Present', 'Absent', 'Leave', 'Half Day')),
-        working_hours NUMERIC(5,2),
-        UNIQUE(employee_id, date)
-      );
-    `);
-
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS leave_requests (
-        id VARCHAR(50) PRIMARY KEY,
-        employee_id VARCHAR(50) REFERENCES employees(employee_id) ON DELETE CASCADE,
-        leave_type VARCHAR(100) NOT NULL,
-        start_date DATE NOT NULL,
-        end_date DATE NOT NULL,
-        status VARCHAR(20) NOT NULL DEFAULT 'Pending' CHECK (status IN ('Pending', 'Approved', 'Rejected'))
-      );
-    `);
-
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS holidays (
-        id VARCHAR(50) PRIMARY KEY,
-        holiday_name VARCHAR(100) NOT NULL,
-        holiday_date DATE NOT NULL UNIQUE,
-        holiday_type VARCHAR(50) NOT NULL,
-        is_recurring BOOLEAN DEFAULT FALSE
-      );
-    `);
-
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS activity_log (
-        id VARCHAR(50) PRIMARY KEY,
-        type VARCHAR(50) NOT NULL,
-        user_name VARCHAR(100) NOT NULL,
-        message TEXT NOT NULL,
-        timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
-    console.log('Tables created successfully.');
-
-    // Check if seeding is needed
-    const empCheck = await pool.query('SELECT COUNT(*) FROM employees');
-    const empCount = parseInt(empCheck.rows[0].count, 10);
+    // Check if database seeding is needed
+    const empCount = await prisma.employee.count();
     
     if (empCount === 0) {
       console.log('Database is empty. Seeding mock data...');
       
       const employees = [
-        { id: '1', employee_id: 'HR001', name: 'Sarah Connor', email: 'admin@company.com', department: 'Human Resources', designation: 'HR Director', role: 'admin', current_status: 'Present', join_date: '2021-03-15', password: 'password' },
+        { id: '0', employee_id: 'ADM001', name: 'Super Admin', email: 'admin@company.com', department: 'Administration', designation: 'General Administrator', role: 'admin', current_status: 'Present', join_date: '2020-01-01', password: 'password' },
+        { id: '1', employee_id: 'HR001', name: 'Sarah Connor', email: 'hr@company.com', department: 'Human Resources', designation: 'HR Director', role: 'hr', current_status: 'Present', join_date: '2021-03-15', password: 'password' },
         { id: '2', employee_id: 'EMP001', name: 'John Doe', email: 'employee@company.com', department: 'Engineering', designation: 'Senior Developer', role: 'employee', current_status: 'Present', join_date: '2022-01-10', password: 'password' },
         { id: '3', employee_id: 'EMP002', name: 'Alice Smith', email: 'alice@company.com', department: 'Engineering', designation: 'Product Designer', role: 'employee', current_status: 'Present', join_date: '2022-07-01', password: 'password' },
         { id: '4', employee_id: 'EMP003', name: 'Bob Johnson', email: 'bob@company.com', department: 'Marketing', designation: 'Marketing Specialist', role: 'employee', current_status: 'Leave', join_date: '2023-02-20', password: 'password' },
@@ -126,11 +22,12 @@ async function init() {
       ];
 
       for (const emp of employees) {
-        await pool.query(
-          `INSERT INTO employees (id, employee_id, name, email, department, designation, role, current_status, join_date, password)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
-          [emp.id, emp.employee_id, emp.name, emp.email, emp.department, emp.designation, emp.role, emp.current_status, emp.join_date, emp.password]
-        );
+        await prisma.employee.create({
+          data: {
+            ...emp,
+            join_date: new Date(emp.join_date)
+          }
+        });
       }
 
       const holidays = [
@@ -159,11 +56,12 @@ async function init() {
       ];
 
       for (const h of holidays) {
-        await pool.query(
-          `INSERT INTO holidays (id, holiday_name, holiday_date, holiday_type, is_recurring)
-           VALUES ($1, $2, $3, $4, $5)`,
-          [h.id, h.holiday_name, h.holiday_date, h.holiday_type, h.is_recurring]
-        );
+        await prisma.holiday.create({
+          data: {
+            ...h,
+            holiday_date: new Date(h.holiday_date)
+          }
+        });
       }
 
       const leaves = [
@@ -175,11 +73,13 @@ async function init() {
       ];
 
       for (const l of leaves) {
-        await pool.query(
-          `INSERT INTO leave_requests (id, employee_id, leave_type, start_date, end_date, status)
-           VALUES ($1, $2, $3, $4, $5, $6)`,
-          [l.id, l.employee_id, l.leave_type, l.start_date, l.end_date, l.status]
-        );
+        await prisma.leaveRequest.create({
+          data: {
+            ...l,
+            start_date: new Date(l.start_date),
+            end_date: new Date(l.end_date)
+          }
+        });
       }
 
       const activities = [
@@ -189,11 +89,12 @@ async function init() {
       ];
 
       for (const act of activities) {
-        await pool.query(
-          `INSERT INTO activity_log (id, type, user_name, message, timestamp)
-           VALUES ($1, $2, $3, $4, $5)`,
-          [act.id, act.type, act.user_name, act.message, act.timestamp]
-        );
+        await prisma.activityLog.create({
+          data: {
+            ...act,
+            timestamp: new Date(act.timestamp)
+          }
+        });
       }
 
       console.log('Generating 30 days of historical attendance data...');
@@ -201,12 +102,24 @@ async function init() {
       console.log(`Generated ${records.length} attendance records. Inserting...`);
       
       for (const rec of records) {
-        await pool.query(
-          `INSERT INTO attendance (id, employee_id, date, check_in, check_out, status, working_hours)
-           VALUES ($1, $2, $3, $4, $5, $6, $7)
-           ON CONFLICT (employee_id, date) DO NOTHING`,
-          [rec.id, rec.employee_id, rec.date, rec.check_in, rec.check_out, rec.status, rec.working_hours]
-        );
+        await prisma.attendance.upsert({
+          where: {
+            employee_id_date: {
+              employee_id: rec.employee_id,
+              date: new Date(rec.date)
+            }
+          },
+          update: {},
+          create: {
+            id: rec.id,
+            employee_id: rec.employee_id,
+            date: new Date(rec.date),
+            check_in: rec.check_in,
+            check_out: rec.check_out,
+            status: rec.status,
+            working_hours: rec.working_hours
+          }
+        });
       }
       
       console.log('Mock database seeded successfully.');
@@ -218,7 +131,7 @@ async function init() {
     console.error('Error running migrations and seeding:', err.message);
     process.exit(1);
   } finally {
-    await pool.end();
+    await prisma.$disconnect();
   }
 }
 

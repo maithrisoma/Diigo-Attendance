@@ -2,13 +2,24 @@ import { Employee, AttendanceRecord, LeaveRequest, Holiday, ActivityLog } from '
 
 export const INITIAL_EMPLOYEES: Employee[] = [
   {
+    id: '0',
+    employee_id: 'ADM001',
+    name: 'Super Admin',
+    email: 'admin@company.com',
+    department: 'Administration',
+    designation: 'General Administrator',
+    role: 'admin',
+    current_status: 'Present',
+    join_date: '2020-01-01',
+  },
+  {
     id: '1',
     employee_id: 'HR001',
     name: 'Sarah Connor',
-    email: 'admin@company.com',
+    email: 'hr@company.com',
     department: 'Human Resources',
     designation: 'HR Director',
-    role: 'admin',
+    role: 'hr',
     current_status: 'Present',
     join_date: '2021-03-15',
   },

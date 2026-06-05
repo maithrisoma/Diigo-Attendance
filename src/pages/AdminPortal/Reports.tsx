@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { AuroraBackground } from '../../components/ui/AuroraBackground';
 import { useData } from '../../context/DataContext';
 import { useToast } from '../../components/ui/Toast';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
@@ -7,14 +8,65 @@ import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { Select } from '../../components/ui/Select';
 import { Input } from '../../components/ui/Input';
+import { DatePicker } from '../../components/ui/DatePicker';
 import { Calendar, Download, Printer, BarChart3, TrendingUp, Users, Clock } from 'lucide-react';
+
+// Helper to generate dates for a range
+const getDateRange = (type: 'daily' | 'weekly' | 'monthly' | 'custom', anchorStr: string, dateRange: string) => {
+  const dates: string[] = [];
+  const anchor = new Date(anchorStr);
+
+  if (type === 'daily') {
+    dates.push(anchorStr);
+  } else if (type === 'weekly') {
+    // Get the 5 weekdays of the week corresponding to the anchor date
+    const day = anchor.getDay();
+    const diff = anchor.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+    const monday = new Date(anchor.setDate(diff));
+
+    for (let i = 0; i < 5; i++) {
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + i);
+      dates.push(d.toISOString().split('T')[0]);
+    }
+  } else if (type === 'monthly') {
+    // Monthly: get all dates in the month of the anchor date
+    const year = anchor.getFullYear();
+    const month = anchor.getMonth();
+    const numDays = new Date(year, month + 1, 0).getDate();
+
+    for (let i = 1; i <= numDays; i++) {
+      const d = new Date(year, month, i);
+      const dayOfWeek = d.getDay();
+      // Standard workdays Mon-Fri
+      if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+        dates.push(d.toISOString().split('T')[0]);
+      }
+    }
+  } else if (type === 'custom') {
+    const parts = dateRange.split(',');
+    const startStr = parts[0];
+    const endStr = parts[1] || parts[0];
+    if (startStr && endStr) {
+      const start = new Date(startStr);
+      const end = new Date(endStr);
+      const temp = new Date(start);
+      while (temp <= end) {
+        dates.push(temp.toISOString().split('T')[0]);
+        temp.setDate(temp.getDate() + 1);
+      }
+    }
+  }
+  return dates;
+};
 
 export const Reports: React.FC = () => {
   const { employees, attendance, holidays } = useData();
   const { toast } = useToast();
 
-  const [reportType, setReportType] = useState<'daily' | 'weekly' | 'monthly'>('daily');
+  const [reportType, setReportType] = useState<'daily' | 'weekly' | 'monthly' | 'custom'>('daily');
   const [selectedDate, setSelectedDate] = useState('2026-06-03'); // Default anchor
+  const [dateRange, setDateRange] = useState('2026-06-01,2026-06-05');
   
   // States for generated report
   const [generated, setGenerated] = useState(false);
@@ -23,49 +75,14 @@ export const Reports: React.FC = () => {
     { value: 'daily', label: 'Daily Report' },
     { value: 'weekly', label: 'Weekly Summary' },
     { value: 'monthly', label: 'Monthly Summary' },
+    { value: 'custom', label: 'Custom Date Range' },
   ];
-
-  // Helper to generate dates for a range
-  const getDateRange = (type: 'daily' | 'weekly' | 'monthly', anchorStr: string) => {
-    const dates: string[] = [];
-    const anchor = new Date(anchorStr);
-
-    if (type === 'daily') {
-      dates.push(anchorStr);
-    } else if (type === 'weekly') {
-      // Get the 5 weekdays of the week corresponding to the anchor date
-      const day = anchor.getDay();
-      const diff = anchor.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
-      const monday = new Date(anchor.setDate(diff));
-
-      for (let i = 0; i < 5; i++) {
-        const d = new Date(monday);
-        d.setDate(monday.getDate() + i);
-        dates.push(d.toISOString().split('T')[0]);
-      }
-    } else {
-      // Monthly: get all dates in the month of the anchor date
-      const year = anchor.getFullYear();
-      const month = anchor.getMonth();
-      const numDays = new Date(year, month + 1, 0).getDate();
-
-      for (let i = 1; i <= numDays; i++) {
-        const d = new Date(year, month, i);
-        const dayOfWeek = d.getDay();
-        // Standard workdays Mon-Fri
-        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-          dates.push(d.toISOString().split('T')[0]);
-        }
-      }
-    }
-    return dates;
-  };
 
   // Generate metrics based on selection
   const reportData = useMemo(() => {
     if (!generated) return null;
 
-    const dates = getDateRange(reportType, selectedDate);
+    const dates = getDateRange(reportType, selectedDate, dateRange);
     
     // Filter attendance records falling within dates
     const rangeAttendance = attendance.filter((a) => dates.includes(a.date));
@@ -186,7 +203,7 @@ export const Reports: React.FC = () => {
       departmentSummaries,
       datesCount: totalDaysCount,
     };
-  }, [generated, reportType, selectedDate, employees, attendance, holidays]);
+  }, [generated, reportType, selectedDate, dateRange, employees, attendance, holidays]);
 
   const handleGenerate = () => {
     setGenerated(true);
@@ -225,17 +242,20 @@ export const Reports: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center print:hidden">
-        <div>
+      {/* ── Aurora Hero Header ── */}
+      <AuroraBackground variant="hero" className="print:hidden">
+        <div className="px-8 py-7">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-primary/70 mb-1">
+            Analytics
+          </p>
           <h1 className="text-2xl font-bold tracking-tight text-foreground font-display">
             Attendance Reports
           </h1>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-muted-foreground mt-1 max-w-xl">
             Analyze historical presence rates and compile daily, weekly, or monthly summaries for export.
           </p>
         </div>
-      </div>
+      </AuroraBackground>
 
       {/* Report parameters input card */}
       <Card className="print:hidden">
@@ -255,23 +275,30 @@ export const Reports: React.FC = () => {
             />
           </div>
 
-          <div className="w-full sm:flex-1 relative">
-            <label className="text-xs font-semibold text-foreground tracking-wide font-display mb-1.5 block">
-              Reference Date
-            </label>
-            <div className="relative">
-              <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="date"
-                value={selectedDate}
-                onChange={(e) => {
-                  setSelectedDate(e.target.value);
+          {reportType === 'custom' ? (
+            <div className="w-full sm:flex-1">
+              <DatePicker
+                selectsRange={true}
+                label="Custom Date Range"
+                value={dateRange}
+                onChange={(val) => {
+                  setDateRange(val);
                   setGenerated(false);
                 }}
-                className="pl-9"
               />
             </div>
-          </div>
+          ) : (
+            <div className="w-full sm:flex-1">
+              <DatePicker
+                label="Reference Date"
+                value={selectedDate}
+                onChange={(val) => {
+                  setSelectedDate(val);
+                  setGenerated(false);
+                }}
+              />
+            </div>
+          )}
 
           <Button onClick={handleGenerate} className="w-full sm:w-auto h-10 px-6 font-semibold bg-primary">
             Generate Report
@@ -391,7 +418,7 @@ export const Reports: React.FC = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {reportData.employeeSummaries.map((emp) => (
+                  {reportData.employeeSummaries.map((emp: any) => (
                     <TableRow key={emp.id}>
                       <TableCell className="font-mono text-xs font-bold text-foreground">{emp.employee_id}</TableCell>
                       <TableCell className="font-semibold text-foreground">{emp.name}</TableCell>

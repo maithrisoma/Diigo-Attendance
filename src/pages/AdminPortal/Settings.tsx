@@ -6,6 +6,7 @@ import { TableWrapper, TableHeader, TableRow, TableHead, TableBody, TableCell } 
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Modal } from '../../components/ui/Modal';
+import { DatePicker } from '../../components/ui/DatePicker';
 import { Calendar, Plus, Clock, Settings2, ShieldCheck, Milestone, Trash2 } from 'lucide-react';
 import { Holiday } from '../../types';
 
@@ -287,11 +288,11 @@ export const Settings: React.FC = () => {
             onChange={(e) => setHolidayForm(p => ({ ...p, name: e.target.value }))}
             error={error}
           />
-          <Input
+          <DatePicker
             label="Holiday Date"
-            type="date"
+            placeholder="Select holiday date"
             value={holidayForm.date}
-            onChange={(e) => setHolidayForm(p => ({ ...p, date: e.target.value }))}
+            onChange={(val) => setHolidayForm(p => ({ ...p, date: val }))}
           />
 
           <div className="flex justify-end space-x-3 pt-2">

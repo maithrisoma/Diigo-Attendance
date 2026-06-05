@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Employee {
+  id             String         @id
+  employee_id    String         @unique
+  name           String
+  email          String         @unique
+  department     String
+  designation    String
+  role           String         // 'admin' or 'employee'
+  current_status String         @default("Absent") // 'Present', 'Absent', 'Leave'
+  join_date      DateTime       @default(now())
+  password       String         @default("password")
+  status         String         @default("Active") // 'Active', 'Inactive'
+  attendance     Attendance[]
+  leave_requests LeaveRequest[]
+
+  @@map("employees")
+}
+
+model Attendance {
+  id            String    @id
+  employee_id   String
+  employee      Employee  @relation(fields: [employee_id], references: [employee_id], onDelete: Cascade, onUpdate: Cascade)
+  date          DateTime
+  check_in      String?
+  check_out     String?
+  status        String    // 'Present', 'Absent', 'Leave', 'Half Day'
+  working_hours Float?
+
+  @@unique([employee_id, date])
+  @@map("attendance")
+}
+
+model LeaveRequest {
+  id          String   @id
+  employee_id String
+  employee    Employee @relation(fields: [employee_id], references: [employee_id], onDelete: Cascade, onUpdate: Cascade)
+  leave_type  String
+  start_date  DateTime
+  end_date    DateTime
+  status      String   @default("Pending") // 'Pending', 'Approved', 'Rejected'
+
+  @@map("leave_requests")
+}
+
+model Holiday {
+  id           String   @id
+  holiday_name String
+  holiday_date DateTime @unique
+  holiday_type String
+  is_recurring Boolean  @default(false)
+
+  @@map("holidays")
+}
+
+model ActivityLog {
+  id        String   @id
+  type      String
+  user_name String
+  message   String
+  timestamp DateTime @default(now())
+
+  @@map("activity_log")
+}
+
+model Announcement {
+  id              String    @id
+  title           String
+  content         String
+  category        String   // 'General', 'Holiday Notice', 'Attendance Update', 'Policy Update', 'Event', 'Emergency'
+  priority        String   // 'Low', 'Medium', 'High', 'Urgent'
+  target_audience String   // 'All Employees', 'HR Only', 'Department: <DeptName>', 'Employee: <EmployeeId>'
+  created_by      String
+  created_at      DateTime  @default(now())
+  expires_at      DateTime?
+  is_active       Boolean   @default(true)
+  is_pinned       Boolean   @default(false)
+
+  @@map("announcements")
+}
+
+model Notification {
+  id         String   @id
+  user_id    String   // employee_id of recipient
+  title      String
+  message    String
+  type       String   // 'New Announcement', 'Holiday Notice', 'Policy Update', 'Attendance Reminder', 'Leave Approval', 'Leave Rejection'
+  is_read    Boolean  @default(false)
+  created_at DateTime @default(now())
+
+  @@map("notifications")
+}
+
+model GoogleToken {
+  id            String   @id
+  employee_id   String   @unique
+  access_token  String
+  refresh_token String
+  token_type    String
+  expiry_date   BigInt
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  @@map("google_tokens")
+}

@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const pool = require('./config/db');
+const prisma = require('./config/db');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -12,12 +12,16 @@ app.use(express.json());
 // Helper to log activities
 async function logActivity(type, userName, message) {
   const id = `act_${Date.now()}`;
-  const timestamp = new Date().toISOString();
   try {
-    await pool.query(
-      `INSERT INTO activity_log (id, type, user_name, message, timestamp) VALUES ($1, $2, $3, $4, $5)`,
-      [id, type, userName, message, timestamp]
-    );
+    await prisma.activityLog.create({
+      data: {
+        id,
+        type,
+        user_name: userName,
+        message,
+        timestamp: new Date()
+      }
+    });
   } catch (err) {
     console.error('Error logging activity:', err.message);
   }
@@ -32,24 +36,33 @@ app.post('/api/auth/login', async (req, res) => {
 
   const normalizedInput = emailOrId.toLowerCase().trim();
   try {
-    const result = await pool.query(
-      `SELECT id, employee_id, name, email, department, designation, role, current_status, TO_CHAR(join_date, 'YYYY-MM-DD') as join_date, password 
-       FROM employees 
-       WHERE LOWER(email) = $1 OR LOWER(employee_id) = $1`,
-      [normalizedInput]
-    );
+    const user = await prisma.employee.findFirst({
+      where: {
+        OR: [
+          { email: normalizedInput },
+          { employee_id: normalizedInput }
+        ]
+      }
+    });
 
-    if (result.rowCount === 0) {
+    if (!user) {
       return res.status(404).json({ success: false, message: 'Invalid Employee ID or Email' });
     }
 
-    const user = result.rows[0];
+    if (user.status === 'Inactive') {
+      return res.status(403).json({ success: false, message: 'Your account has been deactivated. Please contact the administrator.' });
+    }
+
     if (password !== user.password) {
       return res.status(401).json({ success: false, message: 'Incorrect password. Try using "password".' });
     }
 
-    delete user.password;
-    return res.json({ success: true, message: 'Login successful', user });
+    const formattedUser = {
+      ...user,
+      join_date: user.join_date.toISOString().split('T')[0]
+    };
+    delete formattedUser.password;
+    return res.json({ success: true, message: 'Login successful', user: formattedUser });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ success: false, message: 'Internal Server Error' });
@@ -60,18 +73,23 @@ app.post('/api/auth/forgot-password', async (req, res) => {
   const { emailOrId } = req.body;
   const normalizedInput = emailOrId.toLowerCase().trim();
   try {
-    const result = await pool.query(
-      `SELECT email FROM employees WHERE LOWER(email) = $1 OR LOWER(employee_id) = $1`,
-      [normalizedInput]
-    );
+    const user = await prisma.employee.findFirst({
+      where: {
+        OR: [
+          { email: normalizedInput },
+          { employee_id: normalizedInput }
+        ]
+      },
+      select: { email: true }
+    });
 
-    if (result.rowCount === 0) {
+    if (!user) {
       return res.status(404).json({ success: false, message: 'User not found in registry' });
     }
 
     return res.json({
       success: true,
-      message: `Password reset instructions have been sent to ${result.rows[0].email}. (Demo note: password is "password")`
+      message: `Password reset instructions have been sent to ${user.email}. (Demo note: password is "password")`
     });
   } catch (err) {
     console.error(err);
@@ -82,11 +100,18 @@ app.post('/api/auth/forgot-password', async (req, res) => {
 // --- Employees Endpoints ---
 app.get('/api/employees', async (req, res) => {
   try {
-    const result = await pool.query(
-      `SELECT id, employee_id, name, email, department, designation, role, current_status, TO_CHAR(join_date, 'YYYY-MM-DD') as join_date 
-       FROM employees ORDER BY join_date ASC`
-    );
-    res.json(result.rows);
+    const employees = await prisma.employee.findMany({
+      orderBy: { join_date: 'asc' }
+    });
+    const formatted = employees.map(emp => {
+      const formattedEmp = {
+        ...emp,
+        join_date: emp.join_date.toISOString().split('T')[0]
+      };
+      delete formattedEmp.password;
+      return formattedEmp;
+    });
+    res.json(formatted);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -97,17 +122,31 @@ app.post('/api/employees', async (req, res) => {
   const { employee_id, name, email, department, designation, role, join_date } = req.body;
   const id = `emp_${Date.now()}`;
   const status = 'Absent';
+  const dateStr = join_date || new Date().toISOString().split('T')[0];
   
   try {
-    const result = await pool.query(
-      `INSERT INTO employees (id, employee_id, name, email, department, designation, role, current_status, join_date)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-       RETURNING id, employee_id, name, email, department, designation, role, current_status, TO_CHAR(join_date, 'YYYY-MM-DD') as join_date`,
-      [id, employee_id, name, email, department, designation, role, status, join_date || new Date().toISOString().split('T')[0]]
-    );
+    const newEmp = await prisma.employee.create({
+      data: {
+        id,
+        employee_id,
+        name,
+        email,
+        department,
+        designation,
+        role,
+        current_status: status,
+        join_date: new Date(dateStr)
+      }
+    });
 
     await logActivity('employee_add', 'Sarah Connor', `Added new employee ${name} (${employee_id}) in ${department}`);
-    res.status(201).json(result.rows[0]);
+    
+    const formatted = {
+      ...newEmp,
+      join_date: newEmp.join_date.toISOString().split('T')[0]
+    };
+    delete formatted.password;
+    res.status(201).json(formatted);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -116,64 +155,68 @@ app.post('/api/employees', async (req, res) => {
 
 app.put('/api/employees/:id', async (req, res) => {
   const { id } = req.params;
-  const { employee_id, name, email, department, designation, role, current_status, join_date } = req.body;
+  const { employee_id, name, email, department, designation, role, current_status, join_date, status } = req.body;
 
-  const client = await pool.connect();
   try {
-    await client.query('BEGIN');
+    const updated = await prisma.$transaction(async (tx) => {
+      const original = await tx.employee.findUnique({
+        where: { id }
+      });
+      if (!original) {
+        throw new Error('Employee not found');
+      }
 
-    const origResult = await client.query('SELECT employee_id, name FROM employees WHERE id = $1', [id]);
-    if (origResult.rowCount === 0) {
-      await client.query('ROLLBACK');
-      return res.status(404).json({ error: 'Employee not found' });
-    }
-    const original = origResult.rows[0];
+      const updateData = {};
+      if (employee_id !== undefined) updateData.employee_id = employee_id;
+      if (name !== undefined) updateData.name = name;
+      if (email !== undefined) updateData.email = email;
+      if (department !== undefined) updateData.department = department;
+      if (designation !== undefined) updateData.designation = designation;
+      if (role !== undefined) updateData.role = role;
+      if (current_status !== undefined) updateData.current_status = current_status;
+      if (join_date !== undefined) updateData.join_date = new Date(join_date);
+      if (status !== undefined) updateData.status = status;
 
-    const result = await client.query(
-      `UPDATE employees 
-       SET employee_id = COALESCE($1, employee_id),
-           name = COALESCE($2, name),
-           email = COALESCE($3, email),
-           department = COALESCE($4, department),
-           designation = COALESCE($5, designation),
-           role = COALESCE($6, role),
-           current_status = COALESCE($7, current_status),
-           join_date = COALESCE($8, join_date)
-       WHERE id = $9
-       RETURNING id, employee_id, name, email, department, designation, role, current_status, TO_CHAR(join_date, 'YYYY-MM-DD') as join_date`,
-      [employee_id, name, email, department, designation, role, current_status, join_date, id]
-    );
+      const resEmp = await tx.employee.update({
+        where: { id },
+        data: updateData
+      });
 
-    const updated = result.rows[0];
-
-    if (employee_id && employee_id !== original.employee_id) {
-      await client.query('UPDATE attendance SET employee_id = $1 WHERE employee_id = $2', [employee_id, original.employee_id]);
-      await client.query('UPDATE leave_requests SET employee_id = $1 WHERE employee_id = $2', [employee_id, original.employee_id]);
-    }
-
-    await client.query('COMMIT');
+      return resEmp;
+    });
 
     await logActivity('employee_edit', 'Sarah Connor', `Updated details for ${updated.name} (${updated.employee_id})`);
-    res.json(updated);
+    
+    const formatted = {
+      ...updated,
+      join_date: updated.join_date.toISOString().split('T')[0]
+    };
+    delete formatted.password;
+    res.json(formatted);
   } catch (err) {
-    await client.query('ROLLBACK');
     console.error(err);
+    if (err.message === 'Employee not found') {
+      return res.status(404).json({ error: 'Employee not found' });
+    }
     res.status(500).json({ error: 'Internal Server Error' });
-  } finally {
-    client.release();
   }
 });
 
 app.delete('/api/employees/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const origResult = await pool.query('SELECT employee_id, name FROM employees WHERE id = $1', [id]);
-    if (origResult.rowCount === 0) {
+    const emp = await prisma.employee.findUnique({
+      where: { id },
+      select: { employee_id: true, name: true }
+    });
+    if (!emp) {
       return res.status(404).json({ error: 'Employee not found' });
     }
-    const emp = origResult.rows[0];
 
-    await pool.query('DELETE FROM employees WHERE id = $1', [id]);
+    await prisma.employee.delete({
+      where: { id }
+    });
+
     await logActivity('employee_remove', 'Sarah Connor', `Removed employee ${emp.name} (${emp.employee_id}) from the system`);
     res.json({ message: 'Employee deleted successfully' });
   } catch (err) {
@@ -185,11 +228,14 @@ app.delete('/api/employees/:id', async (req, res) => {
 // --- Attendance Endpoints ---
 app.get('/api/attendance', async (req, res) => {
   try {
-    const result = await pool.query(
-      `SELECT id, employee_id, TO_CHAR(date, 'YYYY-MM-DD') as date, check_in, check_out, status, working_hours 
-       FROM attendance ORDER BY date DESC`
-    );
-    res.json(result.rows);
+    const attendance = await prisma.attendance.findMany({
+      orderBy: { date: 'desc' }
+    });
+    const formatted = attendance.map(rec => ({
+      ...rec,
+      date: rec.date.toISOString().split('T')[0]
+    }));
+    res.json(formatted);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -203,48 +249,70 @@ app.post('/api/attendance/check-in', async (req, res) => {
   }
 
   const todayStr = new Date().toISOString().split('T')[0];
+  const todayDate = new Date(todayStr);
   const now = new Date();
   const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
 
-  const client = await pool.connect();
   try {
-    await client.query('BEGIN');
+    const result = await prisma.$transaction(async (tx) => {
+      const emp = await tx.employee.findUnique({
+        where: { employee_id: employeeId }
+      });
+      if (!emp) {
+        throw new Error('Employee not found');
+      }
 
-    const empResult = await client.query('SELECT name FROM employees WHERE employee_id = $1', [employeeId]);
-    if (empResult.rowCount === 0) {
-      await client.query('ROLLBACK');
-      return res.status(404).json({ error: 'Employee not found' });
-    }
-    const emp = empResult.rows[0];
+      const attId = `att_${employeeId}_${todayStr}`;
+      const checkRecord = await tx.attendance.findUnique({
+        where: {
+          employee_id_date: {
+            employee_id: employeeId,
+            date: todayDate
+          }
+        }
+      });
 
-    const attId = `att_${employeeId}_${todayStr}`;
-    const checkRecord = await client.query('SELECT 1 FROM attendance WHERE employee_id = $1 AND date = $2', [employeeId, todayStr]);
+      if (checkRecord) {
+        await tx.attendance.update({
+          where: {
+            employee_id_date: {
+              employee_id: employeeId,
+              date: todayDate
+            }
+          },
+          data: {
+            check_in: timeStr,
+            status: 'Present'
+          }
+        });
+      } else {
+        await tx.attendance.create({
+          data: {
+            id: attId,
+            employee_id: employeeId,
+            date: todayDate,
+            check_in: timeStr,
+            status: 'Present'
+          }
+        });
+      }
 
-    if (checkRecord.rowCount > 0) {
-      await client.query(
-        `UPDATE attendance SET check_in = $1, status = 'Present' WHERE employee_id = $2 AND date = $3`,
-        [timeStr, employeeId, todayStr]
-      );
-    } else {
-      await client.query(
-        `INSERT INTO attendance (id, employee_id, date, check_in, check_out, status, working_hours)
-         VALUES ($1, $2, $3, $4, null, 'Present', null)`,
-        [attId, employeeId, todayStr, timeStr]
-      );
-    }
+      await tx.employee.update({
+        where: { employee_id: employeeId },
+        data: { current_status: 'Present' }
+      });
 
-    await client.query(`UPDATE employees SET current_status = 'Present' WHERE employee_id = $1`, [employeeId]);
+      return { name: emp.name };
+    });
 
-    await client.query('COMMIT');
-
-    await logActivity('check_in', emp.name, `${emp.name} (${employeeId}) checked in at ${timeStr}`);
+    await logActivity('check_in', result.name, `${result.name} (${employeeId}) checked in at ${timeStr}`);
     res.json({ message: 'Checked in successfully', time: timeStr });
   } catch (err) {
-    await client.query('ROLLBACK');
     console.error(err);
+    if (err.message === 'Employee not found') {
+      return res.status(404).json({ error: 'Employee not found' });
+    }
     res.status(500).json({ error: 'Internal Server Error' });
-  } finally {
-    client.release();
   }
 });
 
@@ -255,68 +323,92 @@ app.post('/api/attendance/check-out', async (req, res) => {
   }
 
   const todayStr = new Date().toISOString().split('T')[0];
+  const todayDate = new Date(todayStr);
   const now = new Date();
   const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
 
-  const client = await pool.connect();
   try {
-    await client.query('BEGIN');
+    const result = await prisma.$transaction(async (tx) => {
+      const emp = await tx.employee.findUnique({
+        where: { employee_id: employeeId }
+      });
+      if (!emp) {
+        throw new Error('Employee not found');
+      }
 
-    const empResult = await client.query('SELECT name FROM employees WHERE employee_id = $1', [employeeId]);
-    if (empResult.rowCount === 0) {
-      await client.query('ROLLBACK');
+      const attRecord = await tx.attendance.findUnique({
+        where: {
+          employee_id_date: {
+            employee_id: employeeId,
+            date: todayDate
+          }
+        }
+      });
+
+      if (!attRecord || !attRecord.check_in) {
+        throw new Error('No check-in record found for today');
+      }
+
+      const checkIn = attRecord.check_in;
+      const [inH, inM, inS] = checkIn.split(':').map(Number);
+      const [outH, outM, outS] = timeStr.split(':').map(Number);
+
+      const checkInDecimal = inH + inM / 60 + (inS || 0) / 3600;
+      const checkOutDecimal = outH + outM / 60 + (outS || 0) / 3600;
+
+      let hours = checkOutDecimal - checkInDecimal;
+      if (hours < 0) hours += 24;
+      const workingHours = parseFloat(hours.toFixed(2));
+      const status = workingHours < 5 ? 'Half Day' : 'Present';
+
+      await tx.attendance.update({
+        where: {
+          employee_id_date: {
+            employee_id: employeeId,
+            date: todayDate
+          }
+        },
+        data: {
+          check_out: timeStr,
+          status,
+          working_hours: workingHours
+        }
+      });
+
+      await tx.employee.update({
+        where: { employee_id: employeeId },
+        data: { current_status: 'Present' }
+      });
+
+      return { name: emp.name, workingHours, status };
+    });
+
+    await logActivity('check_out', result.name, `${result.name} (${employeeId}) checked out at ${timeStr}. Total hours: ${result.workingHours}`);
+    res.json({ message: 'Checked out successfully', time: timeStr, workingHours: result.workingHours, status: result.status });
+  } catch (err) {
+    console.error(err);
+    if (err.message === 'Employee not found') {
       return res.status(404).json({ error: 'Employee not found' });
     }
-    const emp = empResult.rows[0];
-
-    const attResult = await client.query('SELECT check_in FROM attendance WHERE employee_id = $1 AND date = $2', [employeeId, todayStr]);
-    if (attResult.rowCount === 0 || !attResult.rows[0].check_in) {
-      await client.query('ROLLBACK');
+    if (err.message === 'No check-in record found for today') {
       return res.status(400).json({ error: 'No check-in record found for today' });
     }
-
-    const checkIn = attResult.rows[0].check_in;
-    const [inH, inM, inS] = checkIn.split(':').map(Number);
-    const [outH, outM, outS] = timeStr.split(':').map(Number);
-
-    const checkInDecimal = inH + inM / 60 + (inS || 0) / 3600;
-    const checkOutDecimal = outH + outM / 60 + (outS || 0) / 3600;
-
-    let hours = checkOutDecimal - checkInDecimal;
-    if (hours < 0) hours += 24;
-    const workingHours = parseFloat(hours.toFixed(2));
-    const status = workingHours < 5 ? 'Half Day' : 'Present';
-
-    await client.query(
-      `UPDATE attendance 
-       SET check_out = $1, status = $2, working_hours = $3 
-       WHERE employee_id = $4 AND date = $5`,
-      [timeStr, status, workingHours, employeeId, todayStr]
-    );
-
-    await client.query(`UPDATE employees SET current_status = 'Present' WHERE employee_id = $1`, [employeeId]);
-
-    await client.query('COMMIT');
-
-    await logActivity('check_out', emp.name, `${emp.name} (${employeeId}) checked out at ${timeStr}. Total hours: ${workingHours}`);
-    res.json({ message: 'Checked out successfully', time: timeStr, workingHours, status });
-  } catch (err) {
-    await client.query('ROLLBACK');
-    console.error(err);
     res.status(500).json({ error: 'Internal Server Error' });
-  } finally {
-    client.release();
   }
 });
 
 // --- Leave Requests Endpoints ---
 app.get('/api/leaves', async (req, res) => {
   try {
-    const result = await pool.query(
-      `SELECT id, employee_id, leave_type, TO_CHAR(start_date, 'YYYY-MM-DD') as start_date, TO_CHAR(end_date, 'YYYY-MM-DD') as end_date, status 
-       FROM leave_requests ORDER BY start_date DESC`
-    );
-    res.json(result.rows);
+    const leaves = await prisma.leaveRequest.findMany({
+      orderBy: { start_date: 'desc' }
+    });
+    const formatted = leaves.map(l => ({
+      ...l,
+      start_date: l.start_date.toISOString().split('T')[0],
+      end_date: l.end_date.toISOString().split('T')[0]
+    }));
+    res.json(formatted);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -329,21 +421,32 @@ app.post('/api/leaves', async (req, res) => {
   const status = 'Pending';
 
   try {
-    const empResult = await pool.query('SELECT name FROM employees WHERE employee_id = $1', [employeeId]);
-    if (empResult.rowCount === 0) {
+    const emp = await prisma.employee.findUnique({
+      where: { employee_id: employeeId }
+    });
+    if (!emp) {
       return res.status(404).json({ error: 'Employee not found' });
     }
-    const emp = empResult.rows[0];
 
-    const result = await pool.query(
-      `INSERT INTO leave_requests (id, employee_id, leave_type, start_date, end_date, status)
-       VALUES ($1, $2, $3, $4, $5, $6)
-       RETURNING id, employee_id, leave_type, TO_CHAR(start_date, 'YYYY-MM-DD') as start_date, TO_CHAR(end_date, 'YYYY-MM-DD') as end_date, status`,
-      [id, employeeId, leaveType, startDate, endDate, status]
-    );
+    const leave = await prisma.leaveRequest.create({
+      data: {
+        id,
+        employee_id: employeeId,
+        leave_type: leaveType,
+        start_date: new Date(startDate),
+        end_date: new Date(endDate),
+        status
+      }
+    });
 
     await logActivity('leave_approve', emp.name, `${emp.name} requested ${leaveType} from ${startDate} to ${endDate}`);
-    res.status(201).json(result.rows[0]);
+    
+    const formatted = {
+      ...leave,
+      start_date: leave.start_date.toISOString().split('T')[0],
+      end_date: leave.end_date.toISOString().split('T')[0]
+    };
+    res.status(201).json(formatted);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -354,64 +457,95 @@ app.put('/api/leaves/:id/approve', async (req, res) => {
   const { id } = req.params;
   const { hrName } = req.body;
 
-  const client = await pool.connect();
   try {
-    await client.query('BEGIN');
+    const result = await prisma.$transaction(async (tx) => {
+      const request = await tx.leaveRequest.findUnique({
+        where: { id }
+      });
+      if (!request) {
+        throw new Error('Leave request not found');
+      }
 
-    const leaveResult = await client.query(
-      `SELECT employee_id, leave_type, TO_CHAR(start_date, 'YYYY-MM-DD') as start_date, TO_CHAR(end_date, 'YYYY-MM-DD') as end_date 
-       FROM leave_requests WHERE id = $1`,
-      [id]
-    );
-    if (leaveResult.rowCount === 0) {
-      await client.query('ROLLBACK');
-      return res.status(404).json({ error: 'Leave request not found' });
+      const emp = await tx.employee.findUnique({
+        where: { employee_id: request.employee_id }
+      });
+      if (!emp) {
+        throw new Error('Employee not found');
+      }
+
+      await tx.leaveRequest.update({
+        where: { id },
+        data: { status: 'Approved' }
+      });
+
+      const start = new Date(request.start_date);
+      const end = new Date(request.end_date);
+
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        const dateStr = d.toISOString().split('T')[0];
+        const dateObj = new Date(dateStr);
+        const dayOfWeek = d.getDay();
+
+        if (dayOfWeek === 0 || dayOfWeek === 6) continue;
+
+        await tx.attendance.deleteMany({
+          where: {
+            employee_id: request.employee_id,
+            date: dateObj
+          }
+        });
+
+        const attId = `att_${request.employee_id}_${dateStr}`;
+        await tx.attendance.create({
+          data: {
+            id: attId,
+            employee_id: request.employee_id,
+            date: dateObj,
+            status: 'Leave'
+          }
+        });
+      }
+
+      const todayStr = new Date().toISOString().split('T')[0];
+      const requestStartStr = request.start_date.toISOString().split('T')[0];
+      const requestEndStr = request.end_date.toISOString().split('T')[0];
+      if (todayStr >= requestStartStr && todayStr <= requestEndStr) {
+        await tx.employee.update({
+          where: { employee_id: request.employee_id },
+          data: { current_status: 'Leave' }
+        });
+      }
+
+      return { empName: emp.name, request };
+    });
+
+    const requestStartStr = result.request.start_date.toISOString().split('T')[0];
+    const requestEndStr = result.request.end_date.toISOString().split('T')[0];
+    await logActivity('leave_approve', hrName || 'HR Manager', `Approved ${result.request.leave_type} for ${result.empName} (${requestStartStr} to ${requestEndStr})`);
+    
+    try {
+      await prisma.notification.create({
+        data: {
+          id: `not_approve_${Date.now()}`,
+          user_id: result.request.employee_id,
+          title: 'Leave Request Approved',
+          message: `Your requested leave (${result.request.leave_type}) from ${requestStartStr} to ${requestEndStr} was approved by ${hrName || 'HR Manager'}.`,
+          type: 'Leave Approval',
+          is_read: false,
+          created_at: new Date()
+        }
+      });
+    } catch (nErr) {
+      console.error('Error logging leave approval notification:', nErr.message);
     }
-    const request = leaveResult.rows[0];
 
-    const empResult = await client.query('SELECT name FROM employees WHERE employee_id = $1', [request.employee_id]);
-    if (empResult.rowCount === 0) {
-      await client.query('ROLLBACK');
-      return res.status(404).json({ error: 'Employee not found' });
-    }
-    const emp = empResult.rows[0];
-
-    await client.query(`UPDATE leave_requests SET status = 'Approved' WHERE id = $1`, [id]);
-
-    const start = new Date(request.start_date);
-    const end = new Date(request.end_date);
-
-    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-      const dateStr = d.toISOString().split('T')[0];
-      const dayOfWeek = d.getDay();
-
-      if (dayOfWeek === 0 || dayOfWeek === 6) continue;
-
-      await client.query('DELETE FROM attendance WHERE employee_id = $1 AND date = $2', [request.employee_id, dateStr]);
-      
-      const attId = `att_${request.employee_id}_${dateStr}`;
-      await client.query(
-        `INSERT INTO attendance (id, employee_id, date, check_in, check_out, status, working_hours)
-         VALUES ($1, $2, $3, null, null, 'Leave', null)`,
-        [attId, request.employee_id, dateStr]
-      );
-    }
-
-    const todayStr = new Date().toISOString().split('T')[0];
-    if (todayStr >= request.start_date && todayStr <= request.end_date) {
-      await client.query(`UPDATE employees SET current_status = 'Leave' WHERE employee_id = $1`, [request.employee_id]);
-    }
-
-    await client.query('COMMIT');
-
-    await logActivity('leave_approve', hrName || 'HR Manager', `Approved ${request.leave_type} for ${emp.name} (${request.start_date} to ${request.end_date})`);
     res.json({ message: 'Leave approved successfully' });
   } catch (err) {
-    await client.query('ROLLBACK');
     console.error(err);
+    if (err.message === 'Leave request not found' || err.message === 'Employee not found') {
+      return res.status(404).json({ error: err.message });
+    }
     res.status(500).json({ error: 'Internal Server Error' });
-  } finally {
-    client.release();
   }
 });
 
@@ -420,21 +554,42 @@ app.put('/api/leaves/:id/reject', async (req, res) => {
   const { hrName } = req.body;
 
   try {
-    const leaveResult = await pool.query(
-      `SELECT employee_id, leave_type, TO_CHAR(start_date, 'YYYY-MM-DD') as start_date, TO_CHAR(end_date, 'YYYY-MM-DD') as end_date 
-       FROM leave_requests WHERE id = $1`,
-      [id]
-    );
-    if (leaveResult.rowCount === 0) {
+    const request = await prisma.leaveRequest.findUnique({
+      where: { id }
+    });
+    if (!request) {
       return res.status(404).json({ error: 'Leave request not found' });
     }
-    const request = leaveResult.rows[0];
 
-    const empResult = await pool.query('SELECT name FROM employees WHERE employee_id = $1', [request.employee_id]);
-    const emp = empResult.rows[0];
+    const emp = await prisma.employee.findUnique({
+      where: { employee_id: request.employee_id }
+    });
 
-    await pool.query(`UPDATE leave_requests SET status = 'Rejected' WHERE id = $1`, [id]);
-    await logActivity('leave_reject', hrName || 'HR Manager', `Rejected ${request.leave_type} for ${emp.name} (${request.start_date} to ${request.end_date})`);
+    await prisma.leaveRequest.update({
+      where: { id },
+      data: { status: 'Rejected' }
+    });
+
+    const requestStartStr = request.start_date.toISOString().split('T')[0];
+    const requestEndStr = request.end_date.toISOString().split('T')[0];
+    await logActivity('leave_reject', hrName || 'HR Manager', `Rejected ${request.leave_type} for ${emp.name} (${requestStartStr} to ${requestEndStr})`);
+    
+    try {
+      await prisma.notification.create({
+        data: {
+          id: `not_reject_${Date.now()}`,
+          user_id: request.employee_id,
+          title: 'Leave Request Rejected',
+          message: `Your requested leave (${request.leave_type}) from ${requestStartStr} to ${requestEndStr} was rejected by ${hrName || 'HR Manager'}.`,
+          type: 'Leave Rejection',
+          is_read: false,
+          created_at: new Date()
+        }
+      });
+    } catch (nErr) {
+      console.error('Error logging leave rejection notification:', nErr.message);
+    }
+
     res.json({ message: 'Leave request rejected successfully' });
   } catch (err) {
     console.error(err);
@@ -445,11 +600,14 @@ app.put('/api/leaves/:id/reject', async (req, res) => {
 // --- Holidays Endpoints ---
 app.get('/api/holidays', async (req, res) => {
   try {
-    const result = await pool.query(
-      `SELECT id, holiday_name, TO_CHAR(holiday_date, 'YYYY-MM-DD') as holiday_date, holiday_type, is_recurring 
-       FROM holidays ORDER BY holiday_date ASC`
-    );
-    res.json(result.rows);
+    const holidays = await prisma.holiday.findMany({
+      orderBy: { holiday_date: 'asc' }
+    });
+    const formatted = holidays.map(h => ({
+      ...h,
+      holiday_date: h.holiday_date.toISOString().split('T')[0]
+    }));
+    res.json(formatted);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -461,15 +619,45 @@ app.post('/api/holidays', async (req, res) => {
   const id = `h_${Date.now()}`;
 
   try {
-    const result = await pool.query(
-      `INSERT INTO holidays (id, holiday_name, holiday_date, holiday_type, is_recurring)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING id, holiday_name, TO_CHAR(holiday_date, 'YYYY-MM-DD') as holiday_date, holiday_type, is_recurring`,
-      [id, holiday_name, holiday_date, holiday_type, is_recurring || false]
-    );
+    const holiday = await prisma.holiday.create({
+      data: {
+        id,
+        holiday_name,
+        holiday_date: new Date(holiday_date),
+        holiday_type,
+        is_recurring: is_recurring || false
+      }
+    });
 
     await logActivity('employee_add', 'HR Manager', `Added holiday: ${holiday_name} on ${holiday_date}`);
-    res.status(201).json(result.rows[0]);
+    
+    try {
+      const emps = await prisma.employee.findMany({
+        where: { status: { not: 'Inactive' } }
+      });
+      const formattedDate = new Date(holiday_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      for (const emp of emps) {
+        await prisma.notification.create({
+          data: {
+            id: `not_hol_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            user_id: emp.employee_id,
+            title: 'New Holiday Notice',
+            message: `Holiday announced: ${holiday_name} on ${formattedDate}.`,
+            type: 'Holiday Notice',
+            is_read: false,
+            created_at: new Date()
+          }
+        });
+      }
+    } catch (nErr) {
+      console.error('Error logging holiday notification:', nErr.message);
+    }
+
+    const formatted = {
+      ...holiday,
+      holiday_date: holiday.holiday_date.toISOString().split('T')[0]
+    };
+    res.status(201).json(formatted);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -481,23 +669,31 @@ app.put('/api/holidays/:id', async (req, res) => {
   const { holiday_name, holiday_date, holiday_type, is_recurring } = req.body;
 
   try {
-    const result = await pool.query(
-      `UPDATE holidays
-       SET holiday_name = COALESCE($1, holiday_name),
-           holiday_date = COALESCE($2, holiday_date),
-           holiday_type = COALESCE($3, holiday_type),
-           is_recurring = COALESCE($4, is_recurring)
-       WHERE id = $5
-       RETURNING id, holiday_name, TO_CHAR(holiday_date, 'YYYY-MM-DD') as holiday_date, holiday_type, is_recurring`,
-      [holiday_name, holiday_date, holiday_type, is_recurring, id]
-    );
-
-    if (result.rowCount === 0) {
+    const original = await prisma.holiday.findUnique({
+      where: { id }
+    });
+    if (!original) {
       return res.status(404).json({ error: 'Holiday not found' });
     }
 
-    await logActivity('employee_edit', 'HR Manager', `Updated holiday: ${result.rows[0].holiday_name} details`);
-    res.json(result.rows[0]);
+    const updateData = {};
+    if (holiday_name !== undefined) updateData.holiday_name = holiday_name;
+    if (holiday_date !== undefined) updateData.holiday_date = new Date(holiday_date);
+    if (holiday_type !== undefined) updateData.holiday_type = holiday_type;
+    if (is_recurring !== undefined) updateData.is_recurring = is_recurring;
+
+    const updated = await prisma.holiday.update({
+      where: { id },
+      data: updateData
+    });
+
+    const formatted = {
+      ...updated,
+      holiday_date: updated.holiday_date.toISOString().split('T')[0]
+    };
+
+    await logActivity('employee_edit', 'HR Manager', `Updated holiday: ${formatted.holiday_name} details`);
+    res.json(formatted);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -507,14 +703,18 @@ app.put('/api/holidays/:id', async (req, res) => {
 app.delete('/api/holidays/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const hResult = await pool.query('SELECT holiday_name FROM holidays WHERE id = $1', [id]);
-    if (hResult.rowCount === 0) {
+    const holiday = await prisma.holiday.findUnique({
+      where: { id }
+    });
+    if (!holiday) {
       return res.status(404).json({ error: 'Holiday not found' });
     }
-    const holidayName = hResult.rows[0].holiday_name;
 
-    await pool.query('DELETE FROM holidays WHERE id = $1', [id]);
-    await logActivity('employee_remove', 'HR Manager', `Removed holiday: ${holidayName}`);
+    await prisma.holiday.delete({
+      where: { id }
+    });
+
+    await logActivity('employee_remove', 'HR Manager', `Removed holiday: ${holiday.holiday_name}`);
     res.json({ message: 'Holiday deleted successfully' });
   } catch (err) {
     console.error(err);
@@ -525,11 +725,10 @@ app.delete('/api/holidays/:id', async (req, res) => {
 // --- Activity Logs Endpoints ---
 app.get('/api/activities', async (req, res) => {
   try {
-    const result = await pool.query(
-      `SELECT id, type, user_name, message, timestamp 
-       FROM activity_log ORDER BY timestamp DESC`
-    );
-    res.json(result.rows);
+    const activities = await prisma.activityLog.findMany({
+      orderBy: { timestamp: 'desc' }
+    });
+    res.json(activities);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -542,21 +741,542 @@ app.post('/api/activities', async (req, res) => {
   const timestamp = new Date().toISOString();
 
   try {
-    const result = await pool.query(
-      `INSERT INTO activity_log (id, type, user_name, message, timestamp)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING id, type, user_name, message, timestamp`,
-      [id, type, userName, message, timestamp]
-    );
-    res.status(201).json(result.rows[0]);
+    const log = await prisma.activityLog.create({
+      data: {
+        id,
+        type,
+        user_name: userName,
+        message,
+        timestamp: new Date(timestamp)
+      }
+    });
+    res.status(201).json(log);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
+// Helper to create notifications for a published announcement
+async function createNotificationsForAnnouncement(ann) {
+  if (!ann.is_active) return;
+  try {
+    const emps = await prisma.employee.findMany({
+      where: { status: { not: 'Inactive' } }
+    });
+
+    const targetEmps = emps.filter(emp => {
+      const aud = ann.target_audience;
+      if (aud === 'All Employees') return true;
+      if (aud === 'HR Only') return emp.role === 'hr' || emp.role === 'admin';
+      if (aud.startsWith('Department:')) {
+        const dept = aud.replace('Department:', '').trim();
+        return emp.department === dept;
+      }
+      if (aud.startsWith('Employee:')) {
+        const ids = aud.replace('Employee:', '').split(',').map(id => id.trim());
+        return ids.includes(emp.employee_id);
+      }
+      return false;
+    });
+
+    for (const emp of targetEmps) {
+      await prisma.notification.create({
+        data: {
+          id: `not_ann_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          user_id: emp.employee_id,
+          title: ann.title,
+          message: ann.content.length > 100 ? ann.content.substring(0, 100) + '...' : ann.content,
+          type: ann.category === 'Holiday Notice' ? 'Holiday Notice' : ann.category === 'Policy Update' ? 'Policy Update' : 'New Announcement',
+          is_read: false,
+          created_at: new Date()
+        }
+      });
+    }
+  } catch (err) {
+    console.error('Error generating notifications for announcement:', err.message);
+  }
+}
+
+// --- Announcements Endpoints ---
+app.get('/api/announcements', async (req, res) => {
+  const { employeeId, role, department } = req.query;
+  try {
+    const announcements = await prisma.announcement.findMany({
+      orderBy: { created_at: 'desc' }
+    });
+
+    if (!role) {
+      return res.json(announcements);
+    }
+
+    if (role === 'admin' || role === 'hr') {
+      return res.json(announcements);
+    }
+
+    // Filter for employee portal view
+    const filtered = announcements.filter(ann => {
+      if (!ann.is_active) return false;
+
+      // Check if expired
+      if (ann.expires_at && new Date(ann.expires_at) < new Date()) {
+        return false;
+      }
+
+      const aud = ann.target_audience;
+      if (aud === 'All Employees') return true;
+      if (aud === 'HR Only') return false;
+      if (aud.startsWith('Department:')) {
+        const dept = aud.replace('Department:', '').trim();
+        return dept === department;
+      }
+      if (aud.startsWith('Employee:')) {
+        const ids = aud.replace('Employee:', '').split(',').map(id => id.trim());
+        return ids.includes(employeeId);
+      }
+      return false;
+    });
+
+    res.json(filtered);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/api/announcements', async (req, res) => {
+  const { title, content, category, priority, target_audience, created_by, expires_at, is_active, is_pinned } = req.body;
+  const id = `ann_${Date.now()}`;
+  try {
+    const ann = await prisma.announcement.create({
+      data: {
+        id,
+        title,
+        content,
+        category,
+        priority,
+        target_audience,
+        created_by,
+        expires_at: expires_at ? new Date(expires_at) : null,
+        is_active: is_active !== undefined ? is_active : true,
+        is_pinned: is_pinned !== undefined ? is_pinned : false,
+        created_at: new Date()
+      }
+    });
+
+    if (ann.is_active) {
+      await createNotificationsForAnnouncement(ann);
+    }
+
+    res.status(201).json(ann);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.put('/api/announcements/:id', async (req, res) => {
+  const { id } = req.params;
+  const { title, content, category, priority, target_audience, expires_at, is_active, is_pinned } = req.body;
+  try {
+    const original = await prisma.announcement.findUnique({ where: { id } });
+    if (!original) {
+      return res.status(404).json({ error: 'Announcement not found' });
+    }
+
+    const updateData = {};
+    if (title !== undefined) updateData.title = title;
+    if (content !== undefined) updateData.content = content;
+    if (category !== undefined) updateData.category = category;
+    if (priority !== undefined) updateData.priority = priority;
+    if (target_audience !== undefined) updateData.target_audience = target_audience;
+    if (expires_at !== undefined) updateData.expires_at = expires_at ? new Date(expires_at) : null;
+    if (is_active !== undefined) updateData.is_active = is_active;
+    if (is_pinned !== undefined) updateData.is_pinned = is_pinned;
+
+    const updated = await prisma.announcement.update({
+      where: { id },
+      data: updateData
+    });
+
+    if (updated.is_active && !original.is_active) {
+      await createNotificationsForAnnouncement(updated);
+    }
+
+    res.json(updated);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.delete('/api/announcements/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const original = await prisma.announcement.findUnique({ where: { id } });
+    if (!original) {
+      return res.status(404).json({ error: 'Announcement not found' });
+    }
+    await prisma.announcement.delete({ where: { id } });
+    res.json({ message: 'Announcement deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// --- Notifications Endpoints ---
+app.get('/api/notifications/:employeeId', async (req, res) => {
+  const { employeeId } = req.params;
+  try {
+    const notifications = await prisma.notification.findMany({
+      where: { user_id: employeeId },
+      orderBy: { created_at: 'desc' }
+    });
+    res.json(notifications);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.put('/api/notifications/:id/read', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const updated = await prisma.notification.update({
+      where: { id },
+      data: { is_read: true }
+    });
+    res.json(updated);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.put('/api/notifications/read-all/:employeeId', async (req, res) => {
+  const { employeeId } = req.params;
+  try {
+    const result = await prisma.notification.updateMany({
+      where: { user_id: employeeId, is_read: false },
+      data: { is_read: true }
+    });
+    res.json({ success: true, count: result.count });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.delete('/api/notifications/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    await prisma.notification.delete({ where: { id } });
+    res.json({ message: 'Notification deleted' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// --- Google Calendar Integration ---
+const { google } = require('googleapis');
+
+function getOAuth2Client() {
+  return new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    process.env.GOOGLE_REDIRECT_URI
+  );
+}
+
+// Generate Google OAuth consent URL
+app.get('/api/google/auth-url', (req, res) => {
+  const { employeeId } = req.query;
+  if (!employeeId) {
+    return res.status(400).json({ error: 'employeeId is required' });
+  }
+
+  const oauth2Client = getOAuth2Client();
+  const scopes = ['https://www.googleapis.com/auth/calendar.events'];
+
+  const url = oauth2Client.generateAuthUrl({
+    access_type: 'offline',
+    scope: scopes,
+    prompt: 'consent',
+    state: employeeId // Pass employeeId through OAuth state
+  });
+
+  res.json({ url });
+});
+
+// OAuth callback - exchange code for tokens
+app.get('/api/google/callback', async (req, res) => {
+  const { code, state: employeeId } = req.query;
+
+  if (!code || !employeeId) {
+    return res.status(400).send('Missing authorization code or employee ID');
+  }
+
+  try {
+    const oauth2Client = getOAuth2Client();
+    const { tokens } = await oauth2Client.getToken(code);
+
+    // Store tokens in DB
+    await prisma.googleToken.upsert({
+      where: { employee_id: employeeId },
+      update: {
+        access_token: tokens.access_token,
+        refresh_token: tokens.refresh_token || '',
+        token_type: tokens.token_type || 'Bearer',
+        expiry_date: BigInt(tokens.expiry_date || 0),
+      },
+      create: {
+        id: `gt_${Date.now()}`,
+        employee_id: employeeId,
+        access_token: tokens.access_token,
+        refresh_token: tokens.refresh_token || '',
+        token_type: tokens.token_type || 'Bearer',
+        expiry_date: BigInt(tokens.expiry_date || 0),
+      }
+    });
+
+    // Redirect back to frontend with success
+    res.redirect('http://localhost:3000/employee/calendar?google=connected');
+  } catch (err) {
+    console.error('Google OAuth error:', err);
+    res.redirect('http://localhost:3000/employee/calendar?google=error');
+  }
+});
+
+// Check if employee has connected Google Calendar
+app.get('/api/google/status/:employeeId', async (req, res) => {
+  const { employeeId } = req.params;
+  try {
+    const token = await prisma.googleToken.findUnique({
+      where: { employee_id: employeeId }
+    });
+    res.json({ connected: !!token });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Disconnect Google Calendar
+app.delete('/api/google/disconnect/:employeeId', async (req, res) => {
+  const { employeeId } = req.params;
+  try {
+    await prisma.googleToken.deleteMany({
+      where: { employee_id: employeeId }
+    });
+    res.json({ message: 'Google Calendar disconnected' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Helper: get authenticated Google Calendar client for an employee
+async function getCalendarClient(employeeId) {
+  const tokenRecord = await prisma.googleToken.findUnique({
+    where: { employee_id: employeeId }
+  });
+  if (!tokenRecord) {
+    throw new Error('Google Calendar not connected');
+  }
+
+  const oauth2Client = getOAuth2Client();
+  oauth2Client.setCredentials({
+    access_token: tokenRecord.access_token,
+    refresh_token: tokenRecord.refresh_token,
+    token_type: tokenRecord.token_type,
+    expiry_date: Number(tokenRecord.expiry_date)
+  });
+
+  // Handle token refresh
+  oauth2Client.on('tokens', async (tokens) => {
+    const updateData = {
+      access_token: tokens.access_token || tokenRecord.access_token,
+      expiry_date: BigInt(tokens.expiry_date || 0)
+    };
+    if (tokens.refresh_token) {
+      updateData.refresh_token = tokens.refresh_token;
+    }
+    await prisma.googleToken.update({
+      where: { employee_id: employeeId },
+      data: updateData
+    });
+  });
+
+  return google.calendar({ version: 'v3', auth: oauth2Client });
+}
+
+// Sync attendance, leaves, and holidays to Google Calendar
+app.post('/api/google/sync/:employeeId', async (req, res) => {
+  const { employeeId } = req.params;
+
+  try {
+    const calendar = await getCalendarClient(employeeId);
+
+    // Fetch employee data
+    const emp = await prisma.employee.findUnique({ where: { employee_id: employeeId } });
+    if (!emp) {
+      return res.status(404).json({ error: 'Employee not found' });
+    }
+
+    // Fetch attendance records (last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const attendanceRecords = await prisma.attendance.findMany({
+      where: {
+        employee_id: employeeId,
+        date: { gte: thirtyDaysAgo }
+      }
+    });
+
+    // Fetch approved leaves
+    const leaves = await prisma.leaveRequest.findMany({
+      where: {
+        employee_id: employeeId,
+        status: 'Approved'
+      }
+    });
+
+    // Fetch upcoming holidays
+    const today = new Date();
+    const holidays = await prisma.holiday.findMany({
+      where: {
+        holiday_date: { gte: today }
+      }
+    });
+
+    let synced = { attendance: 0, leaves: 0, holidays: 0 };
+
+    // Sync attendance records
+    for (const rec of attendanceRecords) {
+      const dateStr = rec.date.toISOString().split('T')[0];
+      const summary = `[DAttendance] ${rec.status}${rec.check_in ? ` | In: ${rec.check_in}` : ''}${rec.check_out ? ` | Out: ${rec.check_out}` : ''}`;
+
+      const event = {
+        summary,
+        description: `Attendance status: ${rec.status}\nCheck-in: ${rec.check_in || 'N/A'}\nCheck-out: ${rec.check_out || 'N/A'}\nWorking hours: ${rec.working_hours || 'N/A'}`,
+        start: { date: dateStr },
+        end: { date: dateStr },
+        colorId: rec.status === 'Present' ? '10' : rec.status === 'Half Day' ? '5' : '11' // Green, Yellow, Red
+      };
+
+      try {
+        // Search for existing event to avoid duplicates
+        const existing = await calendar.events.list({
+          calendarId: 'primary',
+          timeMin: `${dateStr}T00:00:00Z`,
+          timeMax: `${dateStr}T23:59:59Z`,
+          q: '[DAttendance]'
+        });
+
+        if (existing.data.items && existing.data.items.length > 0) {
+          // Update existing event
+          await calendar.events.update({
+            calendarId: 'primary',
+            eventId: existing.data.items[0].id,
+            requestBody: event
+          });
+        } else {
+          await calendar.events.insert({
+            calendarId: 'primary',
+            requestBody: event
+          });
+        }
+        synced.attendance++;
+      } catch (e) {
+        console.error(`Failed to sync attendance for ${dateStr}:`, e.message);
+      }
+    }
+
+    // Sync approved leaves
+    for (const leave of leaves) {
+      const startStr = leave.start_date.toISOString().split('T')[0];
+      const endDate = new Date(leave.end_date);
+      endDate.setDate(endDate.getDate() + 1); // Google Calendar end dates are exclusive
+      const endStr = endDate.toISOString().split('T')[0];
+
+      const event = {
+        summary: `[DAttendance] Leave: ${leave.leave_type}`,
+        description: `Approved ${leave.leave_type} leave`,
+        start: { date: startStr },
+        end: { date: endStr },
+        colorId: '5' // Yellow/Banana
+      };
+
+      try {
+        const existing = await calendar.events.list({
+          calendarId: 'primary',
+          timeMin: `${startStr}T00:00:00Z`,
+          timeMax: `${startStr}T23:59:59Z`,
+          q: `[DAttendance] Leave: ${leave.leave_type}`
+        });
+
+        if (!existing.data.items || existing.data.items.length === 0) {
+          await calendar.events.insert({
+            calendarId: 'primary',
+            requestBody: event
+          });
+        }
+        synced.leaves++;
+      } catch (e) {
+        console.error(`Failed to sync leave:`, e.message);
+      }
+    }
+
+    // Sync holidays
+    for (const holiday of holidays) {
+      const dateStr = holiday.holiday_date.toISOString().split('T')[0];
+      const endDate = new Date(holiday.holiday_date);
+      endDate.setDate(endDate.getDate() + 1);
+      const endStr = endDate.toISOString().split('T')[0];
+
+      const event = {
+        summary: `[DAttendance] Holiday: ${holiday.holiday_name}`,
+        description: `${holiday.holiday_type}`,
+        start: { date: dateStr },
+        end: { date: endStr },
+        colorId: '9' // Blue/Blueberry
+      };
+
+      try {
+        const existing = await calendar.events.list({
+          calendarId: 'primary',
+          timeMin: `${dateStr}T00:00:00Z`,
+          timeMax: `${dateStr}T23:59:59Z`,
+          q: `[DAttendance] Holiday: ${holiday.holiday_name}`
+        });
+
+        if (!existing.data.items || existing.data.items.length === 0) {
+          await calendar.events.insert({
+            calendarId: 'primary',
+            requestBody: event
+          });
+        }
+        synced.holidays++;
+      } catch (e) {
+        console.error(`Failed to sync holiday:`, e.message);
+      }
+    }
+
+    await logActivity('google_sync', emp.name, `${emp.name} synced calendar to Google (${synced.attendance} attendance, ${synced.leaves} leaves, ${synced.holidays} holidays)`);
+    res.json({ message: 'Sync completed', synced });
+  } catch (err) {
+    console.error('Google sync error:', err);
+    if (err.message === 'Google Calendar not connected') {
+      return res.status(401).json({ error: 'Google Calendar not connected. Please connect first.' });
+    }
+    res.status(500).json({ error: 'Failed to sync with Google Calendar' });
+  }
+});
+
 app.get('/', (req, res) => {
-  res.json({ message: 'DAttendance API Server is running', status: 'ok' });
+  res.json({ message: 'DAttendance API Server is running (Prisma/SQLite)', status: 'ok' });
 });
 
 app.listen(PORT, () => {

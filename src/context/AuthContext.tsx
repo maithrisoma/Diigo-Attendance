@@ -39,16 +39,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         body: JSON.stringify({ emailOrId, password }),
       });
       const data = await response.json();
-      if (response.ok && data.success) {
+      if (response.ok && data.success && data.user) {
         localStorage.setItem('currentUser', JSON.stringify(data.user));
         setCurrentUser(data.user);
         return { success: true, message: data.message || 'Login successful' };
       } else {
-        return { success: false, message: data.message || 'Login failed' };
+        return { success: false, message: data.message || 'Invalid credentials' };
       }
     } catch (err) {
       console.error(err);
-      return { success: false, message: 'Failed to authenticate.' };
+      return { success: false, message: 'Failed to connect to authentication server.' };
     }
   };
 
@@ -67,9 +67,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const data = await response.json();
       if (response.ok && data.success) {
         return { success: true, message: data.message };
-      } else {
-        return { success: false, message: data.message || 'Failed to process forgot password request.' };
       }
+      return { success: false, message: data.message || 'Employee not found.' };
     } catch (err) {
       console.error(err);
       return { success: false, message: 'Failed to process request.' };

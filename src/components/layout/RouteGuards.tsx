@@ -14,6 +14,26 @@ export const AdminRoute: React.FC<RouteProps> = ({ children }) => {
   }
 
   if (currentUser?.role !== 'admin') {
+    if (currentUser?.role === 'hr') {
+      return <Navigate to="/hr/dashboard" replace />;
+    }
+    return <Navigate to="/employee/dashboard" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+export const HRRoute: React.FC<RouteProps> = ({ children }) => {
+  const { currentUser, isAuthenticated } = useAuth();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (currentUser?.role !== 'hr') {
+    if (currentUser?.role === 'admin') {
+      return <Navigate to="/admin/dashboard" replace />;
+    }
     return <Navigate to="/employee/dashboard" replace />;
   }
 
@@ -28,7 +48,10 @@ export const EmployeeRoute: React.FC<RouteProps> = ({ children }) => {
   }
 
   if (currentUser?.role !== 'employee') {
-    return <Navigate to="/admin/dashboard" replace />;
+    if (currentUser?.role === 'admin') {
+      return <Navigate to="/admin/dashboard" replace />;
+    }
+    return <Navigate to="/hr/dashboard" replace />;
   }
 
   return <>{children}</>;
