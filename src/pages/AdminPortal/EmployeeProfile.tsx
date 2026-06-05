@@ -145,56 +145,53 @@ export const EmployeeProfile: React.FC = () => {
         <span className="text-sm font-semibold text-foreground/80">{emp.name}</span>
       </div>
 
-      {/* ── Hero banner + identity card ───────────────────────────────────── */}
-      <div className="rounded-2xl overflow-hidden border border-border shadow-card bg-card">
-        {/* Gradient banner */}
-        <div className={`h-36 bg-gradient-to-r ${grad} relative`}>
-          {emp.role === 'admin' && (
-            <span className="absolute top-4 right-4 inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full bg-card/90 text-primary">
-              <ShieldCheck className="h-3.5 w-3.5" /> Super Admin
-            </span>
-          )}
-          {emp.role === 'hr' && (
-            <span className="absolute top-4 right-4 inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full bg-card/90 text-amber-600 dark:text-amber-400">
-              <ShieldCheck className="h-3.5 w-3.5" /> HR Manager
-            </span>
-          )}
-        </div>
-
-        <div className="px-6 pb-6">
-          {/* Avatar overlapping banner */}
-          <div className={`-mt-14 mb-4 h-24 w-24 rounded-2xl bg-gradient-to-br ${grad} text-white text-3xl font-bold flex items-center justify-center ring-4 ring-card shadow-xl`}>
-            {getInitials(emp.name)}
-          </div>
-
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+      {/* ── Compact Profile Header ─────────────────────────────────────── */}
+      <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            {/* Avatar */}
+            <div className={`h-14 w-14 rounded-xl bg-gradient-to-br ${grad} text-white text-xl font-bold flex items-center justify-center shadow-md`}>
+              {getInitials(emp.name)}
+            </div>
             <div>
-              <h1 className="text-2xl font-bold text-foreground font-display">{emp.name}</h1>
-              <p className="text-muted-foreground mt-0.5">{emp.designation}</p>
-              <div className="flex flex-wrap items-center gap-2 mt-3">
-                <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full ${dept.bg} ${dept.text}`}>
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl font-bold text-foreground font-display">{emp.name}</h1>
+                {emp.role === 'admin' && (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                    <ShieldCheck className="h-3 w-3" /> Super Admin
+                  </span>
+                )}
+                {emp.role === 'hr' && (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full">
+                    <ShieldCheck className="h-3 w-3" /> HR Manager
+                  </span>
+                )}
+              </div>
+              <p className="text-sm text-muted-foreground mt-0.5">{emp.designation}</p>
+              <div className="flex flex-wrap items-center gap-2 mt-2">
+                <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ${dept.bg} ${dept.text}`}>
                   <span className={`h-2 w-2 rounded-full ${dept.dot}`} />
                   {emp.department}
                 </span>
                 <StatusBadge status={emp.current_status} />
               </div>
             </div>
+          </div>
 
-            {/* Key info pills */}
-            <div className="flex flex-wrap gap-3 text-sm">
-              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted/5 border border-border">
-                <CalendarDays className="h-4 w-4 text-muted-foreground" />
-                <div>
-                  <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Joined</p>
-                  <p className="text-foreground/80 font-semibold text-xs">{emp.join_date ? fmtShort(emp.join_date) : '—'}</p>
-                </div>
+          {/* Key info pills */}
+          <div className="flex flex-wrap gap-3 text-sm">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted/5 border border-border">
+              <CalendarDays className="h-4 w-4 text-muted-foreground" />
+              <div>
+                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Joined</p>
+                <p className="text-foreground/80 font-semibold text-xs">{emp.join_date ? fmtShort(emp.join_date) : '—'}</p>
               </div>
-              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted/5 border border-border">
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                <div>
-                  <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Tenure</p>
-                  <p className="text-foreground/80 font-semibold text-xs">{tenure}</p>
-                </div>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted/5 border border-border">
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              <div>
+                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Tenure</p>
+                <p className="text-foreground/80 font-semibold text-xs">{tenure}</p>
               </div>
             </div>
           </div>

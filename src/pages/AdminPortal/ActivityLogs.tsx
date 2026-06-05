@@ -178,7 +178,13 @@ export const ActivityLogs: React.FC = () => {
                       </td>
                       <td className="py-4 px-6 font-medium text-foreground">{log.action}</td>
                       <td className="py-4 px-6">
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-muted text-muted-foreground">
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                          log.module === 'Attendance' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                          log.module === 'Leaves' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' :
+                          log.module === 'Holidays' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' :
+                          log.module === 'Directory' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                          'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
+                        }`}>
                           {log.module}
                         </span>
                       </td>

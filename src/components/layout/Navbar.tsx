@@ -84,6 +84,8 @@ export const Navbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) =
         return <CheckCircle className="h-4 w-4 text-emerald-500" />;
       case 'Leave Rejection':
         return <XCircle className="h-4 w-4 text-rose-500" />;
+      case 'Leave Request':
+        return <PlaneTakeoff className="h-4 w-4 text-orange-500" />;
       case 'Holiday Notice':
         return <CalendarCheck className="h-4 w-4 text-blue-500" />;
       case 'New Announcement':
@@ -105,6 +107,10 @@ export const Navbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) =
     const type = not.type;
 
     if (type === 'Leave Approval' || type === 'Leave Rejection') {
+      if (role === 'admin') navigate('/admin/leaves');
+      else if (role === 'hr') navigate('/hr/leaves');
+      else navigate('/employee/leaves');
+    } else if (type === 'Leave Request') {
       if (role === 'admin') navigate('/admin/leaves');
       else if (role === 'hr') navigate('/hr/leaves');
       else navigate('/employee/leaves');

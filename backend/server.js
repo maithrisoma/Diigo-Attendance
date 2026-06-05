@@ -397,6 +397,47 @@ app.post('/api/attendance/check-out', async (req, res) => {
   }
 });
 
+// Update an attendance record (manual edit)
+app.put('/api/attendance/:id', async (req, res) => {
+  const { id } = req.params;
+  const { check_in, check_out, status, working_hours, date } = req.body;
+  try {
+    const existing = await prisma.attendance.findUnique({ where: { id } });
+    if (!existing) return res.status(404).json({ error: 'Attendance record not found' });
+    const updateData = {};
+    if (check_in !== undefined) updateData.check_in = check_in;
+    if (check_out !== undefined) updateData.check_out = check_out;
+    if (status !== undefined) updateData.status = status;
+    if (working_hours !== undefined) updateData.working_hours = working_hours;
+    if (date !== undefined) updateData.date = new Date(date);
+    const updated = await prisma.attendance.update({ where: { id }, data: updateData });
+    res.json({ ...updated, date: updated.date.toISOString().split('T')[0] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Create a new attendance record manually
+app.post('/api/attendance/manual', async (req, res) => {
+  const { employee_id, date, check_in, check_out, status, working_hours } = req.body;
+  if (!employee_id || !date || !status) {
+    return res.status(400).json({ error: 'employee_id, date, and status are required' });
+  }
+  const id = `att_${employee_id}_${date}`;
+  try {
+    const rec = await prisma.attendance.upsert({
+      where: { employee_id_date: { employee_id, date: new Date(date) } },
+      update: { check_in: check_in || null, check_out: check_out || null, status, working_hours: working_hours || null },
+      create: { id, employee_id, date: new Date(date), check_in: check_in || null, check_out: check_out || null, status, working_hours: working_hours || null }
+    });
+    res.json({ ...rec, date: rec.date.toISOString().split('T')[0] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 // --- Leave Requests Endpoints ---
 app.get('/api/leaves', async (req, res) => {
   try {
@@ -441,6 +482,31 @@ app.post('/api/leaves', async (req, res) => {
 
     await logActivity('leave_approve', emp.name, `${emp.name} requested ${leaveType} from ${startDate} to ${endDate}`);
     
+    // Notify HR and Admin about the leave request
+    try {
+      const hrAdmins = await prisma.employee.findMany({
+        where: {
+          role: { in: ['hr', 'admin'] },
+          status: { not: 'Inactive' }
+        }
+      });
+      for (const ha of hrAdmins) {
+        await prisma.notification.create({
+          data: {
+            id: `not_lreq_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            user_id: ha.employee_id,
+            title: 'New Leave Request',
+            message: `${emp.name} requested ${leaveType} leave from ${startDate} to ${endDate}. Awaiting approval.`,
+            type: 'Leave Request',
+            is_read: false,
+            created_at: new Date()
+          }
+        });
+      }
+    } catch (nErr) {
+      console.error('Error creating leave request notification:', nErr.message);
+    }
+
     const formatted = {
       ...leave,
       start_date: leave.start_date.toISOString().split('T')[0],
@@ -1010,13 +1076,17 @@ app.get('/api/google/auth-url', (req, res) => {
   }
 
   const oauth2Client = getOAuth2Client();
-  const scopes = ['https://www.googleapis.com/auth/calendar.events'];
+  const scopes = [
+    'https://www.googleapis.com/auth/calendar.events',
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile'
+  ];
 
   const url = oauth2Client.generateAuthUrl({
     access_type: 'offline',
     scope: scopes,
     prompt: 'consent',
-    state: employeeId // Pass employeeId through OAuth state
+    state: employeeId
   });
 
   res.json({ url });
@@ -1033,8 +1103,23 @@ app.get('/api/google/callback', async (req, res) => {
   try {
     const oauth2Client = getOAuth2Client();
     const { tokens } = await oauth2Client.getToken(code);
+    oauth2Client.setCredentials(tokens);
 
-    // Store tokens in DB
+    // Fetch Google user profile info
+    let profileEmail = null;
+    let profilePicture = null;
+    let profileName = null;
+    try {
+      const oauth2 = google.oauth2({ version: 'v2', auth: oauth2Client });
+      const { data } = await oauth2.userinfo.get();
+      profileEmail = data.email || null;
+      profilePicture = data.picture || null;
+      profileName = data.name || null;
+    } catch (profileErr) {
+      console.warn('Could not fetch profile info:', profileErr.message);
+    }
+
+    // Store tokens + profile in DB
     await prisma.googleToken.upsert({
       where: { employee_id: employeeId },
       update: {
@@ -1042,6 +1127,10 @@ app.get('/api/google/callback', async (req, res) => {
         refresh_token: tokens.refresh_token || '',
         token_type: tokens.token_type || 'Bearer',
         expiry_date: BigInt(tokens.expiry_date || 0),
+        email: profileEmail,
+        picture: profilePicture,
+        name: profileName,
+        last_synced: new Date(),
       },
       create: {
         id: `gt_${Date.now()}`,
@@ -1050,6 +1139,10 @@ app.get('/api/google/callback', async (req, res) => {
         refresh_token: tokens.refresh_token || '',
         token_type: tokens.token_type || 'Bearer',
         expiry_date: BigInt(tokens.expiry_date || 0),
+        email: profileEmail,
+        picture: profilePicture,
+        name: profileName,
+        last_synced: new Date(),
       }
     });
 
@@ -1068,10 +1161,71 @@ app.get('/api/google/status/:employeeId', async (req, res) => {
     const token = await prisma.googleToken.findUnique({
       where: { employee_id: employeeId }
     });
-    res.json({ connected: !!token });
+    if (!token) return res.json({ connected: false });
+    res.json({
+      connected: true,
+      email: token.email,
+      picture: token.picture,
+      name: token.name,
+      auto_sync: token.auto_sync,
+      last_synced: token.last_synced ? token.last_synced.toISOString() : null,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Toggle auto-sync setting
+app.put('/api/google/toggle-auto-sync/:employeeId', async (req, res) => {
+  const { employeeId } = req.params;
+  const { auto_sync } = req.body;
+  try {
+    await prisma.googleToken.update({
+      where: { employee_id: employeeId },
+      data: { auto_sync: !!auto_sync }
+    });
+    res.json({ auto_sync: !!auto_sync });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Get Google Calendar events for the employee (upcoming 30 days)
+app.get('/api/google/events/:employeeId', async (req, res) => {
+  const { employeeId } = req.params;
+  try {
+    const calendar = await getCalendarClient(employeeId);
+    const now = new Date();
+    const future = new Date();
+    future.setDate(future.getDate() + 30);
+    const response = await calendar.events.list({
+      calendarId: 'primary',
+      timeMin: now.toISOString(),
+      timeMax: future.toISOString(),
+      maxResults: 100,
+      singleEvents: true,
+      orderBy: 'startTime',
+    });
+    const events = (response.data.items || []).map(e => ({
+      id: e.id,
+      title: e.summary || '(No title)',
+      start: e.start?.dateTime || e.start?.date,
+      end: e.end?.dateTime || e.end?.date,
+      allDay: !e.start?.dateTime,
+      htmlLink: e.htmlLink,
+      description: e.description,
+      location: e.location,
+      colorId: e.colorId,
+    }));
+    res.json({ events });
+  } catch (err) {
+    if (err.message === 'Google Calendar not connected') {
+      return res.status(401).json({ error: 'Google Calendar not connected.' });
+    }
+    console.error('Error fetching Google events:', err.message);
+    res.status(500).json({ error: 'Failed to fetch Google Calendar events' });
   }
 });
 
@@ -1277,6 +1431,11 @@ app.post('/api/google/sync/:employeeId', async (req, res) => {
     }
 
     await logActivity('google_sync', emp.name, `${emp.name} synced calendar to Google (${synced.attendance} attendance, ${synced.leaves} leaves, ${synced.holidays} holidays)`);
+    // Update last_synced timestamp
+    await prisma.googleToken.update({
+      where: { employee_id: employeeId },
+      data: { last_synced: new Date() }
+    });
     res.json({ message: 'Sync completed', synced });
   } catch (err) {
     console.error('Google sync error:', err);

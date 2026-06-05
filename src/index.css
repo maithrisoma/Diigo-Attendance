@@ -768,10 +768,21 @@ header.sticky {
   cursor: pointer;
   border-radius: 6px !important;
   padding: 2px 6px !important;
-  font-size: 0.75rem !important;
-  font-weight: 600 !important;
+  font-size: 0.7rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.01em;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   transition: transform 0.15s, box-shadow 0.15s;
+  line-height: 1.4 !important;
+}
+
+.fc-event .fc-event-title,
+.fc-event .fc-event-main {
+  font-weight: 700 !important;
+  font-size: 0.7rem !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .fc-event:hover {
@@ -780,67 +791,97 @@ header.sticky {
 }
 
 /* Event Color Codes */
-.fc-event-present {
-  background-color: #EAF8EC !important;
-  border-left: 3.5px solid #6BCB77 !important;
+.fc-event-present,
+.fc-event-present .fc-event-main,
+.fc-event-present .fc-event-title,
+.fc-event-present .fc-event-time {
+  background-color: #DCFCE7 !important;
+  border-left: 3.5px solid #16A34A !important;
   border-top: 0 !important;
   border-right: 0 !important;
   border-bottom: 0 !important;
-  color: #2E7D32 !important;
+  color: #15803D !important;
 }
-[data-theme='dark'] .fc-event-present {
+[data-theme='dark'] .fc-event-present,
+[data-theme='dark'] .fc-event-present .fc-event-main,
+[data-theme='dark'] .fc-event-present .fc-event-title,
+[data-theme='dark'] .fc-event-present .fc-event-time {
   background-color: #153322 !important;
   color: #86EFAC !important;
 }
 
-.fc-event-absent {
-  background-color: #FDECEC !important;
-  border-left: 3.5px solid #F28B82 !important;
+.fc-event-absent,
+.fc-event-absent .fc-event-main,
+.fc-event-absent .fc-event-title,
+.fc-event-absent .fc-event-time {
+  background-color: #FEE2E2 !important;
+  border-left: 3.5px solid #DC2626 !important;
   border-top: 0 !important;
   border-right: 0 !important;
   border-bottom: 0 !important;
-  color: #C62828 !important;
+  color: #991B1B !important;
 }
-[data-theme='dark'] .fc-event-absent {
+[data-theme='dark'] .fc-event-absent,
+[data-theme='dark'] .fc-event-absent .fc-event-main,
+[data-theme='dark'] .fc-event-absent .fc-event-title,
+[data-theme='dark'] .fc-event-absent .fc-event-time {
   background-color: #3F1F1F !important;
   color: #FCA5A5 !important;
 }
 
-.fc-event-leave {
-  background-color: #FFF6E1 !important;
-  border-left: 3.5px solid #F7C873 !important;
+.fc-event-leave,
+.fc-event-leave .fc-event-main,
+.fc-event-leave .fc-event-title,
+.fc-event-leave .fc-event-time {
+  background-color: #FEF3C7 !important;
+  border-left: 3.5px solid #D97706 !important;
   border-top: 0 !important;
   border-right: 0 !important;
   border-bottom: 0 !important;
-  color: #EF6C00 !important;
+  color: #92400E !important;
 }
-[data-theme='dark'] .fc-event-leave {
+[data-theme='dark'] .fc-event-leave,
+[data-theme='dark'] .fc-event-leave .fc-event-main,
+[data-theme='dark'] .fc-event-leave .fc-event-title,
+[data-theme='dark'] .fc-event-leave .fc-event-time {
   background-color: #3F2E12 !important;
   color: #FDE047 !important;
 }
 
-.fc-event-holiday {
-  background-color: #ECF4FF !important;
-  border-left: 3.5px solid #8AB4F8 !important;
+.fc-event-holiday,
+.fc-event-holiday .fc-event-main,
+.fc-event-holiday .fc-event-title,
+.fc-event-holiday .fc-event-time {
+  background-color: #DBEAFE !important;
+  border-left: 3.5px solid #2563EB !important;
   border-top: 0 !important;
   border-right: 0 !important;
   border-bottom: 0 !important;
-  color: #1565C0 !important;
+  color: #1E40AF !important;
 }
-[data-theme='dark'] .fc-event-holiday {
+[data-theme='dark'] .fc-event-holiday,
+[data-theme='dark'] .fc-event-holiday .fc-event-main,
+[data-theme='dark'] .fc-event-holiday .fc-event-title,
+[data-theme='dark'] .fc-event-holiday .fc-event-time {
   background-color: #182845 !important;
   color: #93C5FD !important;
 }
 
-.fc-event-halfday {
-  background-color: #FFF7D6 !important;
-  border-left: 3.5px solid #FFD166 !important;
+.fc-event-halfday,
+.fc-event-halfday .fc-event-main,
+.fc-event-halfday .fc-event-title,
+.fc-event-halfday .fc-event-time {
+  background-color: #FEF9C3 !important;
+  border-left: 3.5px solid #CA8A04 !important;
   border-top: 0 !important;
   border-right: 0 !important;
   border-bottom: 0 !important;
-  color: #B8860B !important;
+  color: #854D0E !important;
 }
-[data-theme='dark'] .fc-event-halfday {
+[data-theme='dark'] .fc-event-halfday,
+[data-theme='dark'] .fc-event-halfday .fc-event-main,
+[data-theme='dark'] .fc-event-halfday .fc-event-title,
+[data-theme='dark'] .fc-event-halfday .fc-event-time {
   background-color: #3F3512 !important;
   color: #FFE082 !important;
 }
@@ -941,4 +982,46 @@ html::before {
   100% {
     transform: translate(-8vw, 8vh) scale(0.8);
   }
+}
+
+/* Google Calendar Event (Blue) */
+.fc-event-google {
+  background-color: #EFF6FF !important;
+  border-left: 3.5px solid #3B82F6 !important;
+  border-top: 0 !important;
+  border-right: 0 !important;
+  border-bottom: 0 !important;
+  color: #1D4ED8 !important;
+}
+[data-theme='dark'] .fc-event-google {
+  background-color: #1E3A5F !important;
+  color: #93C5FD !important;
+}
+
+/* Holiday Purple variant */
+.fc-event-holiday-purple {
+  background-color: #F5F3FF !important;
+  border-left: 3.5px solid #8B5CF6 !important;
+  border-top: 0 !important;
+  border-right: 0 !important;
+  border-bottom: 0 !important;
+  color: #6D28D9 !important;
+}
+[data-theme='dark'] .fc-event-holiday-purple {
+  background-color: #2E1065 !important;
+  color: #C4B5FD !important;
+}
+
+/* Calendar view transition animation */
+.fc .fc-view-harness {
+  transition: height 0.3s ease;
+}
+
+.fc .fc-view {
+  animation: fcFadeIn 0.25s ease-out;
+}
+
+@keyframes fcFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }

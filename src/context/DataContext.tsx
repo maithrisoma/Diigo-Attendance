@@ -29,6 +29,9 @@ interface DataContextType {
   checkIn: (employeeId: string) => void;
   checkOut: (employeeId: string) => void;
   applyForLeave: (employeeId: string, leaveType: string, startDate: string, endDate: string) => void;
+  updateAttendance: (id: string, fields: Partial<AttendanceRecord>) => Promise<void>;
+  addAttendance: (record: Omit<AttendanceRecord, 'id'>) => Promise<void>;
+  refetchAttendance: () => Promise<void>;
   
   // HR/Admin Actions
   addEmployee: (employee: Omit<Employee, 'id' | 'current_status'>) => void;
@@ -150,6 +153,48 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Refetch only attendance
+  const refetchAttendance = async () => {
+    try {
+      const data = await fetch('/api/attendance').then(r => r.json());
+      setAttendance(data);
+    } catch (err) {
+      console.error('Error refetching attendance:', err);
+    }
+  };
+
+  // Update Attendance record
+  const updateAttendance = async (id: string, fields: Partial<AttendanceRecord>) => {
+    try {
+      const res = await fetch(`/api/attendance/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(fields)
+      });
+      if (res.ok) {
+        await refetchAttendance();
+      }
+    } catch (err) {
+      console.error('Error updating attendance:', err);
+    }
+  };
+
+  // Add Attendance record manually
+  const addAttendance = async (record: Omit<AttendanceRecord, 'id'>) => {
+    try {
+      const res = await fetch('/api/attendance/manual', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(record)
+      });
+      if (res.ok) {
+        await refetchAttendance();
+      }
+    } catch (err) {
+      console.error('Error adding attendance:', err);
+    }
+  };
+
   // Apply for Leave (Employee)
   const applyForLeave = async (employeeId: string, leaveType: string, startDate: string, endDate: string) => {
     try {
@@ -160,6 +205,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       if (res.ok) {
         await fetchInitialData();
+        await fetchNotifications();
       }
     } catch (err) {
       console.error('Error applying for leave:', err);
@@ -395,6 +441,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         removeAnnouncement,
         markNotificationRead,
         markAllNotificationsRead,
+        updateAttendance,
+        addAttendance,
+        refetchAttendance,
       }}
     >
       {children}
