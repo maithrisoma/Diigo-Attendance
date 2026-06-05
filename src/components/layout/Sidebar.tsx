@@ -94,7 +94,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
         <img src={diigoLogo} alt="Diigo Logo" className="h-9 object-contain" />
         <span
           className="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest"
-          style={{ background: '#DDD6FE', color: '#4C1D95' }}
+          style={{ background: '#E2E8F0', color: '#0F172A' }}
         >
           HRMS
         </span>
@@ -109,17 +109,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
           <div
             className="h-9 w-9 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
             style={{
-              background: 'linear-gradient(135deg, #A78BFA, #8B5CF6)',
+              background: 'linear-gradient(135deg, #3B82F6, #2563EB)',
               color: '#fff',
             }}
           >
             {initials}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold truncate" style={{ color: '#4C1D95' }}>
+            <p className="text-sm font-bold truncate" style={{ color: '#0F172A' }}>
               {currentUser.name}
             </p>
-            <p className="text-[11px] truncate" style={{ color: '#6D5A9C' }}>
+            <p className="text-[11px] truncate" style={{ color: '#475569' }}>
               {currentUser.designation}
             </p>
           </div>
@@ -129,7 +129,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
       {/* Nav label */}
       <p
         className="px-6 pt-2 pb-1 text-[10px] font-bold tracking-widest uppercase"
-        style={{ color: '#C4B5FD' }}
+        style={{ color: '#CBD5E1' }}
       >
         Navigation
       </p>
@@ -149,7 +149,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
             }
             style={({ isActive }) => ({
               background: isActive ? 'linear-gradient(135deg, rgba(167,139,250,0.22), rgba(139,92,246,0.18))' : 'transparent',
-              color: isActive ? '#7C3AED' : '#6D5A9C',
+              color: isActive ? '#1D4ED8' : '#475569',
               border: isActive ? '1.5px solid rgba(196,181,253,0.5)' : '1.5px solid transparent',
             })}
           >
@@ -158,12 +158,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
                 {isActive && (
                   <span
                     className="absolute left-0 top-2.5 bottom-2.5 w-1 rounded-r-full"
-                    style={{ background: 'linear-gradient(180deg, #A78BFA, #8B5CF6)' }}
+                    style={{ background: 'linear-gradient(180deg, #3B82F6, #2563EB)' }}
                   />
                 )}
                 <link.icon
                   className="h-4 w-4 flex-shrink-0"
-                  style={{ color: isActive ? '#8B5CF6' : '#9879E9' }}
+                  style={{ color: isActive ? '#2563EB' : '#60A5FA' }}
                 />
                 <span>{link.label}</span>
               </>
@@ -180,9 +180,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
         <button
           onClick={logout}
           className="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 hover:bg-lilac-200/60"
-          style={{ color: '#6D5A9C' }}
+          style={{ color: '#475569' }}
         >
-          <LogOut className="h-4 w-4" style={{ color: '#A78BFA' }} />
+          <LogOut className="h-4 w-4" style={{ color: '#3B82F6' }} />
           <span>Sign Out</span>
         </button>
       </div>

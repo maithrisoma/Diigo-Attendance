@@ -246,17 +246,17 @@ export const DatePicker: React.FC<DatePickerProps> = ({
           className={`flex h-10 w-full rounded-md border bg-card pl-10 pr-10 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200 cursor-pointer text-left ${
             error
               ? 'border-rose-400 focus-visible:ring-rose-400'
-              : 'border-input hover:border-[#7C6CF4] focus:border-[#7C6CF4]'
-          } ${isOpen ? 'border-[#7C6CF4] ring-2 ring-[#7C6CF4]/20' : ''}`}
+              : 'border-input hover:border-[#2563EB] focus:border-[#2563EB]'
+          } ${isOpen ? 'border-[#2563EB] ring-2 ring-[#2563EB]/20' : ''}`}
         />
         <CalendarIcon
-          className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none transition-colors ${isOpen ? 'text-[#7C6CF4]' : 'text-muted-foreground'}`}
+          className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none transition-colors ${isOpen ? 'text-[#2563EB]' : 'text-muted-foreground'}`}
         />
         {value && value !== ',' && (
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); handleClearClick(); }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-[#F3EEFF] text-muted-foreground hover:text-[#7C6CF4] transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-[#F1F5F9] text-muted-foreground hover:text-[#2563EB] transition-colors"
           >
             <X className="h-3.5 w-3.5" />
           </button>
@@ -283,11 +283,11 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowYearPicker(false)}
-                  className="text-xs font-bold text-[#7C6CF4] hover:bg-[#F3EEFF] px-2 py-1 rounded-lg transition-colors"
+                  className="text-xs font-bold text-[#2563EB] hover:bg-[#F1F5F9] px-2 py-1 rounded-lg transition-colors"
                 >
                   ← Back
                 </button>
-                <span className="text-xs font-bold text-[#5B4FCF]">Select Year</span>
+                <span className="text-xs font-bold text-[#1D4ED8]">Select Year</span>
                 <span className="w-12" />
               </div>
               <div className="grid grid-cols-4 gap-1.5 max-h-48 overflow-y-auto pr-1">
@@ -298,10 +298,10 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                     onClick={() => { setViewYear(y); setShowYearPicker(false); }}
                     className={`py-1.5 text-xs font-semibold rounded-lg transition-all ${
                       y === viewYear
-                        ? 'bg-[#7C6CF4] text-white shadow-sm'
+                        ? 'bg-[#2563EB] text-white shadow-sm'
                         : y === today.getFullYear()
-                        ? 'border-2 border-[#7C6CF4] text-[#5B4FCF] bg-[#F8F5FF]'
-                        : 'text-[#4B5563] hover:bg-[#F3EEFF] hover:text-[#5B4FCF]'
+                        ? 'border-2 border-[#2563EB] text-[#1D4ED8] bg-[#F8F5FF]'
+                        : 'text-[#4B5563] hover:bg-[#F1F5F9] hover:text-[#1D4ED8]'
                     }`}
                   >
                     {y}
@@ -318,7 +318,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                   <button
                     type="button"
                     onClick={handlePrevYear}
-                    className="p-1.5 rounded-lg hover:bg-[#F3EEFF] text-[#7C6CF4] transition-colors"
+                    className="p-1.5 rounded-lg hover:bg-[#F1F5F9] text-[#2563EB] transition-colors"
                     title="Previous year"
                   >
                     <ChevronsLeft className="h-3.5 w-3.5" />
@@ -326,7 +326,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                   <button
                     type="button"
                     onClick={handlePrevMonth}
-                    className="p-1.5 rounded-lg hover:bg-[#F3EEFF] text-[#7C6CF4] transition-colors"
+                    className="p-1.5 rounded-lg hover:bg-[#F1F5F9] text-[#2563EB] transition-colors"
                     title="Previous month"
                   >
                     <ChevronLeft className="h-3.5 w-3.5" />
@@ -337,12 +337,12 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowYearPicker(true)}
-                  className="flex items-center gap-1.5 px-3 py-1 rounded-lg hover:bg-[#F3EEFF] transition-colors group"
+                  className="flex items-center gap-1.5 px-3 py-1 rounded-lg hover:bg-[#F1F5F9] transition-colors group"
                 >
-                  <span className="text-sm font-bold text-[#5B4FCF] group-hover:text-[#7C6CF4]">
+                  <span className="text-sm font-bold text-[#1D4ED8] group-hover:text-[#2563EB]">
                     {MONTHS[viewMonth]}
                   </span>
-                  <span className="text-sm font-bold text-[#7C6CF4]">{viewYear}</span>
+                  <span className="text-sm font-bold text-[#2563EB]">{viewYear}</span>
                 </button>
 
                 {/* Next month / Next year */}
@@ -350,7 +350,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                   <button
                     type="button"
                     onClick={handleNextMonth}
-                    className="p-1.5 rounded-lg hover:bg-[#F3EEFF] text-[#7C6CF4] transition-colors"
+                    className="p-1.5 rounded-lg hover:bg-[#F1F5F9] text-[#2563EB] transition-colors"
                     title="Next month"
                   >
                     <ChevronRight className="h-3.5 w-3.5" />
@@ -358,7 +358,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                   <button
                     type="button"
                     onClick={handleNextYear}
-                    className="p-1.5 rounded-lg hover:bg-[#F3EEFF] text-[#7C6CF4] transition-colors"
+                    className="p-1.5 rounded-lg hover:bg-[#F1F5F9] text-[#2563EB] transition-colors"
                     title="Next year"
                   >
                     <ChevronsRight className="h-3.5 w-3.5" />
@@ -400,29 +400,29 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                   } else if (isDisabled) {
                     cellClass += 'cursor-not-allowed opacity-20 text-[#6B7280] ';
                   } else if (isSelected) {
-                    cellClass += 'bg-[#7C6CF4] text-white shadow-md scale-105 ';
+                    cellClass += 'bg-[#2563EB] text-white shadow-md scale-105 ';
                   } else if (inRange) {
-                    cellClass += 'bg-[#EDE9FE] text-[#5B4FCF] rounded-none ';
+                    cellClass += 'bg-[#F1F5F9] text-[#1D4ED8] rounded-none ';
                     if (rangeStart) cellClass += 'rounded-l-xl ';
                     if (rangeEnd) cellClass += 'rounded-r-xl ';
                   } else if (isToday) {
-                    cellClass += 'border-2 border-[#7C6CF4] bg-[#F8F5FF] text-[#5B4FCF] font-bold ';
+                    cellClass += 'border-2 border-[#2563EB] bg-[#F8F5FF] text-[#1D4ED8] font-bold ';
                   } else if (isWeekend) {
-                    cellClass += 'text-[#9CA3AF] hover:bg-[#F3EEFF] hover:text-[#5B4FCF] ';
+                    cellClass += 'text-[#9CA3AF] hover:bg-[#F1F5F9] hover:text-[#1D4ED8] ';
                   } else {
-                    cellClass += 'text-[#4B5563] hover:bg-[#F3EEFF] hover:text-[#5B4FCF] ';
+                    cellClass += 'text-[#4B5563] hover:bg-[#F1F5F9] hover:text-[#1D4ED8] ';
                   }
 
                   if (isFocused && !isSelected) {
-                    cellClass += 'ring-2 ring-[#7C6CF4]/40 ';
+                    cellClass += 'ring-2 ring-[#2563EB]/40 ';
                   }
 
                   // Dark mode
                   if (isSelected) {
-                    cellClass += '[data-theme=dark]:bg-[#8B7DFF] ';
+                    cellClass += '[data-theme=dark]:bg-[#3B82F6] ';
                   }
                   if (isToday && !isSelected) {
-                    cellClass += '[data-theme=dark]:border-[#8B7DFF] [data-theme=dark]:text-[#C4B5FD] ';
+                    cellClass += '[data-theme=dark]:border-[#3B82F6] [data-theme=dark]:text-[#CBD5E1] ';
                   }
 
                   return (
@@ -455,7 +455,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                 <button
                   type="button"
                   onClick={handleTodayClick}
-                  className="text-xs font-bold text-[#7C6CF4] hover:bg-[#F3EEFF] px-3 py-1.5 rounded-lg transition-colors"
+                  className="text-xs font-bold text-[#2563EB] hover:bg-[#F1F5F9] px-3 py-1.5 rounded-lg transition-colors"
                 >
                   Today
                 </button>
@@ -469,8 +469,8 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                         onClick={() => setViewMonth(i)}
                         className={`hidden lg:flex h-5 w-5 text-[9px] font-bold items-center justify-center rounded-md transition-colors ${
                           i === viewMonth
-                            ? 'bg-[#7C6CF4] text-white'
-                            : 'text-[#6B7280] hover:bg-[#F3EEFF] hover:text-[#5B4FCF]'
+                            ? 'bg-[#2563EB] text-white'
+                            : 'text-[#6B7280] hover:bg-[#F1F5F9] hover:text-[#1D4ED8]'
                         }`}
                       >
                         {m[0]}
@@ -481,7 +481,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                 <button
                   type="button"
                   onClick={handleClearClick}
-                  className="text-xs font-bold text-[#7C6CF4] hover:bg-[#F3EEFF] px-3 py-1.5 rounded-lg transition-colors"
+                  className="text-xs font-bold text-[#2563EB] hover:bg-[#F1F5F9] px-3 py-1.5 rounded-lg transition-colors"
                 >
                   Clear
                 </button>

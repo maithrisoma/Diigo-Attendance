@@ -212,7 +212,7 @@ export const EmployeeCalendar: React.FC = () => {
           <Card className="hover:shadow-premium-light dark:hover:shadow-premium-dark border border-border transition-all duration-300">
             <CardHeader className="border-b border-border bg-muted/5 py-4">
               <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                <Clock className="h-4 w-4 text-[#8B5CF6]" />
+                <Clock className="h-4 w-4 text-[#2563EB]" />
                 Shift Log Details
               </CardTitle>
             </CardHeader>
@@ -248,7 +248,7 @@ export const EmployeeCalendar: React.FC = () => {
                     {activeDetailLog.status === 'Future' ? 'Unmarked (Future)' : activeDetailLog.status}
                   </p>
                   {activeDetailLog.holidayName && (
-                    <p className="text-xs font-semibold text-[#8B5CF6] mt-1">Details: {activeDetailLog.holidayName}</p>
+                    <p className="text-xs font-semibold text-[#2563EB] mt-1">Details: {activeDetailLog.holidayName}</p>
                   )}
                 </div>
               </div>

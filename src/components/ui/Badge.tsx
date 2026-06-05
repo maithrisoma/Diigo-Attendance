@@ -21,19 +21,19 @@ interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 const VARIANT_STYLES: Record<BadgeVariant, { bg: string; color: string; border?: string }> = {
-  default:     { bg: '#A78BFA', color: '#fff' },
-  secondary:   { bg: '#EDE9FE', color: '#6D28D9' },
-  outline:     { bg: 'transparent', color: '#7C3AED', border: '2px solid #D8B4FE' },
-  destructive: { bg: '#DDD6FE', color: '#4C1D95' },
-  success:     { bg: '#EDE9FE', color: '#6D28D9' },   // lilac-toned "success"
-  warning:     { bg: '#DDD6FE', color: '#7C3AED' },   // lilac-toned "warning"
-  danger:      { bg: '#F2EBFF', color: '#9879E9' },   // lilac-toned "danger"
-  info:        { bg: '#EDE9FE', color: '#8B5CF6' },   // lilac-toned "info"
-  Present:     { bg: '#EDE9FE', color: '#6D28D9' },
-  Absent:      { bg: '#F2EBFF', color: '#9879E9' },
-  Leave:       { bg: '#DDD6FE', color: '#7C3AED' },
-  Holiday:    { bg: '#C4B5FD', color: '#4C1D95' },
-  "Half Day":{ bg: '#EDE9FE', color: '#5B21B6', border: '2px solid #D8B4FE' }
+  default:     { bg: '#2563EB', color: '#fff' },
+  secondary:   { bg: '#DBEAFE', color: '#1E40AF' },
+  outline:     { bg: 'transparent', color: '#2563EB', border: '2px solid #E2E8F0' },
+  destructive: { bg: '#FEE2E2', color: '#B91C1C' },
+  success:     { bg: '#DCFCE7', color: '#166534' },
+  warning:     { bg: '#FEF3C7', color: '#D97706' },
+  danger:      { bg: '#FEE2E2', color: '#B91C1C' },
+  info:        { bg: '#E0F2FE', color: '#0369A1' },
+  Present:     { bg: '#DCFCE7', color: '#15803D' },
+  Absent:      { bg: '#FEE2E2', color: '#B91C1C' },
+  Leave:       { bg: '#FEF3C7', color: '#B45309' },
+  Holiday:    { bg: '#DBEAFE', color: '#1D4ED8' },
+  "Half Day":{ bg: '#CFFAFE', color: '#0369A1', border: '2px solid #06B6D4' }
 };
 
 export const Badge: React.FC<BadgeProps> = ({

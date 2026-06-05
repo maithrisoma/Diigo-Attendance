@@ -384,7 +384,7 @@ export const AttendanceCalendar: React.FC = () => {
             }}
             className={`px-4 py-2 text-xs font-bold rounded-lg transition-all duration-200 ${
               activeTab === 'my'
-                ? 'bg-[#8B5CF6] text-white shadow-sm'
+                ? 'bg-[#2563EB] text-white shadow-sm'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
@@ -397,7 +397,7 @@ export const AttendanceCalendar: React.FC = () => {
             }}
             className={`px-4 py-2 text-xs font-bold rounded-lg transition-all duration-200 ${
               activeTab === 'company'
-                ? 'bg-[#8B5CF6] text-white shadow-sm'
+                ? 'bg-[#2563EB] text-white shadow-sm'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
@@ -485,7 +485,7 @@ export const AttendanceCalendar: React.FC = () => {
               {/* Modal trigger action */}
               <Button
                 onClick={() => setDetailDate(focusedDateStr)}
-                className="w-full text-xs font-bold h-10 bg-[#8B5CF6] hover:bg-[#7C3AED] text-white flex items-center justify-center gap-1.5"
+                className="w-full text-xs font-bold h-10 bg-[#2563EB] hover:bg-[#1D4ED8] text-white flex items-center justify-center gap-1.5"
               >
                 <UserCheck className="h-4 w-4" />
                 View Detailed Table
@@ -557,7 +557,7 @@ export const AttendanceCalendar: React.FC = () => {
               />
             </div>
             {detailDate && (
-              <Badge variant="outline" className="font-bold font-mono text-[10px] border-[#8B5CF6]/30 text-[#8B5CF6] px-2.5 py-1">
+              <Badge variant="outline" className="font-bold font-mono text-[10px] border-[#2563EB]/30 text-[#2563EB] px-2.5 py-1">
                 Total Employees: {selectedDateDetails.length}
               </Badge>
             )}

@@ -46,7 +46,7 @@ export const Select: React.FC<SelectProps> = ({
           : children}
       </select>
       {error && (
-        <p className="text-xs font-medium" style={{ color: '#7C3AED' }}>{error}</p>
+        <p className="text-xs font-medium" style={{ color: '#1D4ED8' }}>{error}</p>
       )}
     </div>
   );

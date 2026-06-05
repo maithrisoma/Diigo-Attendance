@@ -23,11 +23,11 @@ import {
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const AVATAR_GRADIENTS = [
-  'from-[#8B5CF6] to-[#A78BFA]',
-  'from-[#A78BFA] to-[#C084FC]',
+  'from-[#2563EB] to-[#3B82F6]',
+  'from-[#3B82F6] to-[#C084FC]',
   'from-[#C084FC] to-[#E9D5FF]',
-  'from-[#6D28D9] to-[#8B5CF6]',
-  'from-[#7C3AED] to-[#A78BFA]',
+  'from-[#6D28D9] to-[#2563EB]',
+  'from-[#1D4ED8] to-[#3B82F6]',
   'from-[#9F7AEA] to-[#E9D5FF]',
 ];
 const getGradient = (name: string) =>

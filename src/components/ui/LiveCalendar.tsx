@@ -135,7 +135,7 @@ export const LiveCalendar: React.FC<LiveCalendarProps> = ({
           {!compact && (
             <button
               onClick={prevYear}
-              className="p-1.5 rounded-lg hover:bg-[#F3EEFF] text-[#7C6CF4] transition-colors"
+              className="p-1.5 rounded-lg hover:bg-[#F1F5F9] text-[#2563EB] transition-colors"
               title="Previous year"
             >
               <ChevronsLeft className="h-3.5 w-3.5" />
@@ -143,7 +143,7 @@ export const LiveCalendar: React.FC<LiveCalendarProps> = ({
           )}
           <button
             onClick={prevMonth}
-            className="p-1.5 rounded-lg hover:bg-[#F3EEFF] text-[#7C6CF4] transition-colors"
+            className="p-1.5 rounded-lg hover:bg-[#F1F5F9] text-[#2563EB] transition-colors"
             title="Previous month"
           >
             <ChevronLeft className="h-3.5 w-3.5" />
@@ -154,19 +154,19 @@ export const LiveCalendar: React.FC<LiveCalendarProps> = ({
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowYearPicker(v => !v)}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg hover:bg-[#F3EEFF] transition-colors group"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg hover:bg-[#F1F5F9] transition-colors group"
           >
-            <span className={`font-bold text-[#5B4FCF] group-hover:text-[#7C6CF4] ${compact ? 'text-sm' : 'text-base'}`}>
+            <span className={`font-bold text-[#1D4ED8] group-hover:text-[#2563EB] ${compact ? 'text-sm' : 'text-base'}`}>
               {MONTH_NAMES[viewMonth]}
             </span>
-            <span className={`font-bold text-[#7C6CF4] ${compact ? 'text-sm' : 'text-base'}`}>
+            <span className={`font-bold text-[#2563EB] ${compact ? 'text-sm' : 'text-base'}`}>
               {viewYear}
             </span>
           </button>
           {(viewYear !== today.getFullYear() || viewMonth !== today.getMonth()) && (
             <button
               onClick={goToday}
-              className="text-[10px] font-bold text-[#7C6CF4] bg-[#F3EEFF] hover:bg-[#EDE9FE] px-2 py-0.5 rounded-full transition-colors"
+              className="text-[10px] font-bold text-[#2563EB] bg-[#F1F5F9] hover:bg-[#F1F5F9] px-2 py-0.5 rounded-full transition-colors"
             >
               Today
             </button>
@@ -177,7 +177,7 @@ export const LiveCalendar: React.FC<LiveCalendarProps> = ({
         <div className="flex items-center gap-0.5">
           <button
             onClick={nextMonth}
-            className="p-1.5 rounded-lg hover:bg-[#F3EEFF] text-[#7C6CF4] transition-colors"
+            className="p-1.5 rounded-lg hover:bg-[#F1F5F9] text-[#2563EB] transition-colors"
             title="Next month"
           >
             <ChevronRight className="h-3.5 w-3.5" />
@@ -185,7 +185,7 @@ export const LiveCalendar: React.FC<LiveCalendarProps> = ({
           {!compact && (
             <button
               onClick={nextYear}
-              className="p-1.5 rounded-lg hover:bg-[#F3EEFF] text-[#7C6CF4] transition-colors"
+              className="p-1.5 rounded-lg hover:bg-[#F1F5F9] text-[#2563EB] transition-colors"
               title="Next year"
             >
               <ChevronsRight className="h-3.5 w-3.5" />
@@ -208,10 +208,10 @@ export const LiveCalendar: React.FC<LiveCalendarProps> = ({
                 onClick={() => { setViewYear(y); setShowYearPicker(false); }}
                 className={`py-1.5 text-xs font-bold rounded-lg transition-all ${
                   y === viewYear
-                    ? 'bg-[#7C6CF4] text-white shadow-sm'
+                    ? 'bg-[#2563EB] text-white shadow-sm'
                     : y === today.getFullYear()
-                    ? 'border-2 border-[#7C6CF4] text-[#5B4FCF] bg-white'
-                    : 'text-[#4B5563] hover:bg-[#F3EEFF] hover:text-[#5B4FCF]'
+                    ? 'border-2 border-[#2563EB] text-[#1D4ED8] bg-white'
+                    : 'text-[#4B5563] hover:bg-[#F1F5F9] hover:text-[#1D4ED8]'
                 }`}
               >
                 {y}
@@ -255,9 +255,9 @@ export const LiveCalendar: React.FC<LiveCalendarProps> = ({
           if (!day.isCurrentMonth) {
             baseClass += ' text-[#6B7280] opacity-20';
           } else if (isSelected) {
-            baseClass += ' bg-[#7C6CF4] text-white shadow-md scale-105';
+            baseClass += ' bg-[#2563EB] text-white shadow-md scale-105';
           } else if (day.isToday) {
-            baseClass += ' border-2 border-[#7C6CF4] bg-[#F8F5FF] text-[#5B4FCF] font-bold';
+            baseClass += ' border-2 border-[#2563EB] bg-[#F8F5FF] text-[#1D4ED8] font-bold';
           } else if (st && styleInfo) {
             inlineStyle = {
               backgroundColor: styleInfo.bg,
@@ -266,11 +266,11 @@ export const LiveCalendar: React.FC<LiveCalendarProps> = ({
             };
             baseClass += ' hover:scale-105';
           } else if (day.isWeekend) {
-            baseClass += ' text-[#9CA3AF] hover:bg-[#F3EEFF] hover:text-[#5B4FCF]';
+            baseClass += ' text-[#9CA3AF] hover:bg-[#F1F5F9] hover:text-[#1D4ED8]';
           } else if (isFuture) {
-            baseClass += ' text-[#9CA3AF] hover:bg-[#F3EEFF] hover:text-[#5B4FCF]';
+            baseClass += ' text-[#9CA3AF] hover:bg-[#F1F5F9] hover:text-[#1D4ED8]';
           } else {
-            baseClass += ' text-[#4B5563] hover:bg-[#F3EEFF] hover:text-[#5B4FCF]';
+            baseClass += ' text-[#4B5563] hover:bg-[#F1F5F9] hover:text-[#1D4ED8]';
           }
 
           return (

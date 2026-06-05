@@ -986,7 +986,7 @@ function getOAuth2Client() {
   return new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
-    process.env.GOOGLE_REDIRECT_URI
+    process.env.GOOGLE_REDIRECT_URI || 'http://localhost:5000/api/google/callback'
   );
 }
 
@@ -995,6 +995,18 @@ app.get('/api/google/auth-url', (req, res) => {
   const { employeeId } = req.query;
   if (!employeeId) {
     return res.status(400).json({ error: 'employeeId is required' });
+  }
+
+  // Validate Google configuration is present and not placeholders
+  if (
+    !process.env.GOOGLE_CLIENT_ID || 
+    process.env.GOOGLE_CLIENT_ID.startsWith('YOUR_') ||
+    !process.env.GOOGLE_CLIENT_SECRET || 
+    process.env.GOOGLE_CLIENT_SECRET.startsWith('YOUR_')
+  ) {
+    return res.status(400).json({ 
+      error: 'Google Calendar API is not configured. Please set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in backend/.env file.' 
+    });
   }
 
   const oauth2Client = getOAuth2Client();

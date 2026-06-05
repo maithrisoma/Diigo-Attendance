@@ -37,7 +37,7 @@ export function Table<T extends Record<string, unknown>>({
           <tbody>
             {data.length === 0 ? (
               <tr>
-                <td colSpan={columns.length} className="py-16 text-center text-sm" style={{ color: '#C4B5FD' }}>
+                <td colSpan={columns.length} className="py-16 text-center text-sm" style={{ color: '#CBD5E1' }}>
                   {emptyMessage}
                 </td>
               </tr>
@@ -86,7 +86,7 @@ export const TableRow: React.FC<BaseProps> = ({ children, className = '', ...pro
 export const TableHead: React.FC<BaseProps> = ({ children, className = '', ...props }) => (
   <th
     className={`px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider ${className}`}
-    style={{ color: '#4C1D95', background: 'linear-gradient(135deg, #F2EBFF, #EDE9FE)', borderBottom: '1.5px solid #D8B4FE' }}
+    style={{ color: '#0F172A', background: 'linear-gradient(135deg, #F1F5F9, #F1F5F9)', borderBottom: '1.5px solid #E2E8F0' }}
     {...props}
   >
     {children}
@@ -96,7 +96,7 @@ export const TableHead: React.FC<BaseProps> = ({ children, className = '', ...pr
 export const TableCell: React.FC<BaseProps & { colSpan?: number }> = ({ children, className = '', colSpan, ...props }) => (
   <td
     className={`px-4 py-3 text-sm ${className}`}
-    style={{ color: '#4C1D95' }}
+    style={{ color: '#0F172A' }}
     colSpan={colSpan}
     {...props}
   >

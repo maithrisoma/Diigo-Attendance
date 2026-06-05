@@ -161,7 +161,7 @@ const PortalForm: React.FC<PortalFormProps> = ({ portal, onSuccess }) => {
             type="button"
             onClick={() => { setForgotOpen(true); setForgotError(''); }}
             className="text-xs font-semibold transition-colors"
-            style={{ color: '#8B5CF6' }}
+            style={{ color: '#2563EB' }}
           >
             Forgot Password?
           </button>
@@ -170,9 +170,9 @@ const PortalForm: React.FC<PortalFormProps> = ({ portal, onSuccess }) => {
         <Button
           type="submit"
           disabled={loading}
-          style={portal === 'admin' ? { backgroundColor: '#8B5CF6', borderColor: '#8B5CF6' } : undefined}
+          style={portal === 'admin' ? { backgroundColor: '#2563EB', borderColor: '#2563EB' } : undefined}
           className={`w-full h-11 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 ${
-            portal === 'admin' ? 'hover:bg-[#7C3AED] text-white' : ''
+            portal === 'admin' ? 'hover:bg-[#1D4ED8] text-white' : ''
           }`}
         >
           <LogIn className="h-4 w-4" />
@@ -186,7 +186,7 @@ const PortalForm: React.FC<PortalFormProps> = ({ portal, onSuccess }) => {
             {config.demoEmail}
           </code>
           {' / '}
-          <code className="font-mono font-semibold" style={{ color: '#4C1D95' }}>password</code>
+          <code className="font-mono font-semibold" style={{ color: '#0F172A' }}>password</code>
         </div>
       </form>
 
@@ -195,11 +195,11 @@ const PortalForm: React.FC<PortalFormProps> = ({ portal, onSuccess }) => {
           <div className="flex flex-col items-center text-center mb-4">
             <div
               className="h-12 w-12 rounded-2xl flex items-center justify-center mb-3"
-              style={{ background: 'linear-gradient(135deg,#EDE9FE,#DDD6FE)' }}
+              style={{ background: 'linear-gradient(135deg,#F1F5F9,#E2E8F0)' }}
             >
-              <KeyRound className="h-6 w-6" style={{ color: '#7C3AED' }} />
+              <KeyRound className="h-6 w-6" style={{ color: '#1D4ED8' }} />
             </div>
-            <p className="text-sm" style={{ color: '#6D5A9C' }}>
+            <p className="text-sm" style={{ color: '#475569' }}>
               Enter your Employee ID or Email to reset your password.
             </p>
           </div>
@@ -327,7 +327,7 @@ export const Login: React.FC = () => {
             onClick={() => setActiveTab('admin')}
             className={`flex-1 py-4 font-bold transition-all duration-200 border-b-2 flex items-center justify-center gap-1.5 ${
               activeTab === 'admin'
-                ? 'text-[#8B5CF6] border-[#8B5CF6] bg-white/20 dark:bg-white/5'
+                ? 'text-[#2563EB] border-[#2563EB] bg-white/20 dark:bg-white/5'
                 : 'text-muted-foreground hover:bg-white/10 border-transparent'
             }`}
           >
@@ -341,7 +341,7 @@ export const Login: React.FC = () => {
         <div className="p-7 flex flex-col">
           <div className="flex flex-col items-center text-center mb-3">
             {activeTab === 'admin' && (
-              <span className="mb-2 inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#8B5CF6]/10 text-[#8B5CF6] border border-[#8B5CF6]/20 animate-in fade-in zoom-in-95 duration-200">
+              <span className="mb-2 inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#2563EB]/10 text-[#2563EB] border border-[#2563EB]/20 animate-in fade-in zoom-in-95 duration-200">
                 <Crown className="h-3 w-3" /> Super Admin
               </span>
             )}
@@ -357,7 +357,7 @@ export const Login: React.FC = () => {
       </div>
 
       {/* Footer */}
-      <div className="z-10 mt-8 text-xs font-medium" style={{ color: '#C4B5FD' }}>
+      <div className="z-10 mt-8 text-xs font-medium" style={{ color: '#CBD5E1' }}>
         Diigo Attendance &copy; {new Date().getFullYear()} — HRMS v2.0
       </div>
     </div>

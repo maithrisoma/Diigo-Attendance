@@ -44,8 +44,10 @@ export const GoogleCalendarSync: React.FC = () => {
     try {
       const res = await fetch(`/api/google/auth-url?employeeId=${currentUser.employee_id}`);
       const data = await res.json();
-      if (data.url) {
+      if (res.ok && data.url) {
         window.location.href = data.url;
+      } else {
+        setSyncResult({ message: data.error || 'Failed to start Google connection.', type: 'error' });
       }
     } catch (err) {
       setSyncResult({ message: 'Failed to start Google connection.', type: 'error' });

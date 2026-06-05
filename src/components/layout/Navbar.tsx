@@ -129,7 +129,7 @@ export const Navbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) =
       className="sticky top-0 z-30 h-16 flex items-center justify-between px-6"
       style={{
         background: 'rgba(247,242,255,0.85)',
-        borderBottom: '1px solid #D8B4FE',
+        borderBottom: '1px solid #E2E8F0',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
       }}
@@ -144,22 +144,22 @@ export const Navbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) =
         </button>
         {/* Search */}
         <div className="hidden md:flex items-center relative w-72">
-          <Search className="absolute left-3.5 h-4 w-4" style={{ color: '#C4B5FD' }} />
+          <Search className="absolute left-3.5 h-4 w-4" style={{ color: '#CBD5E1' }} />
           <input
             type="text"
             placeholder="Search employees, reports…"
             className="w-full h-9 pl-10 pr-4 rounded-full text-xs font-medium placeholder:text-lilac-400 outline-none transition-all duration-200"
             style={{
               background: 'rgba(255,255,255,0.80)',
-              border: '1.5px solid #D8B4FE',
-              color: '#4C1D95',
+              border: '1.5px solid #E2E8F0',
+              color: '#0F172A',
             }}
             onFocus={e => {
-              (e.target as HTMLInputElement).style.borderColor = '#8B5CF6';
+              (e.target as HTMLInputElement).style.borderColor = '#2563EB';
               (e.target as HTMLInputElement).style.boxShadow = '0 0 0 3px rgba(139,92,246,0.12)';
             }}
             onBlur={e => {
-              (e.target as HTMLInputElement).style.borderColor = '#D8B4FE';
+              (e.target as HTMLInputElement).style.borderColor = '#E2E8F0';
               (e.target as HTMLInputElement).style.boxShadow = 'none';
             }}
           />
@@ -173,12 +173,12 @@ export const Navbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) =
           className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold"
           style={{
             background: 'rgba(255,255,255,0.80)',
-            border: '1.5px solid #DDD6FE',
-            color: '#6D5A9C',
+            border: '1.5px solid #E2E8F0',
+            color: '#475569',
           }}
         >
-          <Clock className="h-3.5 w-3.5" style={{ color: '#A78BFA' }} />
-          <span className="font-mono" style={{ color: '#4C1D95' }}>{formattedTime}</span>
+          <Clock className="h-3.5 w-3.5" style={{ color: '#3B82F6' }} />
+          <span className="font-mono" style={{ color: '#0F172A' }}>{formattedTime}</span>
           <span className="text-[10px] opacity-70">{formattedDate}</span>
         </div>
 
@@ -187,7 +187,7 @@ export const Navbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) =
           onClick={toggleTheme}
           className="p-2 rounded-full transition-all hover:bg-lilac-200/60 flex items-center justify-center"
           title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
-          style={{ color: '#8B5CF6' }}
+          style={{ color: '#2563EB' }}
         >
           {theme === 'light' ? (
             <Moon className="h-5 w-5 transition-transform duration-300 hover:rotate-12 text-[#334155]" />
@@ -206,13 +206,13 @@ export const Navbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) =
             className={`relative p-2 rounded-full transition-all hover:bg-lilac-200/60 ${
               wiggle ? 'animate-wiggle text-primary' : ''
             }`}
-            style={{ color: '#8B5CF6' }}
+            style={{ color: '#2563EB' }}
           >
             <Bell className="h-5 w-5" />
             {unreadNotificationsCount > 0 && (
               <span
                 className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold text-white"
-                style={{ background: 'linear-gradient(135deg,#A78BFA,#7C3AED)' }}
+                style={{ background: 'linear-gradient(135deg,#3B82F6,#1D4ED8)' }}
               >
                 {unreadNotificationsCount}
               </span>
@@ -226,21 +226,21 @@ export const Navbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) =
                 className="absolute right-0 mt-2 w-80 rounded-2xl shadow-lilac-lg overflow-hidden z-40 animate-fadeInUp"
                 style={{
                   background: 'rgba(255,255,255,0.95)',
-                  border: '1.5px solid #D8B4FE',
+                  border: '1.5px solid #E2E8F0',
                   backdropFilter: 'blur(20px)',
                 }}
               >
                 {/* Header */}
                 <div
                   className="px-5 py-4 flex items-center justify-between border-b"
-                  style={{ borderColor: '#DDD6FE', background: '#F7F2FF' }}
+                  style={{ borderColor: '#E2E8F0', background: '#F8FAFC' }}
                 >
-                  <h3 className="font-bold text-sm" style={{ color: '#4C1D95' }}>Notifications</h3>
+                  <h3 className="font-bold text-sm" style={{ color: '#0F172A' }}>Notifications</h3>
                   <div className="flex items-center gap-2">
                     {unreadNotificationsCount > 0 && (
                       <span
                         className="text-xs font-semibold px-2.5 py-0.5 rounded-full"
-                        style={{ background: '#EDE9FE', color: '#7C3AED' }}
+                        style={{ background: '#F1F5F9', color: '#1D4ED8' }}
                       >
                         {unreadNotificationsCount} New
                       </span>
@@ -252,7 +252,7 @@ export const Navbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) =
                           await markAllNotificationsRead();
                         }}
                         className="text-[10px] hover:underline font-bold"
-                        style={{ color: '#7C3AED' }}
+                        style={{ color: '#1D4ED8' }}
                       >
                         Mark all read
                       </button>
@@ -261,9 +261,9 @@ export const Navbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) =
                 </div>
 
                 {/* Notification Items */}
-                <div className="max-h-72 overflow-y-auto divide-y" style={{ borderColor: '#EDE9FE' }}>
+                <div className="max-h-72 overflow-y-auto divide-y" style={{ borderColor: '#F1F5F9' }}>
                   {notifications.length === 0 ? (
-                    <div className="p-6 text-center text-xs" style={{ color: '#9879E9' }}>
+                    <div className="p-6 text-center text-xs" style={{ color: '#60A5FA' }}>
                       No notifications available.
                     </div>
                   ) : (
@@ -285,7 +285,7 @@ export const Navbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) =
                               <p
                                 className="text-xs leading-relaxed"
                                 style={{
-                                  color: '#4C1D95',
+                                  color: '#0F172A',
                                   fontWeight: isUnread ? 'bold' : 'normal',
                                 }}
                               >
@@ -294,14 +294,14 @@ export const Navbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) =
                               {isUnread && (
                                 <span
                                   className="h-1.5 w-1.5 rounded-full flex-shrink-0 mt-1.5"
-                                  style={{ background: '#8B5CF6' }}
+                                  style={{ background: '#2563EB' }}
                                 />
                               )}
                             </div>
-                            <p className="text-[11px] line-clamp-2 mt-0.5" style={{ color: '#6D5A9C' }}>
+                            <p className="text-[11px] line-clamp-2 mt-0.5" style={{ color: '#475569' }}>
                               {not.message}
                             </p>
-                            <p className="text-[9px] mt-1" style={{ color: '#9879E9' }}>
+                            <p className="text-[9px] mt-1" style={{ color: '#60A5FA' }}>
                               {new Date(not.created_at).toLocaleDateString([], {
                                 month: 'short',
                                 day: 'numeric',
@@ -321,7 +321,7 @@ export const Navbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) =
         </div>
 
         {/* Divider */}
-        <div className="h-6 w-px" style={{ background: '#DDD6FE' }} />
+        <div className="h-6 w-px" style={{ background: '#E2E8F0' }} />
 
         {/* Profile */}
         <div className="relative">
@@ -331,15 +331,15 @@ export const Navbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) =
           >
             <div
               className="h-8 w-8 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
-              style={{ background: 'linear-gradient(135deg,#A78BFA,#8B5CF6)' }}
+              style={{ background: 'linear-gradient(135deg,#3B82F6,#2563EB)' }}
             >
               {initials}
             </div>
             <div className="hidden md:block text-left">
-              <p className="text-xs font-bold leading-none" style={{ color: '#4C1D95' }}>{currentUser.name}</p>
-              <p className="text-[10px] mt-0.5 capitalize" style={{ color: '#9879E9' }}>{currentUser.role} Account</p>
+              <p className="text-xs font-bold leading-none" style={{ color: '#0F172A' }}>{currentUser.name}</p>
+              <p className="text-[10px] mt-0.5 capitalize" style={{ color: '#60A5FA' }}>{currentUser.role} Account</p>
             </div>
-            <ChevronDown className="h-3.5 w-3.5" style={{ color: '#C4B5FD' }} />
+            <ChevronDown className="h-3.5 w-3.5" style={{ color: '#CBD5E1' }} />
           </button>
 
           {/* Dropdown Menu */}
@@ -350,23 +350,23 @@ export const Navbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) =
                 className="absolute right-0 mt-2 w-52 rounded-2xl shadow-lilac-lg overflow-hidden z-40 animate-fadeInUp"
                 style={{
                   background: 'rgba(255,255,255,0.95)',
-                  border: '1.5px solid #D8B4FE',
+                  border: '1.5px solid #E2E8F0',
                   backdropFilter: 'blur(20px)',
                 }}
               >
-                <div className="p-4 border-b" style={{ borderColor: '#DDD6FE', background: '#F7F2FF' }}>
-                  <p className="text-xs font-bold truncate" style={{ color: '#4C1D95' }}>{currentUser.name}</p>
-                  <p className="text-[10px] truncate mt-0.5" style={{ color: '#9879E9' }}>{currentUser.email}</p>
+                <div className="p-4 border-b" style={{ borderColor: '#E2E8F0', background: '#F8FAFC' }}>
+                  <p className="text-xs font-bold truncate" style={{ color: '#0F172A' }}>{currentUser.name}</p>
+                  <p className="text-[10px] truncate mt-0.5" style={{ color: '#60A5FA' }}>{currentUser.email}</p>
                 </div>
                 <div className="p-2">
-                  <div className="flex items-center gap-2 px-3 py-2 text-xs" style={{ color: '#9879E9' }}>
-                    <User className="h-3.5 w-3.5" style={{ color: '#C4B5FD' }} />
+                  <div className="flex items-center gap-2 px-3 py-2 text-xs" style={{ color: '#60A5FA' }}>
+                    <User className="h-3.5 w-3.5" style={{ color: '#CBD5E1' }} />
                     <span>ID: {currentUser.employee_id}</span>
                   </div>
                   <button
                     onClick={() => { setShowProfileMenu(false); logout(); }}
                     className="w-full text-left px-3 py-2 text-xs font-semibold rounded-xl hover:bg-lilac-200/60 flex items-center gap-2 transition-colors"
-                    style={{ color: '#7C3AED' }}
+                    style={{ color: '#1D4ED8' }}
                   >
                     <span>Sign Out</span>
                   </button>
