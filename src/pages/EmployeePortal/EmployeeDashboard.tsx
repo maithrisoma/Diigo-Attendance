@@ -22,31 +22,59 @@ export const EmployeeDashboard: React.FC = () => {
   const [futureDaysPresent, setFutureDaysPresent] = useState(10);
   const [futureDaysAbsent, setFutureDaysAbsent] = useState(0);
 
+  // Time update
   useEffect(() => {
     const t = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(t);
   }, []);
 
+  // Core data computations
   const todayStr = new Date().toISOString().split('T')[0];
-  const myAttendance = useMemo(() => currentUser ? attendance.filter(a => a.employee_id === currentUser.employee_id) : [], [attendance, currentUser]);
-  const myAttendanceByDate = useMemo(() => { const m: Record<string, { status: string }> = {}; myAttendance.forEach(a => { m[a.date] = { status: a.status }; }); return m; }, [myAttendance]);
-  const holidayByDate = useMemo(() => { const m: Record<string, string> = {}; holidays.forEach(h => { m[h.holiday_date] = h.holiday_name; }); return m; }, [holidays]);
-  const todayRecord = attendance.find(a => a.employee_id === currentUser?.employee_id && a.date === todayStr);
+  const myAttendance = useMemo(() => {
+    if (!currentUser) return [];
+    return attendance.filter(a => a.employee_id === currentUser.employee_id);
+  }, [attendance, currentUser]);
+
+  const myAttendanceByDate = useMemo(() => {
+    const map: Record<string, { status: string }> = {};
+    myAttendance.forEach(a => { map[a.date] = { status: a.status }; });
+    return map;
+  }, [myAttendance]);
+
+  const holidayByDate = useMemo(() => {
+    const map: Record<string, string> = {};
+    holidays.forEach(h => { map[h.holiday_date] = h.holiday_name; });
+    return map;
+  }, [holidays]);
+
+  const todayRecord = attendance.find(
+    (a) => a.employee_id === currentUser?.employee_id && a.date === todayStr
+  );
+
   const isWeekend = currentTime.getDay() === 0 || currentTime.getDay() === 6;
   const todayHoliday = holidays.find(h => h.holiday_date === todayStr);
   const hasCheckedIn = !!todayRecord?.check_in;
   const hasCheckedOut = !!todayRecord?.check_out;
 
+  // Running hours calculation
   useEffect(() => {
-    if (!hasCheckedIn || hasCheckedOut || !todayRecord?.check_in) { setRunningHoursStr('00:00:00'); return; }
+    if (!hasCheckedIn || hasCheckedOut || !todayRecord?.check_in) {
+      setRunningHoursStr('00:00:00');
+      return;
+    }
     const calc = () => {
       const [inH, inM, inS] = todayRecord.check_in!.split(':').map(Number);
-      const checkInDate = new Date(); checkInDate.setHours(inH, inM, inS || 0);
+      const checkInDate = new Date();
+      checkInDate.setHours(inH, inM, inS || 0);
       let diff = Math.max(0, Date.now() - checkInDate.getTime());
-      const hrs = Math.floor(diff / 3600000), mins = Math.floor((diff % 3600000) / 60000), secs = Math.floor((diff % 60000) / 1000);
-      setRunningHoursStr(`${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`);
+      const hrs = Math.floor(diff / 3600000);
+      const mins = Math.floor((diff % 3600000) / 60000);
+      const secs = Math.floor((diff % 60000) / 1000);
+      setRunningHoursStr(`${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`);
     };
-    calc(); const t = setInterval(calc, 1000); return () => clearInterval(t);
+    calc();
+    const t = setInterval(calc, 1000);
+    return () => clearInterval(t);
   }, [hasCheckedIn, hasCheckedOut, todayRecord]);
 
   if (!currentUser) return null;
@@ -64,8 +92,8 @@ export const EmployeeDashboard: React.FC = () => {
     if (date.getDay() === 0 || date.getDay() === 6) return 'Weekend';
     if (holidays.find(h => h.holiday_date === dStr)) return 'Holiday';
     if (leaveRequests.find(l => l.employee_id === currentUser.employee_id && l.status === 'Approved' && dStr >= l.start_date && dStr <= l.end_date)) return 'Leave';
-    const todayNoTime = new Date(); todayNoTime.setHours(0,0,0,0);
-    const dateNoTime = new Date(date); dateNoTime.setHours(0,0,0,0);
+    const todayNoTime = new Date(); todayNoTime.setHours(0, 0, 0, 0);
+    const dateNoTime = new Date(date); dateNoTime.setHours(0, 0, 0, 0);
     if (dateNoTime.getTime() > todayNoTime.getTime()) return 'Future';
     if (dateNoTime.getTime() === todayNoTime.getTime()) return hasCheckedIn ? 'Present' : 'Pending';
     return 'Absent';
@@ -76,10 +104,21 @@ export const EmployeeDashboard: React.FC = () => {
   const halfDays = myAttendance.filter(a => a.status === 'Half Day').length;
   const totalRecords = myAttendance.length;
   const attendanceRate = totalRecords > 0 ? Math.round(((presentDays + halfDays * 0.5) / totalRecords) * 100) : 94;
-  const approvedLeaves = leaveRequests.filter(l => l.employee_id === currentUser.employee_id && l.status === 'Approved').reduce((acc, l) => acc + (Math.ceil(Math.abs(new Date(l.end_date).getTime() - new Date(l.start_date).getTime()) / 86400000) + 1), 0);
-  const presentThisMonth = myAttendance.filter(a => a.date.startsWith(new Date().toISOString().substring(0,7)) && (a.status === 'Present' || a.status === 'Half Day')).length;
-  const teammatesList = employees.filter(e => e.department === currentUser.department && e.employee_id !== currentUser.employee_id).map(e => ({ ...e, status: leaveRequests.some(l => l.employee_id === e.employee_id && l.status === 'Approved' && todayStr >= l.start_date && todayStr <= l.end_date) ? 'On Leave' : attendance.some(a => a.employee_id === e.employee_id && a.date === todayStr && !a.check_out) ? 'Online' : 'Offline' }));
-  const predictedRate = (totalRecords + futureDaysPresent + futureDaysAbsent) > 0 ? Math.round(((presentDays + futureDaysPresent + halfDays * 0.5) / (totalRecords + futureDaysPresent + futureDaysAbsent)) * 100) : 0;
+  const approvedLeaves = leaveRequests.filter(l => l.employee_id === currentUser.employee_id && l.status === 'Approved')
+    .reduce((acc, l) => acc + (Math.ceil(Math.abs(new Date(l.end_date).getTime() - new Date(l.start_date).getTime()) / 86400000) + 1), 0);
+  const presentThisMonth = myAttendance.filter(a => a.date.startsWith(new Date().toISOString().substring(0, 7)) && (a.status === 'Present' || a.status === 'Half Day')).length;
+  const teammatesList = employees.filter(e => e.department === currentUser.department && e.employee_id !== currentUser.employee_id)
+    .map(e => ({
+      ...e,
+      status: leaveRequests.some(l => l.employee_id === e.employee_id && l.status === 'Approved' && todayStr >= l.start_date && todayStr <= l.end_date)
+        ? 'On Leave'
+        : attendance.some(a => a.employee_id === e.employee_id && a.date === todayStr && !a.check_out)
+          ? 'Online'
+          : 'Offline'
+    }));
+  const predictedRate = (totalRecords + futureDaysPresent + futureDaysAbsent) > 0
+    ? Math.round(((presentDays + futureDaysPresent + (halfDays * 0.5)) / (totalRecords + futureDaysPresent + futureDaysAbsent)) * 100)
+    : 0;
 
   const statusStyle = (s: string) => {
     if (s === 'Present') return { bg: '#EDE9FE', border: 'rgba(139,92,246,0.3)', text: '#6D28D9' };
@@ -90,24 +129,25 @@ export const EmployeeDashboard: React.FC = () => {
     return { bg: 'rgba(242,235,255,0.5)', border: 'rgba(196,181,253,0.2)', text: '#C4B5FD' };
   };
 
+  const card = "glass-card p-6 flex flex-col";
+  const sectionTitle = { fontSize: '11px', fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.08em', color: '#9879E9', marginBottom: 16 };
+
   const companyNews = [
     { id: 1, title: 'Upcoming Public Holiday', desc: 'The office will be closed this Friday. Enjoy the long weekend!', date: 'Jun 2, 2026' },
     { id: 2, title: 'Annual Health Checkup Camp', desc: 'Free healthcare checkup in cafeteria on Monday at 10 AM.', date: 'May 31, 2026' },
     { id: 3, title: 'New Remote Work Guidelines', desc: 'Updated remote working policy published in HR guidelines.', date: 'May 28, 2026' },
   ];
 
-  const card = "glass-card p-6 flex flex-col";
-  const sectionTitle = { fontSize: '11px', fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.08em', color: '#9879E9', marginBottom: 16 };
-
   return (
     <div className="space-y-6 pb-10 animate-fadeInUp">
-
       {/* Welcome Banner */}
       <div className="rounded-3xl p-7 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 relative overflow-hidden"
         style={{ background: 'linear-gradient(135deg,#7C3AED 0%,#A78BFA 60%,#C4B5FD 100%)', boxShadow: '0 12px 40px rgba(124,58,237,0.28)' }}>
-        <div className="absolute top-0 right-0 w-48 h-48 rounded-full opacity-20" style={{ background: 'radial-gradient(circle,#fff,transparent)', transform: 'translate(30%,-30%)' }} />
+        <div className="absolute top-0 right-0 w-48 h-48 rounded-full opacity-20"
+          style={{ background: 'radial-gradient(circle,#fff,transparent)', transform: 'translate(30%,-30%)' }} />
         <div className="text-white z-10 space-y-1">
-          <span className="text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full inline-block" style={{ background: 'rgba(255,255,255,0.2)' }}>Employee Portal</span>
+          <span className="text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full inline-block"
+            style={{ background: 'rgba(255,255,255,0.2)' }}>Employee Portal</span>
           <h2 className="text-2xl font-black">Good {currentTime.getHours() < 12 ? 'Morning' : 'Afternoon'}, {currentUser.name.split(' ')[0]}! 👋</h2>
           <p className="text-sm opacity-80">{currentUser.designation} · {currentUser.department} · {currentUser.employee_id}</p>
         </div>
@@ -115,13 +155,14 @@ export const EmployeeDashboard: React.FC = () => {
           <span className="text-4xl font-black font-mono">
             {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
           </span>
-          <span className="text-sm opacity-75">{currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</span>
+          <span className="text-sm opacity-75">
+            {currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+          </span>
         </div>
       </div>
 
       {/* Clock In/Out + Weekly Streak */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
-
         {/* Clock In/Out Card */}
         <div className={`md:col-span-5 ${card}`} style={{ justifyContent: 'space-between', minHeight: 180 }}>
           <div className="flex items-center justify-between">
@@ -174,7 +215,7 @@ export const EmployeeDashboard: React.FC = () => {
             })}
           </div>
           <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-4 pt-3 border-t text-[10px] font-semibold" style={{ borderColor: 'rgba(216,180,254,0.3)', color: '#9879E9' }}>
-            {[['Present','#8B5CF6'],['Absent','#C4B5FD'],['Leave','#A78BFA'],['Holiday','#7C3AED'],['Half Day','#6D28D9']].map(([lbl,col]) => (
+            {[['Present', '#8B5CF6'], ['Absent', '#C4B5FD'], ['Leave', '#A78BFA'], ['Holiday', '#7C3AED'], ['Half Day', '#6D28D9']].map(([lbl, col]) => (
               <span key={lbl} className="flex items-center gap-1"><span className="h-2 w-2 rounded-full" style={{ background: col }} />{lbl}</span>
             ))}
           </div>
@@ -183,7 +224,6 @@ export const EmployeeDashboard: React.FC = () => {
 
       {/* Stats + Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
-
         {/* Monthly Metrics */}
         <div className={`md:col-span-8 ${card}`}>
           <p style={sectionTitle}>Monthly Overview</p>
@@ -195,7 +235,10 @@ export const EmployeeDashboard: React.FC = () => {
             ].map(({ label, value, max, unit, color }) => (
               <div key={label} className="flex flex-col items-center justify-center p-4 rounded-2xl border" style={{ background: 'rgba(242,235,255,0.5)', borderColor: 'rgba(216,180,254,0.4)' }}>
                 <div className="relative w-20 h-20">
-                  <svg className="w-full h-full ring-progress"><circle cx="50%" cy="50%" r="28" fill="transparent" stroke="#EDE9FE" strokeWidth="4.5" /><circle cx="50%" cy="50%" r="28" fill="transparent" stroke={color} strokeWidth="4.5" strokeDasharray={2 * Math.PI * 28} strokeDashoffset={2 * Math.PI * 28 - (Math.min(1, value / max)) * 2 * Math.PI * 28} strokeLinecap="round" /></svg>
+                  <svg className="w-full h-full ring-progress">
+                    <circle cx="50%" cy="50%" r="28" fill="transparent" stroke="#EDE9FE" strokeWidth="4.5" />
+                    <circle cx="50%" cy="50%" r="28" fill="transparent" stroke={color} strokeWidth="4.5" strokeDasharray={2 * Math.PI * 28} strokeDashoffset={2 * Math.PI * 28 - (Math.min(1, value / max)) * 2 * Math.PI * 28} strokeLinecap="round" />
+                  </svg>
                   <span className="absolute inset-0 flex items-center justify-center text-sm font-black" style={{ color: '#4C1D95' }}>{value}{unit}</span>
                 </div>
                 <span className="text-[10px] font-bold text-center mt-2" style={{ color: '#9879E9' }}>{label}</span>
@@ -223,7 +266,7 @@ export const EmployeeDashboard: React.FC = () => {
             ))}
           </div>
           <div className="flex gap-2 mt-3">
-            {([['Teammates', () => setIsTeammatesOpen(true)], ['Shift Info', () => setIsShiftsOpen(true)]] as [string, () => void][]).map(([lbl, fn]) => (
+            {([['Teammates', () => setIsTeammatesOpen(true)], ['Shift Info', () => setIsShiftsOpen(true)] ] as [string, () => void][]).map(([lbl, fn]) => (
               <button key={lbl} onClick={fn}
                 className="flex-1 py-2 text-xs font-bold rounded-xl border transition-all hover:bg-lilac-100"
                 style={{ borderColor: 'rgba(216,180,254,0.4)', color: '#7C3AED', background: 'rgba(242,235,255,0.5)' }}>
@@ -284,7 +327,7 @@ export const EmployeeDashboard: React.FC = () => {
           {[['Days you will attend', futureDaysPresent, 22, setFutureDaysPresent, '#8B5CF6'], ['Days you will miss', futureDaysAbsent, 10, setFutureDaysAbsent, '#C4B5FD']].map(([lbl, val, max, setter, col]) => (
             <div key={lbl as string}>
               <div className="flex justify-between text-xs font-bold mb-2" style={{ color: '#4C1D95' }}>
-                <> {lbl}: <span style={{ color: col as string }}>{val as number} days</span> </>
+                <>{lbl}:</> <span style={{ color: col as string }}>{val as number} days</span>
               </div>
               <input type="range" min="0" max={max as number} value={val as number} onChange={e => (setter as Function)(Number(e.target.value))}
                 className="w-full h-1.5 rounded-full appearance-none cursor-pointer" style={{ accentColor: col as string, background: '#EDE9FE' }} />
@@ -303,7 +346,10 @@ export const EmployeeDashboard: React.FC = () => {
             <div key={t.id} className="flex items-center justify-between py-3">
               <div className="flex items-center gap-2.5">
                 <div className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg,#A78BFA,#8B5CF6)' }}>{t.name.split(' ').map((n: string) => n[0]).join('')}</div>
-                <div><span className="text-sm font-semibold block" style={{ color: '#4C1D95' }}>{t.name}</span><span className="text-[10px]" style={{ color: '#9879E9' }}>{t.designation}</span></div>
+                <div>
+                  <span className="text-sm font-semibold block" style={{ color: '#4C1D95' }}>{t.name}</span>
+                  <span className="text-[10px]" style={{ color: '#9879E9' }}>{t.designation}</span>
+                </div>
               </div>
               <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: t.status === 'Online' ? '#EDE9FE' : t.status === 'On Leave' ? '#DDD6FE' : '#F2EBFF', color: t.status === 'Online' ? '#6D28D9' : t.status === 'On Leave' ? '#7C3AED' : '#9879E9' }}>{t.status}</span>
             </div>
@@ -318,7 +364,12 @@ export const EmployeeDashboard: React.FC = () => {
             <span className="text-xs font-bold block" style={{ color: '#4C1D95' }}>Standard Day Shift</span>
             <span className="text-lg font-black font-mono mt-1 block" style={{ color: '#7C3AED' }}>09:00 AM – 05:00 PM</span>
           </div>
-          {[['Shift Type','Fixed Weekdays'],['Grace Period','15 Minutes'],['Break Time','1 Hour Lunch'],['Work Days','Mon – Fri']].map(([k,v]) => (
+          {[
+            ['Shift Type', 'Fixed Weekdays'],
+            ['Grace Period', '15 Minutes'],
+            ['Break Time', '1 Hour Lunch'],
+            ['Work Days', 'Mon – Fri']
+          ].map(([k, v]) => (
             <div key={k} className="flex justify-between text-xs" style={{ color: '#6D5A9C' }}>
               <span>{k}:</span><strong style={{ color: '#4C1D95' }}>{v}</strong>
             </div>

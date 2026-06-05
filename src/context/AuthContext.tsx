@@ -17,7 +17,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in from localStorage
     const savedUser = localStorage.getItem('currentUser');
     if (savedUser) {
       try {
@@ -33,7 +32,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!password) {
       return { success: false, message: 'Password is required' };
     }
-
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
@@ -50,7 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } catch (err) {
       console.error(err);
-      return { success: false, message: 'Server is currently offline or unreachable.' };
+      return { success: false, message: 'Failed to authenticate.' };
     }
   };
 
@@ -74,7 +72,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } catch (err) {
       console.error(err);
-      return { success: false, message: 'Server is currently offline or unreachable.' };
+      return { success: false, message: 'Failed to process request.' };
     }
   };
 

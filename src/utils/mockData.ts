@@ -14,7 +14,7 @@ export const INITIAL_EMPLOYEES: Employee[] = [
   },
   {
     id: '2',
-    employee_id: 'EMP001',
+    employee_id: 'D01',
     name: 'John Doe',
     email: 'employee@company.com',
     department: 'Engineering',
@@ -25,7 +25,7 @@ export const INITIAL_EMPLOYEES: Employee[] = [
   },
   {
     id: '3',
-    employee_id: 'EMP002',
+    employee_id: 'D02',
     name: 'Alice Smith',
     email: 'alice@company.com',
     department: 'Engineering',
@@ -36,7 +36,7 @@ export const INITIAL_EMPLOYEES: Employee[] = [
   },
   {
     id: '4',
-    employee_id: 'EMP003',
+    employee_id: 'D03',
     name: 'Bob Johnson',
     email: 'bob@company.com',
     department: 'Marketing',
@@ -47,7 +47,7 @@ export const INITIAL_EMPLOYEES: Employee[] = [
   },
   {
     id: '5',
-    employee_id: 'EMP004',
+    employee_id: 'D04',
     name: 'Charlie Brown',
     email: 'charlie@company.com',
     department: 'Sales',
@@ -58,7 +58,7 @@ export const INITIAL_EMPLOYEES: Employee[] = [
   },
   {
     id: '6',
-    employee_id: 'EMP005',
+    employee_id: 'D05',
     name: 'Diana Prince',
     email: 'diana@company.com',
     department: 'Engineering',
@@ -69,7 +69,7 @@ export const INITIAL_EMPLOYEES: Employee[] = [
   },
   {
     id: '7',
-    employee_id: 'EMP006',
+    employee_id: 'D06',
     name: 'Evan Wright',
     email: 'evan@company.com',
     department: 'Finance',
@@ -108,7 +108,7 @@ export const INITIAL_HOLIDAYS: Holiday[] = [
 export const INITIAL_LEAVES: LeaveRequest[] = [
   {
     id: 'l1',
-    employee_id: 'EMP003', // Bob Johnson
+    employee_id: 'D03', // Bob Johnson
     leave_type: 'Annual Leave',
     start_date: '2026-06-01',
     end_date: '2026-06-05',
@@ -116,7 +116,7 @@ export const INITIAL_LEAVES: LeaveRequest[] = [
   },
   {
     id: 'l2',
-    employee_id: 'EMP005', // Charlie Brown
+    employee_id: 'D05', // Diana Prince
     leave_type: 'Sick Leave',
     start_date: '2026-06-02',
     end_date: '2026-06-02',
@@ -124,7 +124,7 @@ export const INITIAL_LEAVES: LeaveRequest[] = [
   },
   {
     id: 'l3',
-    employee_id: 'EMP001', // John Doe
+    employee_id: 'D01', // John Doe
     leave_type: 'Casual Leave',
     start_date: '2026-06-10',
     end_date: '2026-06-12',
@@ -132,7 +132,7 @@ export const INITIAL_LEAVES: LeaveRequest[] = [
   },
   {
     id: 'l4',
-    employee_id: 'EMP002', // Alice Smith
+    employee_id: 'D02', // Alice Smith
     leave_type: 'Sick Leave',
     start_date: '2026-05-12',
     end_date: '2026-05-13',
@@ -140,7 +140,7 @@ export const INITIAL_LEAVES: LeaveRequest[] = [
   },
   {
     id: 'l5',
-    employee_id: 'EMP006', // Evan Wright
+    employee_id: 'D06', // Evan Wright
     leave_type: 'Annual Leave',
     start_date: '2026-06-15',
     end_date: '2026-06-18',
@@ -160,7 +160,7 @@ export const INITIAL_ACTIVITIES: ActivityLog[] = [
     id: 'act2',
     type: 'employee_add',
     user_name: 'Sarah Connor',
-    message: 'Added new employee Evan Wright (EMP006) to Finance',
+    message: 'Added new employee Evan Wright (D06) to Finance',
     timestamp: '2026-06-01T09:15:00Z',
   },
   {
@@ -283,7 +283,7 @@ export const generateMockAttendance = (employees: Employee[], holidays: Holiday[
   // Let's assume some employees checked in today
   const todayStr = getFormattedDate(today);
   employees.forEach(emp => {
-    if (emp.employee_id === 'EMP003') { // Bob is on leave
+    if (emp.employee_id === 'D03') { // Bob is on leave
       records.push({
         id: `att_${emp.employee_id}_${todayStr}`,
         employee_id: emp.employee_id,
@@ -293,7 +293,7 @@ export const generateMockAttendance = (employees: Employee[], holidays: Holiday[
         status: 'Leave',
         working_hours: null,
       });
-    } else if (emp.employee_id === 'EMP004') { // Charlie is absent
+    } else if (emp.employee_id === 'D04') { // Charlie is absent
       records.push({
         id: `att_${emp.employee_id}_${todayStr}`,
         employee_id: emp.employee_id,
