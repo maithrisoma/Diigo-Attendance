@@ -1,5 +1,14 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Employee, AttendanceRecord, LeaveRequest, Holiday, ActivityLog, AttendanceStatus } from '../types';
+import { API_BASE_URL } from '../config';
+
+const originalFetch = window.fetch;
+const fetch = (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+  if (typeof input === 'string' && input.startsWith('/api')) {
+    return originalFetch(`${API_BASE_URL}${input}`, init);
+  }
+  return originalFetch(input, init);
+};
 
 
 interface DataContextType {

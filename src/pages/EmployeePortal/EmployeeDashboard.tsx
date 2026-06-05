@@ -5,718 +5,326 @@ import { useData } from '../../context/DataContext';
 import { useToast } from '../../components/ui/Toast';
 import { Modal } from '../../components/ui/Modal';
 import { LiveCalendar } from '../../components/ui/LiveCalendar';
-import {
-  Calendar,
-  Clock,
-  Award,
-  Newspaper,
-  Sparkles,
-  Users2,
-  CalendarCheck,
-  Check,
-  TrendingUp,
-  Info,
-  CalendarDays
-} from 'lucide-react';
+import { Clock, Award, Newspaper, Sparkles, CalendarDays, Check, TrendingUp, Info } from 'lucide-react';
 
 export const EmployeeDashboard: React.FC = () => {
   const { currentUser } = useAuth();
   const { attendance, checkIn, checkOut, leaveRequests, holidays, employees } = useData();
   const { toast } = useToast();
   const navigate = useNavigate();
-
   const [currentTime, setCurrentTime] = useState(new Date());
   const [runningHoursStr, setRunningHoursStr] = useState('00:00:00');
-
-  // Modal states
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
   const [isNewsOpen, setIsNewsOpen] = useState(false);
   const [isPredictorOpen, setIsPredictorOpen] = useState(false);
   const [isTeammatesOpen, setIsTeammatesOpen] = useState(false);
   const [isShiftsOpen, setIsShiftsOpen] = useState(false);
-
-  // Predictor modal states
   const [futureDaysPresent, setFutureDaysPresent] = useState(10);
   const [futureDaysAbsent, setFutureDaysAbsent] = useState(0);
 
-  // Keep digital clock updating
   useEffect(() => {
-    const clockTimer = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(clockTimer);
+    const t = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(t);
   }, []);
 
   const todayStr = new Date().toISOString().split('T')[0];
-
-  const myAttendance = useMemo(() => {
-    if (!currentUser) return [];
-    return attendance.filter(a => a.employee_id === currentUser.employee_id);
-  }, [attendance, currentUser]);
-
-  // Build calendar lookup maps
-  const myAttendanceByDate = useMemo(() => {
-    const map: Record<string, { status: string }> = {};
-    myAttendance.forEach(a => { map[a.date] = { status: a.status }; });
-    return map;
-  }, [myAttendance]);
-
-  const holidayByDate = useMemo(() => {
-    const map: Record<string, string> = {};
-    holidays.forEach(h => { map[h.holiday_date] = h.holiday_name; });
-    return map;
-  }, [holidays]);
-
-  // Find today's attendance record
-  const todayRecord = attendance.find(
-    (a) => a.employee_id === currentUser?.employee_id && a.date === todayStr
-  );
-
+  const myAttendance = useMemo(() => currentUser ? attendance.filter(a => a.employee_id === currentUser.employee_id) : [], [attendance, currentUser]);
+  const myAttendanceByDate = useMemo(() => { const m: Record<string, { status: string }> = {}; myAttendance.forEach(a => { m[a.date] = { status: a.status }; }); return m; }, [myAttendance]);
+  const holidayByDate = useMemo(() => { const m: Record<string, string> = {}; holidays.forEach(h => { m[h.holiday_date] = h.holiday_name; }); return m; }, [holidays]);
+  const todayRecord = attendance.find(a => a.employee_id === currentUser?.employee_id && a.date === todayStr);
   const isWeekend = currentTime.getDay() === 0 || currentTime.getDay() === 6;
-  const todayHoliday = holidays.find((h) => h.holiday_date === todayStr);
-
+  const todayHoliday = holidays.find(h => h.holiday_date === todayStr);
   const hasCheckedIn = !!todayRecord?.check_in;
   const hasCheckedOut = !!todayRecord?.check_out;
 
-  // Running timer for elapsed working hours
   useEffect(() => {
-    if (!currentUser || !hasCheckedIn || hasCheckedOut || !todayRecord?.check_in) {
-      setRunningHoursStr('00:00:00');
-      return;
-    }
-
-    const calculateElapsed = () => {
-      const checkInTimeStr = todayRecord.check_in!;
-      const [inH, inM, inS] = checkInTimeStr.split(':').map(Number);
-      
-      const now = new Date();
-      const checkInDate = new Date();
-      checkInDate.setHours(inH, inM, inS || 0);
-
-      let diffMs = now.getTime() - checkInDate.getTime();
-      if (diffMs < 0) diffMs = 0;
-
-      const hrs = Math.floor(diffMs / 3600000);
-      const mins = Math.floor((diffMs % 3600000) / 60000);
-      const secs = Math.floor((diffMs % 60000) / 1000);
-
-      setRunningHoursStr(
-        `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
-      );
+    if (!hasCheckedIn || hasCheckedOut || !todayRecord?.check_in) { setRunningHoursStr('00:00:00'); return; }
+    const calc = () => {
+      const [inH, inM, inS] = todayRecord.check_in!.split(':').map(Number);
+      const checkInDate = new Date(); checkInDate.setHours(inH, inM, inS || 0);
+      let diff = Math.max(0, Date.now() - checkInDate.getTime());
+      const hrs = Math.floor(diff / 3600000), mins = Math.floor((diff % 3600000) / 60000), secs = Math.floor((diff % 60000) / 1000);
+      setRunningHoursStr(`${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`);
     };
-
-    calculateElapsed();
-    const timer = setInterval(calculateElapsed, 1000);
-    return () => clearInterval(timer);
-  }, [hasCheckedIn, hasCheckedOut, todayRecord, currentUser]);
-
-  const handleCheckIn = () => {
-    if (!currentUser) return;
-    checkIn(currentUser.employee_id);
-    toast('Successfully checked in today!', 'success');
-  };
-
-  const handleCheckOut = () => {
-    if (!currentUser) return;
-    checkOut(currentUser.employee_id);
-    toast('Successfully checked out today!', 'success');
-  };
+    calc(); const t = setInterval(calc, 1000); return () => clearInterval(t);
+  }, [hasCheckedIn, hasCheckedOut, todayRecord]);
 
   if (!currentUser) return null;
 
-  // Calculate Dates for the Current Week (Mon to Fri)
   const getWeekDays = () => {
-    const current = new Date();
-    const day = current.getDay();
-    const diff = current.getDate() - day + (day === 0 ? -6 : 1);
-    const monday = new Date(current.setDate(diff));
-    
-    const weekDays = [];
-    for (let i = 0; i < 5; i++) {
-      const nextDay = new Date(monday);
-      nextDay.setDate(monday.getDate() + i);
-      weekDays.push(nextDay);
-    }
-    return weekDays;
+    const cur = new Date(), day = cur.getDay(), diff = cur.getDate() - day + (day === 0 ? -6 : 1);
+    const mon = new Date(cur.setDate(diff));
+    return Array.from({ length: 5 }, (_, i) => { const d = new Date(mon); d.setDate(mon.getDate() + i); return d; });
   };
 
-  const weekDays = getWeekDays();
-
-  // Find attendance status for a given date
   const getDayStatus = (date: Date) => {
     const dStr = date.toISOString().split('T')[0];
     const rec = attendance.find(a => a.employee_id === currentUser.employee_id && a.date === dStr);
-    
-    if (rec) {
-      return rec.status; // 'Present', 'Absent', 'Half Day'
-    }
-
-    // Check if it's weekend
-    const dayNum = date.getDay();
-    if (dayNum === 0 || dayNum === 6) return 'Weekend';
-
-    // Check if holiday
-    const hol = holidays.find(h => h.holiday_date === dStr);
-    if (hol) return 'Holiday';
-
-    // Check if approved leave
-    const leave = leaveRequests.find(
-      l => l.employee_id === currentUser.employee_id && l.status === 'Approved' && dStr >= l.start_date && dStr <= l.end_date
-    );
-    if (leave) return 'Leave';
-
-    // Check if past or future
-    const todayNoTime = new Date();
-    todayNoTime.setHours(0,0,0,0);
-    const dateNoTime = new Date(date);
-    dateNoTime.setHours(0,0,0,0);
-
-    if (dateNoTime.getTime() > todayNoTime.getTime()) {
-      return 'Future';
-    } else if (dateNoTime.getTime() === todayNoTime.getTime()) {
-      return hasCheckedIn ? 'Present' : 'Pending';
-    } else {
-      return 'Absent'; // past unmarked weekday is absent
-    }
+    if (rec) return rec.status;
+    if (date.getDay() === 0 || date.getDay() === 6) return 'Weekend';
+    if (holidays.find(h => h.holiday_date === dStr)) return 'Holiday';
+    if (leaveRequests.find(l => l.employee_id === currentUser.employee_id && l.status === 'Approved' && dStr >= l.start_date && dStr <= l.end_date)) return 'Leave';
+    const todayNoTime = new Date(); todayNoTime.setHours(0,0,0,0);
+    const dateNoTime = new Date(date); dateNoTime.setHours(0,0,0,0);
+    if (dateNoTime.getTime() > todayNoTime.getTime()) return 'Future';
+    if (dateNoTime.getTime() === todayNoTime.getTime()) return hasCheckedIn ? 'Present' : 'Pending';
+    return 'Absent';
   };
 
-  const getNumberSuffix = (num: number) => {
-    if (num > 3 && num < 21) return 'th';
-    switch (num % 10) {
-      case 1:  return 'st';
-      case 2:  return 'nd';
-      case 3:  return 'rd';
-      default: return 'th';
-    }
-  };
-
-  const currentDayNum = currentTime.getDate();
-  const currentDayName = currentTime.toLocaleDateString('en-US', { weekday: 'long' });
-  const currentMonthYear = currentTime.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-
-  // Compute Statistics
+  const weekDays = getWeekDays();
   const presentDays = myAttendance.filter(a => a.status === 'Present').length;
   const halfDays = myAttendance.filter(a => a.status === 'Half Day').length;
-  const totalCompletedRecords = myAttendance.length;
-  
-  const baseAttendanceRate = totalCompletedRecords > 0 
-    ? Math.round(((presentDays + halfDays * 0.5) / totalCompletedRecords) * 100)
-    : 94;
+  const totalRecords = myAttendance.length;
+  const attendanceRate = totalRecords > 0 ? Math.round(((presentDays + halfDays * 0.5) / totalRecords) * 100) : 94;
+  const approvedLeaves = leaveRequests.filter(l => l.employee_id === currentUser.employee_id && l.status === 'Approved').reduce((acc, l) => acc + (Math.ceil(Math.abs(new Date(l.end_date).getTime() - new Date(l.start_date).getTime()) / 86400000) + 1), 0);
+  const presentThisMonth = myAttendance.filter(a => a.date.startsWith(new Date().toISOString().substring(0,7)) && (a.status === 'Present' || a.status === 'Half Day')).length;
+  const teammatesList = employees.filter(e => e.department === currentUser.department && e.employee_id !== currentUser.employee_id).map(e => ({ ...e, status: leaveRequests.some(l => l.employee_id === e.employee_id && l.status === 'Approved' && todayStr >= l.start_date && todayStr <= l.end_date) ? 'On Leave' : attendance.some(a => a.employee_id === e.employee_id && a.date === todayStr && !a.check_out) ? 'Online' : 'Offline' }));
+  const predictedRate = (totalRecords + futureDaysPresent + futureDaysAbsent) > 0 ? Math.round(((presentDays + futureDaysPresent + halfDays * 0.5) / (totalRecords + futureDaysPresent + futureDaysAbsent)) * 100) : 0;
 
-  const approvedLeavesCount = leaveRequests
-    .filter(l => l.employee_id === currentUser.employee_id && l.status === 'Approved')
-    .reduce((acc, curr) => {
-      const start = new Date(curr.start_date);
-      const end = new Date(curr.end_date);
-      const diffTime = Math.abs(end.getTime() - start.getTime());
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-      return acc + diffDays;
-    }, 0);
-
-  const currentMonthPrefix = new Date().toISOString().substring(0, 7);
-  const presentThisMonth = myAttendance.filter(
-    a => a.date.startsWith(currentMonthPrefix) && (a.status === 'Present' || a.status === 'Half Day')
-  ).length;
+  const statusStyle = (s: string) => {
+    if (s === 'Present') return { bg: '#EDE9FE', border: 'rgba(139,92,246,0.3)', text: '#6D28D9' };
+    if (s === 'Absent') return { bg: '#F2EBFF', border: 'rgba(196,181,253,0.4)', text: '#9879E9' };
+    if (s === 'Leave') return { bg: '#DDD6FE', border: 'rgba(167,139,250,0.4)', text: '#7C3AED' };
+    if (s === 'Holiday') return { bg: '#C4B5FD', border: 'rgba(139,92,246,0.4)', text: '#4C1D95' };
+    if (s === 'Half Day') return { bg: '#EDE9FE', border: 'rgba(167,139,250,0.3)', text: '#5B21B6' };
+    return { bg: 'rgba(242,235,255,0.5)', border: 'rgba(196,181,253,0.2)', text: '#C4B5FD' };
+  };
 
   const companyNews = [
-    { id: 1, title: 'Upcoming Public Holiday', desc: 'The office will be closed this Friday for World Environment Day. Enjoy the long weekend!', date: 'Jun 2, 2026' },
-    { id: 2, title: 'Annual Health Checkup Camp', desc: 'A free healthcare checkup is scheduled in the cafeteria room on Monday morning, starting at 10 AM.', date: 'May 31, 2026' },
-    { id: 3, title: 'New Remote Work Guidelines', desc: 'Updated remote working policy has been published in the HR guidelines manual. Access via portal attachments.', date: 'May 28, 2026' }
+    { id: 1, title: 'Upcoming Public Holiday', desc: 'The office will be closed this Friday. Enjoy the long weekend!', date: 'Jun 2, 2026' },
+    { id: 2, title: 'Annual Health Checkup Camp', desc: 'Free healthcare checkup in cafeteria on Monday at 10 AM.', date: 'May 31, 2026' },
+    { id: 3, title: 'New Remote Work Guidelines', desc: 'Updated remote working policy published in HR guidelines.', date: 'May 28, 2026' },
   ];
 
-  const teammatesList = employees
-    .filter(e => e.department === currentUser.department && e.employee_id !== currentUser.employee_id)
-    .map(e => {
-      const isOnline = attendance.some(a => a.employee_id === e.employee_id && a.date === todayStr && !a.check_out);
-      const isOnLeave = leaveRequests.some(l => l.employee_id === e.employee_id && l.status === 'Approved' && todayStr >= l.start_date && todayStr <= l.end_date);
-      return {
-        ...e,
-        status: isOnLeave ? 'On Leave' : isOnline ? 'Online' : 'Offline'
-      };
-    });
-
-  const totalDaysSoFarPredictor = totalCompletedRecords + futureDaysPresent + futureDaysAbsent;
-  const predictedRate = totalDaysSoFarPredictor > 0
-    ? Math.round(((presentDays + futureDaysPresent + (halfDays * 0.5)) / totalDaysSoFarPredictor) * 100)
-    : 0;
-
-
+  const card = "glass-card p-6 flex flex-col";
+  const sectionTitle = { fontSize: '11px', fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.08em', color: '#9879E9', marginBottom: 16 };
 
   return (
-    <div className="space-y-6">
-      
-      {/* ── Unified Bento Grid Layout ── */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+    <div className="space-y-6 pb-10 animate-fadeInUp">
 
-        {/* Bento 1: Unified Shift & Identity Header (Spans 8) */}
-        <div className="md:col-span-8 bg-card border border-border rounded-lg p-6 shadow-card hover:scale-[1.005] hover:shadow-premium-light dark:hover:shadow-premium-dark transition-all duration-300 flex flex-col justify-between min-h-[160px]">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div className="flex items-center space-x-3.5">
-              <div className="h-12 w-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-display font-bold text-lg border border-border shadow-sm">
-                {currentUser.name.split(' ').map(n => n[0]).join('')}
-              </div>
-              <div className="text-left">
-                <h4 className="font-bold text-lg text-foreground font-display leading-tight">{currentUser.name}</h4>
-                <p className="text-xs text-muted-foreground font-mono mt-0.5">{currentUser.designation} • {currentUser.employee_id}</p>
-              </div>
-            </div>
-            <div className="text-xs font-semibold text-muted-foreground bg-muted/10 px-3 py-1 rounded-full font-display">
-              {currentMonthYear}
-            </div>
-          </div>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-6 pt-4 border-t border-border">
-            <div className="flex items-center space-x-2.5">
-              <Clock className="h-5 w-5 text-muted-foreground" />
-              <div className="text-left">
-                <p className="text-xs font-bold text-foreground uppercase tracking-wider">Active Shift Time</p>
-                <p className="text-xs text-muted-foreground font-mono mt-0.5">
-                  {hasCheckedIn 
-                    ? `Clocked In at ${new Date(`2000-01-01T${todayRecord.check_in}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-                    : todayHoliday 
-                    ? `Holiday: ${todayHoliday.holiday_name}`
-                    : isWeekend 
-                    ? 'Weekend Rest Day' 
-                    : 'Standard Shift: 9:00 AM - 5:00 PM'}
-                </p>
-              </div>
-            </div>
-            <div>
-              {!hasCheckedIn ? (
-                <button
-                  onClick={handleCheckIn}
-                  disabled={isWeekend || !!todayHoliday}
-                  className="px-5 py-2.5 bg-primary text-primary-foreground hover:opacity-90 disabled:bg-muted/10 disabled:text-muted-foreground/40 font-bold text-sm rounded-lg transition duration-150 shadow-sm font-display"
-                >
-                  Clock In
-                </button>
-              ) : !hasCheckedOut ? (
-                <div className="flex items-center gap-3">
-                  <span className="text-xs font-mono bg-muted/10 px-2 py-1 rounded-md text-foreground animate-pulse">
-                    {runningHoursStr}
-                  </span>
-                  <button
-                    onClick={handleCheckOut}
-                    className="px-5 py-2.5 bg-primary text-primary-foreground hover:bg-[var(--primary-hover)] font-bold text-sm rounded-lg transition duration-150 shadow-sm font-display"
-                  >
-                    Clock Out
-                  </button>
-                </div>
-              ) : (
-                <button
-                  disabled
-                  className="px-5 py-2.5 bg-muted/10 text-muted-foreground/40 font-bold text-sm rounded-lg"
-                >
-                  Completed
-                </button>
-              )}
-            </div>
-          </div>
+      {/* Welcome Banner */}
+      <div className="rounded-3xl p-7 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 relative overflow-hidden"
+        style={{ background: 'linear-gradient(135deg,#7C3AED 0%,#A78BFA 60%,#C4B5FD 100%)', boxShadow: '0 12px 40px rgba(124,58,237,0.28)' }}>
+        <div className="absolute top-0 right-0 w-48 h-48 rounded-full opacity-20" style={{ background: 'radial-gradient(circle,#fff,transparent)', transform: 'translate(30%,-30%)' }} />
+        <div className="text-white z-10 space-y-1">
+          <span className="text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full inline-block" style={{ background: 'rgba(255,255,255,0.2)' }}>Employee Portal</span>
+          <h2 className="text-2xl font-black">Good {currentTime.getHours() < 12 ? 'Morning' : 'Afternoon'}, {currentUser.name.split(' ')[0]}! 👋</h2>
+          <p className="text-sm opacity-80">{currentUser.designation} · {currentUser.department} · {currentUser.employee_id}</p>
         </div>
-
-        {/* Bento 2: Digital Clock Widget (Spans 4) */}
-        <div className="md:col-span-4 bg-card border border-border rounded-lg p-6 shadow-card hover:scale-[1.005] hover:shadow-premium-light dark:hover:shadow-premium-dark transition-all duration-300 flex flex-col justify-between min-h-[160px]">
-          <div className="flex justify-between items-center">
-            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Live Time Clock</span>
-            <span className="h-2 w-2 rounded-full bg-primary animate-ping" />
-          </div>
-          <div className="text-left my-auto py-1">
-            <div className="text-4xl font-black font-mono tracking-tight text-foreground leading-none">
-              {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
-            </div>
-            <p className="text-xs text-muted-foreground mt-2 font-medium">
-              {currentDayName}, {currentTime.toLocaleDateString([], { month: 'short', day: 'numeric' })}
-            </p>
-          </div>
-          <div className="text-[10px] text-muted-foreground/80 font-semibold border-t border-border/60 pt-2 flex items-center gap-1">
-            <Info className="h-3.5 w-3.5 text-primary" />
-            <span>Updates automatically in real time</span>
-          </div>
+        <div className="z-10 flex flex-col items-end gap-1 text-white">
+          <span className="text-4xl font-black font-mono">
+            {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
+          </span>
+          <span className="text-sm opacity-75">{currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</span>
         </div>
-
-        {/* Bento 3: Weekly Streak (Spans 8) */}
-        <div className="md:col-span-8 bg-card border border-border rounded-lg p-6 shadow-card hover:scale-[1.005] hover:shadow-premium-light dark:hover:shadow-premium-dark transition-all duration-300 flex flex-col justify-between">
-          <div>
-            <h3 className="text-xs font-bold text-foreground uppercase tracking-wider mb-4 text-left">Weekly Status Streak</h3>
-            <div className="grid grid-cols-5 gap-4">
-              {weekDays.map((day, idx) => {
-                const status = getDayStatus(day);
-                const isToday = day.toISOString().split('T')[0] === todayStr;
-
-                let bgStyle = 'bg-muted/10 border-border';
-                let icon = null;
-                
-                if (status === 'Present') {
-                  bgStyle = 'bg-[var(--calendar-present-bg)] border-[var(--calendar-present-border)] text-[var(--calendar-present-text)]';
-                  icon = <Check className="h-3.5 w-3.5 stroke-[3]" />;
-                } else if (status === 'Absent') {
-                  bgStyle = 'bg-[var(--calendar-absent-bg)] border-[var(--calendar-absent-border)] text-[var(--calendar-absent-text)]';
-                  icon = <span className="text-[10px] font-black">✕</span>;
-                } else if (status === 'Leave') {
-                  bgStyle = 'bg-[var(--calendar-leave-bg)] border-[var(--calendar-leave-border)] text-[var(--calendar-leave-text)]';
-                  icon = <span className="text-[10px] font-bold">L</span>;
-                } else if (status === 'Holiday') {
-                  bgStyle = 'bg-[var(--calendar-holiday-bg)] border-[var(--calendar-holiday-border)] text-[var(--calendar-holiday-text)]';
-                  icon = <span className="text-[10px] font-bold">H</span>;
-                } else if (status === 'Half Day') {
-                  bgStyle = 'bg-[var(--calendar-leave-bg)]/80 border-[var(--calendar-leave-border)]/70 text-[var(--calendar-leave-text)]';
-                  icon = <span className="text-[10px] font-bold">HD</span>;
-                } else if (status === 'Pending') {
-                  bgStyle = 'bg-muted/20 border-border animate-pulse';
-                }
-
-                return (
-                  <div key={idx} className="flex flex-col items-center space-y-2">
-                    <span className="text-xs font-bold text-muted-foreground">
-                      {day.toLocaleDateString('en-US', { weekday: 'short' })}
-                    </span>
-                    <div 
-                      className={`w-10 h-10 rounded-full flex items-center justify-center border font-display transition shadow-sm ${bgStyle} ${
-                        isToday ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''
-                      }`}
-                    >
-                      {icon ? icon : <span className="text-xs text-muted-foreground font-bold">{day.getDate()}</span>}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-5 pt-4 border-t border-border text-[10px] text-muted-foreground font-semibold justify-between">
-            <div className="flex items-center gap-3">
-              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-present" /> Present</span>
-              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-absent" /> Absent</span>
-              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-leave" /> Leave</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-halfday" /> Half Day</span>
-              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-holiday" /> Holiday</span>
-              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-weekend" /> Weekend</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Bento 4: Quick Actions Grid (Spans 4) */}
-        <div className="md:col-span-4 bg-card border border-border rounded-lg p-6 shadow-card hover:scale-[1.005] hover:shadow-premium-light dark:hover:shadow-premium-dark transition-all duration-300 flex flex-col justify-between">
-          <div>
-            <h3 className="text-xs font-bold text-foreground uppercase tracking-wider mb-4 text-left">Quick Actions</h3>
-            <div className="grid grid-cols-2 gap-3">
-              <button 
-                onClick={() => navigate('/employee/leaves')}
-                className="flex flex-col items-center justify-center p-3 bg-muted/5 hover:bg-primary/10 rounded-xl border border-border/80 transition text-center group active:scale-95"
-              >
-                <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-2 group-hover:scale-110 transition duration-150">
-                  <CalendarDays className="h-4.5 w-4.5" />
-                </div>
-                <span className="text-xs font-bold text-foreground">Ask Leave</span>
-              </button>
-
-              <button 
-                onClick={() => setIsLeaderboardOpen(true)}
-                className="flex flex-col items-center justify-center p-3 bg-muted/5 hover:bg-primary/10 rounded-xl border border-border/80 transition text-center group active:scale-95"
-              >
-                <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-2 group-hover:scale-110 transition duration-150">
-                  <Award className="h-4.5 w-4.5" />
-                </div>
-                <span className="text-xs font-bold text-foreground">Leaderboard</span>
-              </button>
-
-              <button 
-                onClick={() => setIsNewsOpen(true)}
-                className="flex flex-col items-center justify-center p-3 bg-muted/5 hover:bg-primary/10 rounded-xl border border-border/80 transition text-center group active:scale-95"
-              >
-                <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-2 group-hover:scale-110 transition duration-150">
-                  <Newspaper className="h-4.5 w-4.5" />
-                </div>
-                <span className="text-xs font-bold text-foreground">News</span>
-              </button>
-
-              <button 
-                onClick={() => setIsPredictorOpen(true)}
-                className="flex flex-col items-center justify-center p-3 bg-muted/5 hover:bg-primary/10 rounded-xl border border-border/80 transition text-center group active:scale-95"
-              >
-                <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-2 group-hover:scale-110 transition duration-150">
-                  <Sparkles className="h-4.5 w-4.5" />
-                </div>
-                <span className="text-xs font-bold text-foreground">Predictor</span>
-              </button>
-            </div>
-          </div>
-          <div className="flex gap-2 mt-4">
-            <button 
-              onClick={() => setIsTeammatesOpen(true)}
-              className="flex-1 py-2 bg-muted/5 hover:bg-primary/10 text-xs font-bold text-foreground border border-border/80 rounded-lg transition active:scale-95"
-            >
-              Teammates
-            </button>
-            <button 
-              onClick={() => setIsShiftsOpen(true)}
-              className="flex-1 py-2 bg-muted/5 hover:bg-primary/10 text-xs font-bold text-foreground border border-border/80 rounded-lg transition active:scale-95"
-            >
-              Active Shift
-            </button>
-          </div>
-        </div>
-
-        {/* Bento 5: Monthly Circular Overview (Spans 8) */}
-        <div className="md:col-span-8 bg-card border border-border rounded-lg p-6 shadow-card hover:scale-[1.005] hover:shadow-premium-light dark:hover:shadow-premium-dark transition-all duration-300 flex flex-col justify-between">
-          <h3 className="text-xs font-bold text-foreground uppercase tracking-wider mb-5 text-left">Monthly Overview Metrics</h3>
-          <div className="grid grid-cols-3 gap-3">
-            <div className="flex flex-col items-center justify-center p-4 bg-muted/5 rounded-xl border border-border/60">
-              <div className="relative flex items-center justify-center w-20 h-20">
-                <svg className="w-full h-full transform -rotate-90">
-                  <circle cx="50%" cy="50%" r="28" className="stroke-border fill-transparent" strokeWidth="4.5" />
-                  <circle cx="50%" cy="50%" r="28" className="stroke-primary fill-transparent transition-all duration-500" strokeWidth="4.5" 
-                    strokeDasharray={2 * Math.PI * 28} 
-                    strokeDashoffset={2 * Math.PI * 28 - (baseAttendanceRate / 100) * (2 * Math.PI * 28)} 
-                    strokeLinecap="round" />
-                </svg>
-                <span className="absolute text-sm font-extrabold font-display text-foreground">{baseAttendanceRate}%</span>
-              </div>
-              <span className="text-[10px] font-bold text-muted-foreground mt-2 text-center">Attendance Rate</span>
-            </div>
-
-            <div className="flex flex-col items-center justify-center p-4 bg-muted/5 rounded-xl border border-border/60">
-              <div className="relative flex items-center justify-center w-20 h-20">
-                <svg className="w-full h-full transform -rotate-90">
-                  <circle cx="50%" cy="50%" r="28" className="stroke-border fill-transparent" strokeWidth="4.5" />
-                  <circle cx="50%" cy="50%" r="28" className="stroke-primary fill-transparent transition-all duration-500" strokeWidth="4.5" 
-                    strokeDasharray={2 * Math.PI * 28} 
-                    strokeDashoffset={2 * Math.PI * 28 - (Math.min(100, (approvedLeavesCount / 12) * 100) / 100) * (2 * Math.PI * 28)} 
-                    strokeLinecap="round" />
-                </svg>
-                <span className="absolute text-sm font-extrabold font-display text-foreground">{approvedLeavesCount.toString().padStart(2, '0')}</span>
-              </div>
-              <span className="text-[10px] font-bold text-muted-foreground mt-2 text-center">Leaves Taken</span>
-            </div>
-
-            <div className="flex flex-col items-center justify-center p-4 bg-muted/5 rounded-xl border border-border/60">
-              <div className="relative flex items-center justify-center w-20 h-20">
-                <svg className="w-full h-full transform -rotate-90">
-                  <circle cx="50%" cy="50%" r="28" className="stroke-border fill-transparent" strokeWidth="4.5" />
-                  <circle cx="50%" cy="50%" r="28" className="stroke-primary fill-transparent transition-all duration-500" strokeWidth="4.5" 
-                    strokeDasharray={2 * Math.PI * 28} 
-                    strokeDashoffset={2 * Math.PI * 28 - (Math.min(100, (presentThisMonth / 22) * 100) / 100) * (2 * Math.PI * 28)} 
-                    strokeLinecap="round" />
-                </svg>
-                <span className="absolute text-sm font-extrabold font-display text-foreground">{presentThisMonth.toString().padStart(2, '0')}</span>
-              </div>
-              <span className="text-[10px] font-bold text-muted-foreground mt-2 text-center">Working Days</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Bento 6: Colleagues & System Info Tip (Spans 4) */}
-        <div className="md:col-span-4 bg-card border border-border rounded-lg p-6 shadow-card hover:scale-[1.005] hover:shadow-premium-light dark:hover:shadow-premium-dark transition-all duration-300 flex flex-col justify-between">
-          <div>
-            <div className="flex justify-between items-center mb-3">
-              <h3 className="text-xs font-bold text-foreground uppercase tracking-wider text-left">Colleagues ({teammatesList.filter(t => t.status === 'Online').length} Online)</h3>
-              <button onClick={() => setIsTeammatesOpen(true)} className="text-[10px] text-primary font-bold hover:underline">View All</button>
-            </div>
-            <div className="space-y-2 max-h-[110px] overflow-y-auto pr-1">
-              {teammatesList.slice(0, 3).map(teammate => (
-                <div key={teammate.id} className="flex items-center justify-between py-1 border-b border-border/30 last:border-0 text-left">
-                  <div className="flex items-center space-x-2">
-                    <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center font-bold text-[10px] text-primary">
-                      {teammate.name.split(' ').map(n => n[0]).join('')}
-                    </div>
-                    <span className="text-xs font-medium text-foreground truncate max-w-[120px]">{teammate.name}</span>
-                  </div>
-                  <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
-                    teammate.status === 'Online' ? 'bg-[var(--calendar-present-bg)] text-[var(--calendar-present-text)]' : teammate.status === 'On Leave' ? 'bg-[var(--calendar-leave-bg)] text-[var(--calendar-leave-text)]' : 'bg-muted text-muted-foreground'
-                  }`}>
-                    {teammate.status}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="bg-muted/5 text-foreground rounded-xl p-3 border border-border/80 flex items-start gap-2.5 mt-4">
-            <Info className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-            <div className="text-left">
-              <span className="text-[10px] font-bold text-foreground block">Quick tip</span>
-              <span className="text-[9.5px] text-muted-foreground leading-normal block mt-0.5">
-                Forgot check-out? Reach out directly to your HR Representative to adjust past registry logs.
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Bento 7: Live Calendar (Full width) */}
-        <div className="md:col-span-12 bg-card border border-border rounded-lg p-6 shadow-card hover:shadow-premium-light transition-all duration-300">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">My Attendance Calendar</h3>
-            <span className="text-[10px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">Live View</span>
-          </div>
-          <LiveCalendar
-            attendanceByDate={myAttendanceByDate}
-            holidayByDate={holidayByDate}
-            compact={false}
-          />
-        </div>
-
       </div>
 
-      {/* ── MODALS ── */}
+      {/* Clock In/Out + Weekly Streak */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
 
-      {/* 1. Leaderboard Modal */}
-      <Modal isOpen={isLeaderboardOpen} onClose={() => setIsLeaderboardOpen(false)} title="Department Attendance Leaderboard" size="md">
-        <div className="space-y-4 text-left">
-          <div className="flex items-center gap-3 bg-muted/5 p-3.5 rounded-xl border border-border">
-            <Award className="h-6 w-6 text-primary flex-shrink-0" />
-            <p className="text-xs font-medium text-foreground leading-relaxed">
-              Teammates with the best attendance score in the <strong>{currentUser.department}</strong> department this month.
-            </p>
+        {/* Clock In/Out Card */}
+        <div className={`md:col-span-5 ${card}`} style={{ justifyContent: 'space-between', minHeight: 180 }}>
+          <div className="flex items-center justify-between">
+            <div>
+              <p style={sectionTitle}>Today's Attendance</p>
+              <p className="text-sm" style={{ color: '#6D5A9C' }}>
+                {hasCheckedIn ? `Clocked in at ${new Date(`2000-01-01T${todayRecord!.check_in}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : todayHoliday ? `Holiday: ${todayHoliday.holiday_name}` : isWeekend ? 'Weekend Rest Day' : 'Standard Shift: 9:00 AM - 5:00 PM'}
+              </p>
+            </div>
+            {hasCheckedIn && !hasCheckedOut && (
+              <span className="font-mono text-sm font-bold px-3 py-1.5 rounded-xl animate-pulse" style={{ background: '#EDE9FE', color: '#7C3AED' }}>{runningHoursStr}</span>
+            )}
           </div>
-          
-          <div className="divide-y divide-border">
-            {employees
-              .filter(e => e.department === currentUser.department)
-              .map((emp, index) => {
-                const score = 100 - (index * 2);
-                return (
-                  <div key={emp.id} className="flex items-center justify-between py-3">
-                    <div className="flex items-center space-x-3">
-                      <div className={`h-6 w-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                        index === 0 ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400' : index === 1 ? 'bg-muted text-muted-foreground' : 'bg-muted/50 text-muted-foreground'
-                      }`}>
-                        {index + 1}
-                      </div>
-                      <div>
-                        <span className="text-sm font-semibold text-foreground block">{emp.name}</span>
-                        <span className="text-[10px] text-muted-foreground">{emp.designation}</span>
-                      </div>
-                    </div>
-                    <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">{score}% Score</span>
-                  </div>
-                );
-              })}
+          <div className="mt-4">
+            {!hasCheckedIn ? (
+              <button onClick={() => { if (!currentUser) return; checkIn(currentUser.employee_id); toast('Checked in successfully!', 'success'); }} disabled={isWeekend || !!todayHoliday}
+                className="btn-lilac px-6 py-3 rounded-full text-sm font-bold w-full disabled:opacity-40 disabled:cursor-not-allowed">
+                Clock In
+              </button>
+            ) : !hasCheckedOut ? (
+              <button onClick={() => { if (!currentUser) return; checkOut(currentUser.employee_id); toast('Checked out successfully!', 'success'); }}
+                className="w-full px-6 py-3 rounded-full text-sm font-bold transition-all" style={{ background: 'linear-gradient(135deg,#6D28D9,#4C1D95)', color: '#fff', boxShadow: '0 4px 16px rgba(109,40,217,0.3)' }}>
+                Clock Out
+              </button>
+            ) : (
+              <div className="flex items-center gap-2 justify-center py-2" style={{ color: '#8B5CF6' }}>
+                <Check className="h-5 w-5" /> <span className="font-semibold text-sm">Shift Complete</span>
+              </div>
+            )}
           </div>
         </div>
-      </Modal>
 
-      {/* 2. News Modal */}
-      <Modal isOpen={isNewsOpen} onClose={() => setIsNewsOpen(false)} title="Company Announcements" size="md">
-        <div className="space-y-4">
-          {companyNews.map(news => (
-            <div key={news.id} className="p-4 bg-muted/5 border border-border rounded-xl space-y-1 text-left">
-              <div className="flex justify-between items-center">
-                <span className="text-xs font-bold text-foreground font-display">{news.title}</span>
-                <span className="text-[10px] text-muted-foreground font-medium">{news.date}</span>
+        {/* Weekly Streak */}
+        <div className={`md:col-span-7 ${card}`}>
+          <p style={sectionTitle}>Weekly Streak</p>
+          <div className="grid grid-cols-5 gap-3">
+            {weekDays.map((day, idx) => {
+              const status = getDayStatus(day);
+              const st = statusStyle(status);
+              const isToday = day.toISOString().split('T')[0] === todayStr;
+              return (
+                <div key={idx} className="flex flex-col items-center gap-2">
+                  <span className="text-xs font-bold" style={{ color: '#9879E9' }}>{day.toLocaleDateString('en-US', { weekday: 'short' })}</span>
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center border transition-all"
+                    style={{ background: st.bg, borderColor: st.border, color: st.text, boxShadow: isToday ? '0 0 0 2.5px #8B5CF6, 0 0 0 4px rgba(139,92,246,0.2)' : 'none' }}>
+                    {status === 'Present' ? <Check className="h-3.5 w-3.5 stroke-[3]" /> : status === 'Absent' ? <span className="text-[10px] font-black">✕</span> : status === 'Leave' ? <span className="text-[10px] font-bold">L</span> : status === 'Holiday' ? <span className="text-[10px] font-bold">H</span> : status === 'Half Day' ? <span className="text-[10px] font-bold">HD</span> : <span className="text-[10px] font-bold" style={{ color: '#C4B5FD' }}>{day.getDate()}</span>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-4 pt-3 border-t text-[10px] font-semibold" style={{ borderColor: 'rgba(216,180,254,0.3)', color: '#9879E9' }}>
+            {[['Present','#8B5CF6'],['Absent','#C4B5FD'],['Leave','#A78BFA'],['Holiday','#7C3AED'],['Half Day','#6D28D9']].map(([lbl,col]) => (
+              <span key={lbl} className="flex items-center gap-1"><span className="h-2 w-2 rounded-full" style={{ background: col }} />{lbl}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Stats + Quick Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
+
+        {/* Monthly Metrics */}
+        <div className={`md:col-span-8 ${card}`}>
+          <p style={sectionTitle}>Monthly Overview</p>
+          <div className="grid grid-cols-3 gap-4">
+            {[
+              { label: 'Attendance Rate', value: attendanceRate, max: 100, unit: '%', color: '#8B5CF6' },
+              { label: 'Leaves Taken', value: approvedLeaves, max: 12, unit: '', color: '#A78BFA' },
+              { label: 'Working Days', value: presentThisMonth, max: 22, unit: '', color: '#7C3AED' },
+            ].map(({ label, value, max, unit, color }) => (
+              <div key={label} className="flex flex-col items-center justify-center p-4 rounded-2xl border" style={{ background: 'rgba(242,235,255,0.5)', borderColor: 'rgba(216,180,254,0.4)' }}>
+                <div className="relative w-20 h-20">
+                  <svg className="w-full h-full ring-progress"><circle cx="50%" cy="50%" r="28" fill="transparent" stroke="#EDE9FE" strokeWidth="4.5" /><circle cx="50%" cy="50%" r="28" fill="transparent" stroke={color} strokeWidth="4.5" strokeDasharray={2 * Math.PI * 28} strokeDashoffset={2 * Math.PI * 28 - (Math.min(1, value / max)) * 2 * Math.PI * 28} strokeLinecap="round" /></svg>
+                  <span className="absolute inset-0 flex items-center justify-center text-sm font-black" style={{ color: '#4C1D95' }}>{value}{unit}</span>
+                </div>
+                <span className="text-[10px] font-bold text-center mt-2" style={{ color: '#9879E9' }}>{label}</span>
               </div>
-              <p className="text-xs text-muted-foreground leading-relaxed mt-1">{news.desc}</p>
+            ))}
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className={`md:col-span-4 ${card}`}>
+          <p style={sectionTitle}>Quick Actions</p>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { label: 'Ask Leave', icon: <CalendarDays className="h-5 w-5" />, action: () => navigate('/employee/leaves') },
+              { label: 'Leaderboard', icon: <Award className="h-5 w-5" />, action: () => setIsLeaderboardOpen(true) },
+              { label: 'News', icon: <Newspaper className="h-5 w-5" />, action: () => setIsNewsOpen(true) },
+              { label: 'Predictor', icon: <Sparkles className="h-5 w-5" />, action: () => setIsPredictorOpen(true) },
+            ].map(({ label, icon, action }) => (
+              <button key={label} onClick={action}
+                className="flex flex-col items-center gap-2 p-4 rounded-2xl border transition-all hover:-translate-y-0.5 active:scale-95"
+                style={{ background: 'rgba(242,235,255,0.5)', borderColor: 'rgba(216,180,254,0.4)', color: '#6D5A9C' }}>
+                <div className="p-2 rounded-xl" style={{ background: 'linear-gradient(135deg,#EDE9FE,#DDD6FE)', color: '#8B5CF6' }}>{icon}</div>
+                <span className="text-xs font-bold" style={{ color: '#4C1D95' }}>{label}</span>
+              </button>
+            ))}
+          </div>
+          <div className="flex gap-2 mt-3">
+            {([['Teammates', () => setIsTeammatesOpen(true)], ['Shift Info', () => setIsShiftsOpen(true)]] as [string, () => void][]).map(([lbl, fn]) => (
+              <button key={lbl} onClick={fn}
+                className="flex-1 py-2 text-xs font-bold rounded-xl border transition-all hover:bg-lilac-100"
+                style={{ borderColor: 'rgba(216,180,254,0.4)', color: '#7C3AED', background: 'rgba(242,235,255,0.5)' }}>
+                {lbl}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Calendar */}
+      <div className="glass-card p-6">
+        <div className="flex items-center justify-between mb-4">
+          <p style={sectionTitle}>My Attendance Calendar</p>
+          <span className="text-xs font-bold px-3 py-1 rounded-full" style={{ background: '#EDE9FE', color: '#7C3AED' }}>Live View</span>
+        </div>
+        <LiveCalendar attendanceByDate={myAttendanceByDate} holidayByDate={holidayByDate} compact={false} />
+      </div>
+
+      {/* Modals */}
+      <Modal isOpen={isLeaderboardOpen} onClose={() => setIsLeaderboardOpen(false)} title="Attendance Leaderboard" size="md">
+        <div className="space-y-3">
+          {employees.filter(e => e.department === currentUser.department).map((emp, i) => (
+            <div key={emp.id} className="flex items-center justify-between py-2.5 border-b last:border-0" style={{ borderColor: '#EDE9FE' }}>
+              <div className="flex items-center gap-3">
+                <div className="h-6 w-6 rounded-full flex items-center justify-center text-xs font-black" style={{ background: i === 0 ? '#DDD6FE' : '#F2EBFF', color: '#7C3AED' }}>{i + 1}</div>
+                <div>
+                  <span className="text-sm font-semibold block" style={{ color: '#4C1D95' }}>{emp.name}</span>
+                  <span className="text-[10px]" style={{ color: '#9879E9' }}>{emp.designation}</span>
+                </div>
+              </div>
+              <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: '#EDE9FE', color: '#6D28D9' }}>{100 - i * 2}%</span>
             </div>
           ))}
         </div>
       </Modal>
 
-      {/* 3. Predictor Modal */}
-      <Modal isOpen={isPredictorOpen} onClose={() => setIsPredictorOpen(false)} title="Smart Attendance Predictor" size="md">
-        <div className="space-y-5 text-left">
-          <div className="bg-muted/5 p-4 rounded-xl border border-border text-left space-y-2">
-            <h4 className="text-xs font-bold text-foreground flex items-center gap-1">
-              <TrendingUp className="h-4 w-4 text-primary" />
-              How it works
-            </h4>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Estimate your monthly attendance percentage by toggling the slider to predict your future weekday check-ins vs missed days.
-            </p>
-          </div>
-
-          <div className="space-y-4">
-            <div>
-              <div className="flex justify-between text-xs font-bold text-foreground mb-1.5 font-display">
-                <span>Days you will check in:</span>
-                <span className="text-primary">{futureDaysPresent} Workdays</span>
+      <Modal isOpen={isNewsOpen} onClose={() => setIsNewsOpen(false)} title="Company Announcements" size="md">
+        <div className="space-y-3">
+          {companyNews.map(n => (
+            <div key={n.id} className="p-4 rounded-2xl border" style={{ background: '#F7F2FF', borderColor: '#DDD6FE' }}>
+              <div className="flex justify-between mb-1">
+                <span className="text-xs font-bold" style={{ color: '#4C1D95' }}>{n.title}</span>
+                <span className="text-[10px]" style={{ color: '#9879E9' }}>{n.date}</span>
               </div>
-              <input 
-                type="range" min="0" max="22" value={futureDaysPresent} 
-                onChange={e => setFutureDaysPresent(Number(e.target.value))}
-                className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
-              />
+              <p className="text-xs leading-relaxed" style={{ color: '#6D5A9C' }}>{n.desc}</p>
             </div>
+          ))}
+        </div>
+      </Modal>
 
-            <div>
-              <div className="flex justify-between text-xs font-bold text-foreground mb-1.5 font-display">
-                <span>Days you will miss/skip:</span>
-                <span className="text-[#E88B8B]">{futureDaysAbsent} Days</span>
-              </div>
-              <input 
-                type="range" min="0" max="10" value={futureDaysAbsent} 
-                onChange={e => setFutureDaysAbsent(Number(e.target.value))}
-                className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-[#E88B8B]"
-              />
-            </div>
+      <Modal isOpen={isPredictorOpen} onClose={() => setIsPredictorOpen(false)} title="Attendance Predictor" size="md">
+        <div className="space-y-5">
+          <div className="p-3 rounded-2xl flex items-start gap-2" style={{ background: '#F2EBFF', border: '1px solid #DDD6FE' }}>
+            <TrendingUp className="h-4 w-4 mt-0.5 flex-shrink-0" style={{ color: '#8B5CF6' }} />
+            <p className="text-xs" style={{ color: '#6D5A9C' }}>Estimate your monthly attendance score by adjusting future check-in days.</p>
           </div>
-
-          <div className="bg-primary text-primary-foreground p-4 rounded-xl text-center space-y-1">
-            <span className="text-[10px] uppercase font-bold tracking-wider opacity-85">Predicted Score</span>
-            <div className="text-3xl font-extrabold font-display">{predictedRate}%</div>
-            <span className="text-[11px] opacity-80 block mt-1">
-              Based on {presentDays} past present days + {futureDaysPresent} predicted workdays.
-            </span>
+          {[['Days you will attend', futureDaysPresent, 22, setFutureDaysPresent, '#8B5CF6'], ['Days you will miss', futureDaysAbsent, 10, setFutureDaysAbsent, '#C4B5FD']].map(([lbl, val, max, setter, col]) => (
+            <div key={lbl as string}>
+              <div className="flex justify-between text-xs font-bold mb-2" style={{ color: '#4C1D95' }}>
+                <> {lbl}: <span style={{ color: col as string }}>{val as number} days</span> </>
+              </div>
+              <input type="range" min="0" max={max as number} value={val as number} onChange={e => (setter as Function)(Number(e.target.value))}
+                className="w-full h-1.5 rounded-full appearance-none cursor-pointer" style={{ accentColor: col as string, background: '#EDE9FE' }} />
+            </div>
+          ))}
+          <div className="p-5 rounded-2xl text-center" style={{ background: 'linear-gradient(135deg,#8B5CF6,#7C3AED)', color: '#fff' }}>
+            <p className="text-[10px] uppercase font-bold tracking-widest opacity-80 mb-1">Predicted Score</p>
+            <div className="text-4xl font-black">{predictedRate}%</div>
           </div>
         </div>
       </Modal>
 
-      {/* 4. Teammates Modal */}
       <Modal isOpen={isTeammatesOpen} onClose={() => setIsTeammatesOpen(false)} title="Department Colleagues" size="md">
-        <div className="space-y-3 text-left">
-          <p className="text-xs text-muted-foreground mb-3">Live check-in indicators of your colleagues today.</p>
-          <div className="divide-y divide-border">
-            {teammatesList.map(teammate => (
-              <div key={teammate.id} className="flex items-center justify-between py-2.5">
-                <div className="flex items-center space-x-2.5">
-                  <div className="h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center font-bold text-xs text-primary">
-                    {teammate.name.split(' ').map(n => n[0]).join('')}
-                  </div>
-                  <div>
-                    <span className="text-xs font-semibold text-foreground block">{teammate.name}</span>
-                    <span className="text-[10px] text-muted-foreground">{teammate.designation}</span>
-                  </div>
-                </div>
-                
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                  teammate.status === 'Online' ? 'bg-[var(--calendar-present-bg)] text-[var(--calendar-present-text)]' : teammate.status === 'On Leave' ? 'bg-[var(--calendar-leave-bg)] text-[var(--calendar-leave-text)]' : 'bg-muted text-muted-foreground'
-                }`}>
-                  {teammate.status}
-                </span>
+        <div className="divide-y" style={{ borderColor: '#EDE9FE' }}>
+          {teammatesList.map(t => (
+            <div key={t.id} className="flex items-center justify-between py-3">
+              <div className="flex items-center gap-2.5">
+                <div className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg,#A78BFA,#8B5CF6)' }}>{t.name.split(' ').map((n: string) => n[0]).join('')}</div>
+                <div><span className="text-sm font-semibold block" style={{ color: '#4C1D95' }}>{t.name}</span><span className="text-[10px]" style={{ color: '#9879E9' }}>{t.designation}</span></div>
               </div>
-            ))}
-          </div>
+              <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: t.status === 'Online' ? '#EDE9FE' : t.status === 'On Leave' ? '#DDD6FE' : '#F2EBFF', color: t.status === 'Online' ? '#6D28D9' : t.status === 'On Leave' ? '#7C3AED' : '#9879E9' }}>{t.status}</span>
+            </div>
+          ))}
         </div>
       </Modal>
 
-      {/* 5. Shifts Modal */}
-      <Modal isOpen={isShiftsOpen} onClose={() => setIsShiftsOpen(false)} title="Your Active Work Shift" size="sm">
-        <div className="space-y-4 text-left">
-          <div className="p-4 bg-muted/5 rounded-xl border border-border text-center space-y-2">
-            <Clock className="h-8 w-8 text-primary mx-auto" />
-            <div>
-              <span className="text-xs font-bold text-foreground block">Standard Day Shift</span>
-              <span className="text-sm font-black font-mono text-primary block mt-1">09:00 AM - 05:00 PM</span>
-            </div>
+      <Modal isOpen={isShiftsOpen} onClose={() => setIsShiftsOpen(false)} title="Active Work Shift" size="sm">
+        <div className="space-y-4">
+          <div className="p-5 rounded-2xl text-center" style={{ background: '#F2EBFF', border: '1px solid #DDD6FE' }}>
+            <Clock className="h-8 w-8 mx-auto mb-2" style={{ color: '#8B5CF6' }} />
+            <span className="text-xs font-bold block" style={{ color: '#4C1D95' }}>Standard Day Shift</span>
+            <span className="text-lg font-black font-mono mt-1 block" style={{ color: '#7C3AED' }}>09:00 AM – 05:00 PM</span>
           </div>
-          
-          <div className="space-y-2.5 text-xs text-muted-foreground">
-            <div className="flex justify-between">
-              <span>Shift Type:</span>
-              <strong className="text-foreground font-semibold">Fixed Weekdays</strong>
+          {[['Shift Type','Fixed Weekdays'],['Grace Period','15 Minutes'],['Break Time','1 Hour Lunch'],['Work Days','Mon – Fri']].map(([k,v]) => (
+            <div key={k} className="flex justify-between text-xs" style={{ color: '#6D5A9C' }}>
+              <span>{k}:</span><strong style={{ color: '#4C1D95' }}>{v}</strong>
             </div>
-            <div className="flex justify-between">
-              <span>Grace Period:</span>
-              <strong className="text-foreground font-semibold">15 Minutes</strong>
-            </div>
-            <div className="flex justify-between">
-              <span>Break Time:</span>
-              <strong className="text-foreground font-semibold">1 Hour Lunch break</strong>
-            </div>
-            <div className="flex justify-between">
-              <span>Work Days:</span>
-              <strong className="text-foreground font-semibold">Monday - Friday</strong>
-            </div>
-          </div>
+          ))}
         </div>
       </Modal>
-
     </div>
   );
 };

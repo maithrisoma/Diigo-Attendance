@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useData } from '../../context/DataContext';
 import { useToast } from '../../components/ui/Toast';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '../../components/ui/Table';
+import { TableWrapper, TableHeader, TableRow, TableHead, TableBody, TableCell } from '../../components/ui/Table';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
@@ -267,7 +267,7 @@ export const HolidayManagement: React.FC = () => {
       {/* ── Holidays Table ── */}
       <Card>
         <CardContent className="p-0">
-          <Table>
+          <TableWrapper>
             <TableHeader>
               <TableRow>
                 <TableHead>Holiday Name</TableHead>
@@ -343,7 +343,7 @@ export const HolidayManagement: React.FC = () => {
                 ))
               )}
             </TableBody>
-          </Table>
+          </TableWrapper>
         </CardContent>
       </Card>
 

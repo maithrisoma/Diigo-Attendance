@@ -29,6 +29,8 @@ import { LeaveManagement } from './pages/AdminPortal/LeaveManagement';
 import { HolidayManagement } from './pages/AdminPortal/HolidayManagement';
 import { Reports } from './pages/AdminPortal/Reports';
 import { Settings } from './pages/AdminPortal/Settings';
+import { Analytics } from './pages/AdminPortal/Analytics';
+import { Payroll } from './pages/AdminPortal/Payroll';
 
 // Helper component for root route redirect
 const RootRedirect: React.FC = () => {
@@ -164,6 +166,22 @@ function App() {
                   element={
                     <AdminRoute>
                       <Settings />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="admin/analytics"
+                  element={
+                    <AdminRoute>
+                      <Analytics />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="admin/payroll"
+                  element={
+                    <AdminRoute>
+                      <Payroll />
                     </AdminRoute>
                   }
                 />

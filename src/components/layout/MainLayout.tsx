@@ -8,31 +8,28 @@ export const MainLayout: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // If not authenticated, redirect to login
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Sidebar Navigation */}
+    <div className="min-h-screen flex" style={{ background: '#F7F2FF' }}>
+      {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
 
-      {/* Mobile Sidebar overlay */}
+      {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-30 bg-slate-900/40 backdrop-blur-xs md:hidden"
+          className="fixed inset-0 z-30 md:hidden"
+          style={{ background: 'rgba(76,29,149,0.25)', backdropFilter: 'blur(4px)' }}
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Main Content Area */}
+      {/* Main content */}
       <div className="flex-1 flex flex-col md:pl-64 min-h-screen">
-        {/* Navbar */}
         <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-
-        {/* Scrollable page container */}
-        <main className="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto animate-in fade-in duration-300">
+        <main className="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto animate-fadeInUp">
           <Outlet />
         </main>
       </div>

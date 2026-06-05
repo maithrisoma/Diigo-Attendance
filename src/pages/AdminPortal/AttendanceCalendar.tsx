@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useData } from '../../context/DataContext';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import { Modal } from '../../components/ui/Modal';
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '../../components/ui/Table';
+import { TableWrapper, TableHeader, TableRow, TableHead, TableBody, TableCell } from '../../components/ui/Table';
 import { Badge } from '../../components/ui/Badge';
 import { ChevronLeft, ChevronRight, Users, UserCheck, UserX, PlaneTakeoff, Clock, CalendarDays } from 'lucide-react';
 import { AttendanceStatus } from '../../types';
@@ -295,7 +295,7 @@ export const AttendanceCalendar: React.FC = () => {
         size="xl"
       >
         <div className="space-y-4">
-          <Table>
+          <TableWrapper>
             <TableHeader>
               <TableRow>
                 <TableHead>Employee</TableHead>
@@ -351,7 +351,7 @@ export const AttendanceCalendar: React.FC = () => {
                 </TableRow>
               ))}
             </TableBody>
-          </Table>
+          </TableWrapper>
         </div>
       </Modal>
     </div>

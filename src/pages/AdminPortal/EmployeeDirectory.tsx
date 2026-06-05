@@ -24,15 +24,15 @@ import { Employee } from '../../types';
 
 // ─── Department colour map ───────────────────────────────────────────────────
 const DEPT_COLORS: Record<string, { bg: string; text: string; dot: string }> = {
-  Engineering:      { bg: 'bg-primary/10', text: 'text-primary-text', dot: 'bg-primary' },
-  Marketing:        { bg: 'bg-primary/10', text: 'text-primary-text', dot: 'bg-primary' },
-  Sales:            { bg: 'bg-primary/10', text: 'text-primary-text', dot: 'bg-primary' },
-  'Human Resources':{ bg: 'bg-primary/10', text: 'text-primary-text', dot: 'bg-primary' },
-  Finance:          { bg: 'bg-primary/10', text: 'text-primary-text', dot: 'bg-primary' },
+  Engineering:      { bg: 'bg-lilac-200', text: 'text-lilac-900', dot: 'bg-lilac-600' },
+  Marketing:        { bg: 'bg-lilac-300', text: 'text-lilac-900', dot: 'bg-lilac-700' },
+  Sales:            { bg: 'bg-lilac-200', text: 'text-lilac-900', dot: 'bg-lilac-500' },
+  'Human Resources':{ bg: 'bg-lilac-300', text: 'text-lilac-900', dot: 'bg-lilac-600' },
+  Finance:          { bg: 'bg-lilac-200', text: 'text-lilac-900', dot: 'bg-lilac-700' },
 };
 
 const getDeptColor = (dept: string) =>
-  DEPT_COLORS[dept] ?? { bg: 'bg-muted/10', text: 'text-muted-foreground', dot: 'bg-muted' };
+  DEPT_COLORS[dept] ?? { bg: 'bg-lilac-100', text: 'text-lilac-700', dot: 'bg-lilac-400' };
 
 // ─── Avatar initials ─────────────────────────────────────────────────────────
 const getInitials = (name: string) =>
@@ -40,12 +40,12 @@ const getInitials = (name: string) =>
 
 // ─── Avatar background gradient by name ──────────────────────────────────────
 const AVATAR_GRADIENTS = [
-  'from-violet-300 to-violet-400',
-  'from-purple-300 to-purple-400',
-  'from-indigo-300 to-indigo-400',
-  'from-violet-400 to-purple-400',
-  'from-purple-400 to-indigo-400',
-  'from-indigo-400 to-violet-400',
+  'from-lilac-400 to-lilac-500',
+  'from-lilac-500 to-lilac-600',
+  'from-lilac-300 to-lilac-500',
+  'from-lilac-400 to-lilac-700',
+  'from-lilac-500 to-lilac-700',
+  'from-lilac-600 to-lilac-800',
 ];
 const getAvatarGradient = (name: string) =>
   AVATAR_GRADIENTS[name.charCodeAt(0) % AVATAR_GRADIENTS.length];
@@ -203,14 +203,14 @@ export const EmployeeDirectory: React.FC = () => {
       {/* ── Header row ─────────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground font-display">Employee Directory</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          <h1 className="text-2xl font-black tracking-tight" style={{ color: '#4C1D95' }}>Employee Directory</h1>
+          <p className="text-xs mt-0.5" style={{ color: '#9879E9' }}>
             {filteredEmployees.length} of {employees.length} employees shown
           </p>
         </div>
         <button
           onClick={() => { resetForm(); setAddOpen(true); }}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity shadow-md"
+          className="btn-lilac flex items-center gap-2 px-5 py-2.5 text-sm font-semibold"
         >
           <UserPlus className="h-4 w-4" />
           Add Employee
@@ -220,51 +220,37 @@ export const EmployeeDirectory: React.FC = () => {
       {/* ── Summary stats strip ────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: 'Total Staff',  value: stats.total,   icon: Users,          cls: 'text-primary',                          bg: 'bg-primary/10' },
-          { label: 'Present Today',value: stats.present, icon: CheckCircle2,   cls: 'text-[var(--calendar-present-text)]',   bg: 'bg-[var(--calendar-present-bg)]' },
-          { label: 'Absent Today', value: stats.absent,  icon: XCircle,        cls: 'text-[var(--calendar-absent-text)]',    bg: 'bg-[var(--calendar-absent-bg)]' },
-          { label: 'On Leave',     value: stats.leave,   icon: Clock3,         cls: 'text-[var(--calendar-leave-text)]',     bg: 'bg-[var(--calendar-leave-bg)]' },
-        ].map(s => {
-          const Icon = s.icon;
-          return (
-            <div key={s.label} className="rounded-xl border border-border bg-card p-4 flex items-center gap-3 shadow-sm text-foreground">
-              <div className={`h-10 w-10 rounded-lg ${s.bg} flex items-center justify-center flex-shrink-0`}>
-                <Icon className={`h-5 w-5 ${s.cls}`} />
-              </div>
-              <div>
-                <p className="text-2xl font-bold font-display leading-none">{s.value}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{s.label}</p>
-              </div>
+          { label: 'Total Staff',   value: stats.total,   accent: '#6D28D9' },
+          { label: 'Present Today', value: stats.present, accent: '#7C3AED' },
+          { label: 'Absent Today',  value: stats.absent,  accent: '#9879E9' },
+          { label: 'On Leave',      value: stats.leave,   accent: '#A78BFA' },
+        ].map(s => (
+          <div key={s.label} className="glass-card p-4 flex items-center gap-3">
+            <div className="flex-1">
+              <p className="text-2xl font-black" style={{ color: s.accent }}>{s.value}</p>
+              <p className="text-xs mt-0.5" style={{ color: '#9879E9' }}>{s.label}</p>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
 
       {/* ── Filter toolbar ──────────────────────────────────────────────────── */}
-      <div className="rounded-xl border border-border bg-card p-4 flex flex-col sm:flex-row gap-3 shadow-sm">
+      <div className="glass-card p-4 flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: '#C4B5FD' }} />
           <input
             type="text"
             placeholder="Search by name, ID, email or designation…"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 text-sm rounded-lg border border-border bg-muted/5 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+            className="input-lilac w-full pl-9 pr-4 py-2.5 text-sm"
           />
         </div>
-        <select
-          value={selectedDept}
-          onChange={e => setSelectedDept(e.target.value)}
-          className="px-3 py-2.5 text-sm rounded-lg border border-border bg-muted/5 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition sm:w-48"
-        >
-          {departments.map(d => <option key={d.value} value={d.value} className="bg-card text-foreground">{d.label}</option>)}
+        <select value={selectedDept} onChange={e => setSelectedDept(e.target.value)} className="input-lilac px-3 py-2.5 text-sm sm:w-48">
+          {departments.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
         </select>
-        <select
-          value={selectedStatus}
-          onChange={e => setSelectedStatus(e.target.value)}
-          className="px-3 py-2.5 text-sm rounded-lg border border-border bg-muted/5 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition sm:w-40"
-        >
-          {statusOptions.map(s => <option key={s.value} value={s.value} className="bg-card text-foreground">{s.label}</option>)}
+        <select value={selectedStatus} onChange={e => setSelectedStatus(e.target.value)} className="input-lilac px-3 py-2.5 text-sm sm:w-40">
+          {statusOptions.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
         </select>
       </div>
 
@@ -287,7 +273,7 @@ export const EmployeeDirectory: React.FC = () => {
                 <div
                   key={emp.id}
                   onClick={() => navigate(`/admin/employees/${emp.id}`)}
-                  className="group relative rounded-lg border border-border bg-card shadow-card hover:shadow-premium-light dark:hover:shadow-premium-dark hover:border-primary/40 transition-all duration-300 cursor-pointer overflow-hidden text-foreground"
+                  className="group glass-card cursor-pointer hover:-translate-y-1"
                 >
                   {/* Top colour banner */}
                   <div className={`h-16 bg-gradient-to-r ${gradient} relative`}>
@@ -303,17 +289,17 @@ export const EmployeeDirectory: React.FC = () => {
                       {emp.employee_id !== 'HR001' && (
                         <button
                           onClick={e => openDelete(emp, e)}
-                          className="h-7 w-7 rounded-lg bg-card/80 backdrop-blur flex items-center justify-center hover:bg-rose-500/10 transition shadow"
+                          className="h-7 w-7 rounded-lg bg-white/80 backdrop-blur flex items-center justify-center hover:bg-lilac-200 transition shadow"
                           title="Remove"
                         >
-                          <Trash2 className="h-3.5 w-3.5 text-rose-500" />
+                          <Trash2 className="h-3.5 w-3.5" style={{ color: '#8B5CF6' }} />
                         </button>
                       )}
                     </div>
 
                     {/* Role badge */}
                     {emp.role === 'admin' && (
-                      <span className="absolute top-2 left-2 inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-card/90 text-primary">
+                      <span className="absolute top-2 left-2 inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.9)', color: '#7C3AED' }}>
                         <ShieldCheck className="h-3 w-3" /> Admin
                       </span>
                     )}
@@ -405,17 +391,17 @@ export const EmployeeDirectory: React.FC = () => {
       <Modal isOpen={deleteConfirmOpen} onClose={() => setDeleteConfirmOpen(false)} title="Remove Employee?" size="sm">
         {selectedEmp && (
           <div className="space-y-4">
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-rose-50 border border-rose-100">
+            <div className="flex items-center gap-3 p-3 rounded-2xl" style={{ background: '#F2EBFF', border: '1px solid #DDD6FE' }}>
               <div className={`h-10 w-10 rounded-full bg-gradient-to-br ${getAvatarGradient(selectedEmp.name)} text-white text-sm font-bold flex items-center justify-center flex-shrink-0`}>
                 {getInitials(selectedEmp.name)}
               </div>
               <div>
-                <p className="font-semibold text-slate-800 text-sm">{selectedEmp.name}</p>
-                <p className="text-xs text-slate-500">{selectedEmp.employee_id} · {selectedEmp.department}</p>
+                <p className="font-semibold text-sm" style={{ color: '#4C1D95' }}>{selectedEmp.name}</p>
+                <p className="text-xs" style={{ color: '#9879E9' }}>{selectedEmp.employee_id} · {selectedEmp.department}</p>
               </div>
             </div>
-            <p className="text-sm text-slate-600 leading-normal">
-              Are you sure you want to remove this employee? This action <span className="text-rose-600 font-semibold">cannot be undone</span> and all associated attendance records will be deleted.
+            <p className="text-sm leading-normal" style={{ color: '#6D5A9C' }}>
+              Are you sure you want to remove this employee? This action <span style={{ color: '#7C3AED', fontWeight: 600 }}>cannot be undone</span>.
             </p>
             <div className="flex gap-3 pt-1 justify-end">
               <Button type="button" variant="outline" size="sm" onClick={() => setDeleteConfirmOpen(false)}>Cancel</Button>

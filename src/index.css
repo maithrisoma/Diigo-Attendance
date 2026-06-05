@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,233 +6,326 @@
 
 @layer base {
   :root {
-    /* ── LIGHT MODE COLOR SYSTEM (PREMIUM LILAC-LAVENDER) ── */
-    --background:   260 50% 90%;       /* #E2DAFA - Classic Soft Lilac Page Background */
-    --foreground:   262 24% 28%;       /* #3E3B4F */
+    /* ── LILAC LUXURY COLOR SYSTEM ── */
+    --background:   270 100% 97%;       /* #F7F2FF */
+    --foreground:   270 80% 35%;        /* #4C1D95 */
 
-    --card:         260 50% 98%;        /* #FAF9FF - Light Lilac Card Background */
-    --card-foreground: 262 24% 28%;
+    --card:         0 0% 100%;          /* White */
+    --card-foreground: 270 80% 35%;
 
-    --popover:      260 50% 98%;
-    --popover-foreground: 262 24% 28%;
+    --popover:      0 0% 100%;
+    --popover-foreground: 270 80% 35%;
 
-    --primary:      260 80% 62%;      /* #8A5CF5 - Vibrant Lilac Primary Background */
-    --primary-foreground: 0 0% 100%;  /* #FFFFFF - White text for contrast */
-    --primary-text: 260 75% 50%;       /* #7045E6 - Readable Lilac text */
-    --primary-text-hover: 260 85% 42%; /* #5527CD - Darker Lilac text hover */
+    --primary:      263 88% 75%;        /* #A78BFA */
+    --primary-foreground: 0 0% 100%;
+    --primary-text: 270 80% 35%;
+    --primary-text-hover: 263 68% 45%;
 
-    --secondary:    260 60% 92%;      /* #EAE3FC - Soft Lilac Fill */
-    --secondary-foreground: 260 75% 50%; /* #7045E6 - Readable Lilac */
+    --secondary:    270 60% 52%;        /* #8B5CF6 deep lilac */
+    --secondary-foreground: 0 0% 100%;
 
-    --muted:        260 12% 58%;       /* #9793A6 */
-    --muted-foreground: 260 12% 58%;
+    --muted:        270 50% 93%;        /* #DDD6FE light lavender */
+    --muted-foreground: 270 30% 55%;    /* #6D5A9C */
 
-    --accent:       260 60% 95%;      /* #F5F2FE - Soft Lilac Hover */
-    --accent-foreground: 260 75% 50%;
+    --accent:       263 68% 65%;        /* #8B5CF6 */
+    --accent-foreground: 0 0% 100%;
 
-    --destructive:  0 84% 60%;        /* #F28B82 */
+    --destructive:  270 50% 60%;        /* Soft violet for errors */
     --destructive-foreground: 0 0% 100%;
 
-    --border:       260 40% 84%;       /* #E2DBFC - Muted Lilac Divider/Border */
-    --input:        260 40% 84%;
-    --ring:         260 80% 62%;
+    --border:       291 60% 80%;        /* #D8B4FE */
+    --input:        291 60% 80%;
+    --ring:         263 68% 65%;        /* #8B5CF6 */
 
-    --radius: 1.25rem;                 /* 20px */
+    --radius: 1.25rem;                  /* 20px */
 
-    /* Custom Theme Colors */
-    --sidebar-bg: #EAE3FC;             /* Lilac Sidebar Background */
-    --sidebar-active-bg: #D9CEFC;      /* Saturated Lilac Active Background */
-    --sidebar-text: #3E3B4F;
-    --sidebar-active-text: #4C3280;
-    --sidebar-hover: #EDE9FE;          /* Soft Lilac Hover */
-    --sidebar-icon: #8A5CF5;           /* Primary Lilac Icon */
-    
-    --navbar-bg: #EAE3FC;              /* Lilac Navbar Background */
-    
-    --table-header-bg: #EDE9FE;        /* Soft Lilac Table Header */
-    --table-row-hover-bg: #FAF9FF;      /* Very Light Lilac Table Row Hover */
+    /* ── Custom Lilac Theme Tokens ── */
+    --lilac-main:       #F7F2FF;
+    --lilac-secondary:  #F2EBFF;
+    --lilac-sidebar:    #EFE5FF;
+    --lilac-primary:    #A78BFA;
+    --lilac-deep:       #8B5CF6;
+    --lilac-light:      #DDD6FE;
+    --lilac-border:     #D8B4FE;
+    --lilac-text:       #4C1D95;
+    --lilac-text-sec:   #6D5A9C;
+    --lilac-hover:      #C4B5FD;
+    --lilac-active:     #8B5CF6;
 
-    --primary-hover: #7341EC;          /* #7341EC - Slightly darker primary hover */
-    --secondary-hover: #D0C0FC;
+    --sidebar-bg:           rgba(239, 229, 255, 0.92);
+    --sidebar-active-bg:    rgba(167, 139, 250, 0.18);
+    --sidebar-text:         #6D5A9C;
+    --sidebar-active-text:  #8B5CF6;
+    --sidebar-hover:        rgba(167, 139, 250, 0.10);
+    --sidebar-icon:         #6D5A9C;
 
-    /* Calendar Day Backgrounds (Light) */
-    --calendar-present-bg: #EAF8EC;
-    --calendar-absent-bg: #FDECEC;
-    --calendar-leave-bg: #FFF6E1;
-    --calendar-holiday-bg: #ECF4FF;
-    --calendar-weekend-bg: #F5F5F5;
-    --calendar-halfday-bg: #FFF7D6;
-    --calendar-halfday-text: #B8860B;
-    --calendar-halfday-border: rgba(255, 209, 102, 0.3);
+    --navbar-bg:            rgba(247, 242, 255, 0.85);
 
-    --calendar-present-text: #6BCB77;
-    --calendar-present-border: rgba(107, 203, 119, 0.3);
-    --calendar-absent-text: #F28B82;
-    --calendar-absent-border: rgba(242, 139, 130, 0.3);
-    --calendar-leave-text: #F7C873;
-    --calendar-leave-border: rgba(247, 200, 115, 0.3);
-    --calendar-holiday-text: #8AB4F8;
-    --calendar-holiday-border: rgba(138, 180, 248, 0.3);
-    --calendar-weekend-text: #D1D5DB;
-    --calendar-weekend-border: rgba(209, 213, 219, 0.2);
+    --table-header-bg:      #F2EBFF;
+    --table-row-hover-bg:   rgba(167, 139, 250, 0.06);
+
+    --primary-hover:        #7C3AED;
+    --secondary-hover:      #C4B5FD;
+
+    /* Calendar Status Colors — all lilac-toned */
+    --calendar-present-bg:      #EDE9FE;
+    --calendar-present-border:  rgba(139, 92, 246, 0.25);
+    --calendar-present-text:    #4C1D95;
+
+    --calendar-absent-bg:       #F5F3FF;
+    --calendar-absent-border:   rgba(196, 181, 253, 0.4);
+    --calendar-absent-text:     #6D5A9C;
+
+    --calendar-leave-bg:        #EDE9FE;
+    --calendar-leave-border:    rgba(167, 139, 250, 0.3);
+    --calendar-leave-text:      #5B21B6;
+
+    --calendar-holiday-bg:      #DDD6FE;
+    --calendar-holiday-border:  rgba(139, 92, 246, 0.35);
+    --calendar-holiday-text:    #4C1D95;
+
+    --calendar-weekend-bg:      #F2EBFF;
+    --calendar-weekend-border:  rgba(196, 181, 253, 0.25);
+    --calendar-weekend-text:    #7C3AED;
+
+    --calendar-halfday-bg:      #EDE9FE;
+    --calendar-halfday-border:  rgba(167, 139, 250, 0.3);
+    --calendar-halfday-text:    #5B21B6;
   }
+}
 
-  [data-theme='dark'] {
-    /* ── DARK MODE COLOR SYSTEM (PREMIUM LILAC-LAVENDER DARK) ── */
-    --background:   260 30% 10%;       /* #151322 - Deep Lilac Black */
-    --foreground:   260 30% 94%;       /* #ECEAF0 */
+/* ── Global Reset ── */
+*, *::before, *::after { box-sizing: border-box; }
 
-    --card:         260 25% 15%;       /* #201B30 - Dark Lilac Card */
-    --card-foreground: 260 30% 94%;
-
-    --popover:      260 25% 15%;
-    --popover-foreground: 260 30% 94%;
-
-    --primary:      260 85% 75%;      /* #A78BFA - Glowing Lilac-Lavender */
-    --primary-foreground: 260 30% 10%;
-
-    --secondary:    260 20% 20%;      /* #302947 - Muted Dark Lilac */
-    --secondary-foreground: 260 85% 75%;
-
-    --muted:        260 12% 58%;       /* #9793A6 */
-    --muted-foreground: 260 12% 58%;
-
-    --accent:       260 20% 20%;
-    --accent-foreground: 260 30% 94%;
-
-    --destructive:  0 84% 65%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border:       260 20% 22%;       /* #382F52 - Dark Lilac Border */
-    --input:        260 20% 22%;
-    --ring:         260 85% 75%;
-
-    /* Custom Theme Colors */
-    --sidebar-bg: #201B30;
-    --sidebar-active-bg: #302947;
-    --sidebar-text: #A7A3B7;
-    --sidebar-active-text: #C084FC;
-    --sidebar-hover: #26203B;
-    --sidebar-icon: #A78BFA;
-    
-    --navbar-bg: #201B30;
-    
-    --table-header-bg: #151322;
-    --table-row-hover-bg: #26203B;
-
-    --primary-hover: #8B5CF6;
-    --secondary-hover: #302947;
-
-    /* Calendar Day Backgrounds (Dark) */
-    --calendar-present-bg: #153322;
-    --calendar-absent-bg: #3F1F1F;
-    --calendar-leave-bg: #3F2E12;
-    --calendar-holiday-bg: #182845;
-    --calendar-weekend-bg: #1F202E;
-
-    --calendar-present-text: #86EFAC;
-    --calendar-present-border: rgba(134, 239, 172, 0.3);
-    --calendar-absent-text: #FCA5A5;
-    --calendar-absent-border: rgba(252, 165, 165, 0.3);
-    --calendar-leave-text: #FDE047;
-    --calendar-leave-border: rgba(253, 224, 71, 0.3);
-    --calendar-holiday-text: #93C5FD;
-    --calendar-holiday-border: rgba(147, 197, 253, 0.3);
-    --calendar-weekend-text: #6B7280;
-    --calendar-weekend-border: rgba(107, 114, 128, 0.2);
-    --calendar-halfday-bg: #3F3512;
-    --calendar-halfday-text: #FFE082;
-    --calendar-halfday-border: rgba(255, 224, 130, 0.3);
-  }
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  @apply bg-background text-foreground font-sans antialiased selection:bg-primary/20 transition-colors duration-200;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--lilac-main);
+  color: var(--lilac-text);
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  @apply font-display tracking-tight text-foreground/90 font-bold;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  color: var(--lilac-text);
+  letter-spacing: -0.02em;
 }
 
-/* ── Custom Scrollbars ─────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track  { @apply bg-transparent; }
+/* ── Scrollbars ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track  { background: transparent; }
 ::-webkit-scrollbar-thumb  {
-  @apply bg-muted/20 rounded-full;
+  background: #DDD6FE;
+  border-radius: 999px;
   transition: background 0.2s;
 }
-::-webkit-scrollbar-thumb:hover { @apply bg-muted/40; }
+::-webkit-scrollbar-thumb:hover { background: #C4B5FD; }
 
-/* ── Sidebar theme overrides ───────────────────────────────────────────── */
+/* ── Sidebar Override ── */
 aside {
-  background-color: var(--sidebar-bg) !important;
-  border-right-color: var(--border) !important;
-  transition: background-color 0.2s, border-color 0.2s;
+  background: var(--sidebar-bg) !important;
+  border-right: 1px solid var(--lilac-border) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
 }
 
-/* ── Navbar theme overrides ────────────────────────────────────────────── */
+/* ── Navbar Override ── */
 header.sticky {
-  background-color: var(--navbar-bg) !important;
-  border-bottom-color: var(--border) !important;
-  transition: background-color 0.2s, border-color 0.2s;
+  background: var(--navbar-bg) !important;
+  border-bottom: 1px solid var(--lilac-border) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
 }
 
-/* ── Calendar cell theme overrides ────────────────────────────────────── */
-.cell-present { background-color: var(--calendar-present-bg); border-color: var(--calendar-present-border); color: var(--calendar-present-text); }
-.cell-absent { background-color: var(--calendar-absent-bg); border-color: var(--calendar-absent-border); color: var(--calendar-absent-text); }
-.cell-leave { background-color: var(--calendar-leave-bg); border-color: var(--calendar-leave-border); color: var(--calendar-leave-text); }
-.cell-holiday { background-color: var(--calendar-holiday-bg); border-color: var(--calendar-holiday-border); color: var(--calendar-holiday-text); }
-.cell-weekend { background-color: var(--calendar-weekend-bg); border-color: var(--calendar-weekend-border); color: var(--calendar-weekend-text); }
-.cell-halfday { background-color: var(--calendar-halfday-bg); border-color: var(--calendar-halfday-border); color: var(--calendar-halfday-text); }
+/* ── Glass Card ── */
+.glass-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--lilac-border);
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(139, 92, 246, 0.08), 0 1px 4px rgba(196, 181, 253, 0.15);
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+.glass-card:hover {
+  box-shadow: 0 8px 40px rgba(139, 92, 246, 0.14), 0 2px 8px rgba(196, 181, 253, 0.2);
+  transform: translateY(-1px);
+}
 
-/* ── Soft Shadows ──────────────────────────────────────────────────────── */
+/* ── Premium Lilac Shadow ── */
+.shadow-lilac {
+  box-shadow: 0 4px 24px rgba(139, 92, 246, 0.10), 0 1px 4px rgba(196, 181, 253, 0.18);
+}
+.shadow-lilac-lg {
+  box-shadow: 0 8px 40px rgba(139, 92, 246, 0.15), 0 2px 10px rgba(196, 181, 253, 0.22);
+}
 .shadow-premium-light {
-  box-shadow: 0 4px 20px rgba(109, 116, 201, 0.08);
+  box-shadow: 0 4px 24px rgba(139, 92, 246, 0.10);
 }
 .shadow-premium-dark {
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.18);
 }
-
 .shadow-card {
-  box-shadow: 0 4px 20px rgba(109, 116, 201, 0.08);
-}
-[data-theme='dark'] .shadow-card {
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 24px rgba(139, 92, 246, 0.08), 0 1px 4px rgba(196, 181, 253, 0.15);
 }
 
-/* ── Circular progress ring (used in stats) ────────────────────────────── */
-.ring-progress {
-  transform: rotate(-90deg);
+/* ── Lilac Gradient Button ── */
+.btn-lilac {
+  background: linear-gradient(135deg, #A78BFA 0%, #8B5CF6 100%);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.30);
+}
+.btn-lilac:hover {
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+  box-shadow: 0 6px 24px rgba(139, 92, 246, 0.40);
+  transform: translateY(-1px);
+}
+.btn-lilac:active {
+  transform: scale(0.98);
 }
 
-/* ── Legend color circles ─────────────────────────────────────────────── */
-.bg-present { background-color: #6BCB77; }
-.bg-absent { background-color: #F28B82; }
-.bg-leave { background-color: #F7C873; }
-.bg-holiday { background-color: #8AB4F8; }
-.bg-weekend { background-color: #D1D5DB; }
-.bg-halfday { background-color: #FFD166; }
+/* ── Lilac Input ── */
+.input-lilac {
+  background: rgba(255,255,255,0.9);
+  border: 1.5px solid #D8B4FE;
+  border-radius: 12px;
+  color: #4C1D95;
+  transition: all 0.2s ease;
+  font-family: 'Inter', sans-serif;
+}
+.input-lilac::placeholder { color: #C4B5FD; }
+.input-lilac:focus {
+  outline: none;
+  border-color: #8B5CF6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+}
 
-.text-present { color: #6BCB77; }
-.text-absent { color: #F28B82; }
-.text-leave { color: #F7C873; }
-.text-holiday { color: #8AB4F8; }
-.text-weekend { color: #D1D5DB; }
-.text-halfday { color: #FFD166; }
+/* ── Calendar status cells ── */
+.cell-present  { background-color: var(--calendar-present-bg);  border-color: var(--calendar-present-border);  color: var(--calendar-present-text); }
+.cell-absent   { background-color: var(--calendar-absent-bg);   border-color: var(--calendar-absent-border);   color: var(--calendar-absent-text); }
+.cell-leave    { background-color: var(--calendar-leave-bg);    border-color: var(--calendar-leave-border);    color: var(--calendar-leave-text); }
+.cell-holiday  { background-color: var(--calendar-holiday-bg);  border-color: var(--calendar-holiday-border);  color: var(--calendar-holiday-text); }
+.cell-weekend  { background-color: var(--calendar-weekend-bg);  border-color: var(--calendar-weekend-border);  color: var(--calendar-weekend-text); }
+.cell-halfday  { background-color: var(--calendar-halfday-bg);  border-color: var(--calendar-halfday-border);  color: var(--calendar-halfday-text); }
 
-/* ── Accessible Lilac Text Overrides ───────────────────────────────────── */
-.text-primary {
-  color: hsl(var(--primary-text)) !important;
+/* ── Status Legend dots ── */
+.bg-present { background-color: #8B5CF6; }
+.bg-absent  { background-color: #C4B5FD; }
+.bg-leave   { background-color: #A78BFA; }
+.bg-holiday { background-color: #7C3AED; }
+.bg-weekend { background-color: #DDD6FE; }
+.bg-halfday { background-color: #6D28D9; }
+
+.text-present { color: #8B5CF6; }
+.text-absent  { color: #9879E9; }
+.text-leave   { color: #A78BFA; }
+.text-holiday { color: #7C3AED; }
+.text-weekend { color: #6D5A9C; }
+.text-halfday { color: #6D28D9; }
+
+/* ── Floating login animation ── */
+@keyframes float {
+  0%,100% { transform: translateY(0px); }
+  50%      { transform: translateY(-10px); }
 }
-.hover\:text-primary:hover {
-  color: hsl(var(--primary-text-hover)) !important;
+.animate-float { animation: float 5s ease-in-out infinite; }
+
+/* ── Blob shape animations for login bg ── */
+@keyframes blob {
+  0%,100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+  50%      { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
 }
-.hover\:text-primary\/80:hover {
-  color: hsla(var(--primary-text), 0.8) !important;
+.animate-blob { animation: blob 10s ease-in-out infinite; }
+.animation-delay-2000 { animation-delay: 2s; }
+.animation-delay-4000 { animation-delay: 4s; }
+
+/* ── Fade-in page transition ── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-.text-primary\/80 {
-  color: hsla(var(--primary-text), 0.8) !important;
+.animate-fadeInUp { animation: fadeInUp 0.4s ease forwards; }
+
+/* ── Skeleton loading (lilac shades) ── */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
 }
-.text-primary\/70 {
-  color: hsla(var(--primary-text), 0.7) !important;
+.skeleton {
+  background: linear-gradient(90deg, #EDE9FE 25%, #DDD6FE 50%, #EDE9FE 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
 }
+
+/* ── Ripple Effect ── */
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+.ripple::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(196, 181, 253, 0.4) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.ripple:active::after { opacity: 1; }
+
+/* ── Active nav glow ── */
+.nav-active-glow {
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.30);
+}
+
+/* ── Lilac progress ring ── */
+.ring-progress { transform: rotate(-90deg); }
+
+/* ── Table premium lilac ── */
+.table-lilac thead {
+  background: linear-gradient(135deg, #F2EBFF 0%, #EDE9FE 100%);
+}
+.table-lilac thead th {
+  color: #4C1D95;
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 12px 16px;
+  border-bottom: 1.5px solid #D8B4FE;
+}
+.table-lilac tbody tr {
+  transition: background 0.15s ease;
+}
+.table-lilac tbody tr:nth-child(even) {
+  background: rgba(242, 235, 255, 0.4);
+}
+.table-lilac tbody tr:hover {
+  background: rgba(196, 181, 253, 0.12);
+}
+.table-lilac tbody td {
+  padding: 12px 16px;
+  color: #4C1D95;
+  font-size: 0.875rem;
+  border-bottom: 1px solid rgba(216, 180, 254, 0.3);
+}
+
+/* ── Tailwind text/primary overrides ── */
+.text-primary { color: #4C1D95 !important; }
+.hover\:text-primary:hover { color: #7C3AED !important; }
+
+/* ── Ring progress ── */
+.ring-progress { transform: rotate(-90deg); }

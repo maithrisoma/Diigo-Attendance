@@ -1,63 +1,114 @@
 import React from 'react';
 
-interface TableProps extends React.HTMLAttributes<HTMLTableElement> {}
-interface TableSectionProps extends React.HTMLAttributes<HTMLTableSectionElement> {}
-interface TableRowProps extends React.HTMLAttributes<HTMLTableRowElement> {}
-interface TableCellProps extends React.TdHTMLAttributes<HTMLTableCellElement> {}
-interface TableHeadProps extends React.ThHTMLAttributes<HTMLTableCellElement> {}
+// ── Generic data-driven Table ─────────────────────────────────────────────────
+interface Column<T> {
+  key: keyof T | string;
+  header: string;
+  render?: (row: T) => React.ReactNode;
+  className?: string;
+}
 
-export const Table: React.FC<TableProps> = ({ children, className = '', ...props }) => {
+interface TableDataProps<T> {
+  columns: Column<T>[];
+  data: T[];
+  className?: string;
+  emptyMessage?: string;
+}
+
+export function Table<T extends Record<string, unknown>>({
+  columns,
+  data,
+  className = '',
+  emptyMessage = 'No data available',
+}: TableDataProps<T>) {
   return (
-    <div className="relative w-full overflow-auto">
-      <table className={`w-full caption-bottom text-sm border-collapse bg-card ${className}`} {...props}>
-        {children}
-      </table>
+    <div className={`overflow-hidden rounded-2xl border shadow-lilac-sm ${className}`} style={{ borderColor: 'rgba(216,180,254,0.5)' }}>
+      <div className="overflow-x-auto">
+        <table className="w-full table-lilac">
+          <thead>
+            <tr>
+              {columns.map((col) => (
+                <th key={String(col.key)} className={col.className || ''}>
+                  {col.header}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {data.length === 0 ? (
+              <tr>
+                <td colSpan={columns.length} className="py-16 text-center text-sm" style={{ color: '#C4B5FD' }}>
+                  {emptyMessage}
+                </td>
+              </tr>
+            ) : (
+              data.map((row, i) => (
+                <tr key={i}>
+                  {columns.map((col) => (
+                    <td key={String(col.key)}>
+                      {col.render ? col.render(row) : String(row[col.key as keyof T] ?? '')}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
-};
+}
 
-export const TableHeader: React.FC<TableSectionProps> = ({ children, className = '', ...props }) => {
-  return (
-    <thead className={`border-b border-border bg-[var(--table-header-bg)] [&_tr]:border-b ${className}`} {...props}>
-      {children}
-    </thead>
-  );
-};
+// ── Named sub-components (used by existing pages) ─────────────────────────────
 
-export const TableBody: React.FC<TableSectionProps> = ({ children, className = '', ...props }) => {
-  return (
-    <tbody className={`[&_tr:last-child]:border-0 bg-card ${className}`} {...props}>
-      {children}
-    </tbody>
-  );
-};
+interface BaseProps extends React.HTMLAttributes<HTMLElement> {
+  children?: React.ReactNode;
+}
 
-export const TableRow: React.FC<TableRowProps> = ({ children, className = '', ...props }) => {
-  return (
-    <tr
-      className={`border-b border-border transition-colors hover:bg-[var(--table-row-hover-bg)] ${className}`}
-      {...props}
-    >
-      {children}
-    </tr>
-  );
-};
+export const TableHeader: React.FC<BaseProps> = ({ children, className = '', ...props }) => (
+  <thead className={className} {...props}>{children}</thead>
+);
 
-export const TableHead: React.FC<TableHeadProps> = ({ children, className = '', ...props }) => {
-  return (
-    <th
-      className={`h-12 px-4 text-left align-middle font-bold text-foreground [&:has([role=checkbox])]:pr-0 font-display ${className}`}
-      {...props}
-    >
-      {children}
-    </th>
-  );
-};
+export const TableBody: React.FC<BaseProps> = ({ children, className = '', ...props }) => (
+  <tbody className={className} {...props}>{children}</tbody>
+);
 
-export const TableCell: React.FC<TableCellProps> = ({ children, className = '', ...props }) => {
-  return (
-    <td className={`p-4 align-middle text-foreground border-b border-border [&:has([role=checkbox])]:pr-0 ${className}`} {...props}>
-      {children}
-    </td>
-  );
-};
+export const TableRow: React.FC<BaseProps> = ({ children, className = '', ...props }) => (
+  <tr
+    className={`transition-colors hover:bg-[rgba(196,181,253,0.10)] border-b ${className}`}
+    style={{ borderColor: 'rgba(216,180,254,0.25)' }}
+    {...props}
+  >
+    {children}
+  </tr>
+);
+
+export const TableHead: React.FC<BaseProps> = ({ children, className = '', ...props }) => (
+  <th
+    className={`px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider ${className}`}
+    style={{ color: '#4C1D95', background: 'linear-gradient(135deg, #F2EBFF, #EDE9FE)', borderBottom: '1.5px solid #D8B4FE' }}
+    {...props}
+  >
+    {children}
+  </th>
+);
+
+export const TableCell: React.FC<BaseProps & { colSpan?: number }> = ({ children, className = '', colSpan, ...props }) => (
+  <td
+    className={`px-4 py-3 text-sm ${className}`}
+    style={{ color: '#4C1D95' }}
+    colSpan={colSpan}
+    {...props}
+  >
+    {children}
+  </td>
+);
+
+// ── Wrapper table element for use with named sub-components ───────────────────
+export const TableWrapper: React.FC<BaseProps> = ({ children, className = '', ...props }) => (
+  <div className={`overflow-hidden rounded-2xl border shadow-lilac-sm ${className}`} style={{ borderColor: 'rgba(216,180,254,0.5)' }}>
+    <div className="overflow-x-auto">
+      <table className="w-full table-lilac" {...props}>{children}</table>
+    </div>
+  </div>
+);

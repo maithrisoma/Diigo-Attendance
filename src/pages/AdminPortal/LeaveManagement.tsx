@@ -2,11 +2,21 @@ import React, { useState, useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 import { useToast } from '../../components/ui/Toast';
-import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '../../components/ui/Table';
-import { Badge } from '../../components/ui/Badge';
+import { Card, CardContent } from '../../components/ui/Card';
+import { TableWrapper, TableHeader, TableRow, TableHead, TableBody, TableCell } from '../../components/ui/Table';
 import { Button } from '../../components/ui/Button';
-import { Check, X, Plane, Calendar, UserRound } from 'lucide-react';
+import { Check, X, Plane, UserRound } from 'lucide-react';
+
+// ── Lilac status badge (inline, no Badge import needed) ──────────────────────
+const StatusPill: React.FC<{ status: string }> = ({ status }) => {
+  const s: Record<string, { bg: string; color: string }> = {
+    Approved: { bg: '#EDE9FE', color: '#6D28D9' },
+    Rejected: { bg: '#F2EBFF', color: '#9879E9' },
+    Pending:  { bg: '#DDD6FE', color: '#7C3AED' },
+  };
+  const style = s[status] ?? s.Pending;
+  return <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold" style={{ background: style.bg, color: style.color }}>{status}</span>;
+};
 
 export const LeaveManagement: React.FC = () => {
   const { currentUser } = useAuth();
@@ -47,17 +57,7 @@ export const LeaveManagement: React.FC = () => {
     toast(`Rejected leave request for ${name}`, 'success');
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'Approved':
-        return <Badge variant="Present" className="font-semibold text-xs px-2.5 py-0.5">Approved</Badge>;
-      case 'Rejected':
-        return <Badge variant="Absent" className="font-semibold text-xs px-2.5 py-0.5">Rejected</Badge>;
-      case 'Pending':
-      default:
-        return <Badge variant="Leave" className="font-semibold text-xs px-2.5 py-0.5">Pending</Badge>;
-    }
-  };
+  const getStatusBadge = (status: string) => <StatusPill status={status} />;
 
   const tabs = [
     { id: 'all', label: 'All Requests' },
@@ -86,11 +86,10 @@ export const LeaveManagement: React.FC = () => {
           <button
             key={t.id}
             onClick={() => setActiveTab(t.id as any)}
-            className={`pb-3 transition-colors duration-150 relative ${
-              activeTab === t.id
+            className={`pb-3 transition-colors duration-150 relative ${activeTab === t.id
                 ? 'text-primary'
                 : 'text-muted-foreground hover:text-foreground'
-            }`}
+              }`}
           >
             {t.label}
             {t.id === 'pending' && leavesWithEmployee.filter((l) => l.status === 'Pending').length > 0 && (
@@ -105,10 +104,9 @@ export const LeaveManagement: React.FC = () => {
         ))}
       </div>
 
-      {/* Leave request list table */}
       <Card>
         <CardContent className="p-0">
-          <Table>
+          <TableWrapper>
             <TableHeader>
               <TableRow>
                 <TableHead>Employee Name</TableHead>
@@ -183,7 +181,7 @@ export const LeaveManagement: React.FC = () => {
                 ))
               )}
             </TableBody>
-          </Table>
+          </TableWrapper>
         </CardContent>
       </Card>
     </div>

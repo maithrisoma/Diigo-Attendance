@@ -1,57 +1,58 @@
 import React from 'react';
 
-type BadgeVariant = 
-  | 'default' 
-  | 'secondary' 
-  | 'outline' 
-  | 'success' 
-  | 'warning' 
-  | 'danger' 
-  | 'info' 
-  | 'pending'
+type BadgeVariant =
+  | 'default'
+  | 'secondary'
+  | 'outline'
+  | 'destructive'
+  | 'success'
+  | 'warning'
+  | 'danger'
+  | 'info'
   | 'Present'
   | 'Absent'
   | 'Leave'
-  | 'Half Day'
   | 'Holiday'
-  | 'Weekend';
+  | 'Half Day';
 
 interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   variant?: BadgeVariant;
   children: React.ReactNode;
 }
 
-export const Badge: React.FC<BadgeProps> = ({ children, variant = 'default', className = '', ...props }) => {
-  const getVariantClasses = () => {
-    switch (variant) {
-      case 'success':
-      case 'Present':
-        return 'bg-[var(--calendar-present-bg)] text-[var(--calendar-present-text)] border-[var(--calendar-present-border)] hover:opacity-90';
-      case 'danger':
-      case 'Absent':
-        return 'bg-[var(--calendar-absent-bg)] text-[var(--calendar-absent-text)] border-[var(--calendar-absent-border)] hover:opacity-90';
-      case 'warning':
-      case 'Leave':
-        return 'bg-[var(--calendar-leave-bg)] text-[var(--calendar-leave-text)] border-[var(--calendar-leave-border)] hover:opacity-90';
-      case 'pending':
-      case 'Half Day':
-        return 'bg-[var(--calendar-halfday-bg)] text-[var(--calendar-halfday-text)] border-[var(--calendar-halfday-border)] hover:opacity-90';
-      case 'info':
-      case 'Holiday':
-        return 'bg-[var(--calendar-holiday-bg)] text-[var(--calendar-holiday-text)] border-[var(--calendar-holiday-border)] hover:opacity-90';
-      case 'secondary':
-      case 'outline':
-      case 'Weekend':
-        return 'bg-[var(--calendar-weekend-bg)] text-[var(--calendar-weekend-text)] border-[var(--calendar-weekend-border)] hover:opacity-90';
-      case 'default':
-      default:
-        return 'bg-primary text-primary-foreground border-transparent hover:opacity-90';
-    }
-  };
+const VARIANT_STYLES: Record<BadgeVariant, { bg: string; color: string; border?: string }> = {
+  default:     { bg: '#A78BFA', color: '#fff' },
+  secondary:   { bg: '#EDE9FE', color: '#6D28D9' },
+  outline:     { bg: 'transparent', color: '#7C3AED', border: '2px solid #D8B4FE' },
+  destructive: { bg: '#DDD6FE', color: '#4C1D95' },
+  success:     { bg: '#EDE9FE', color: '#6D28D9' },   // lilac-toned "success"
+  warning:     { bg: '#DDD6FE', color: '#7C3AED' },   // lilac-toned "warning"
+  danger:      { bg: '#F2EBFF', color: '#9879E9' },   // lilac-toned "danger"
+  info:        { bg: '#EDE9FE', color: '#8B5CF6' },   // lilac-toned "info"
+  Present:     { bg: '#EDE9FE', color: '#6D28D9' },
+  Absent:      { bg: '#F2EBFF', color: '#9879E9' },
+  Leave:       { bg: '#DDD6FE', color: '#7C3AED' },
+  Holiday:    { bg: '#C4B5FD', color: '#4C1D95' },
+  "Half Day":{ bg: '#EDE9FE', color: '#5B21B6', border: '2px solid #D8B4FE' }
+};
 
+export const Badge: React.FC<BadgeProps> = ({
+  variant = 'default',
+  children,
+  className = '',
+  style: styleProp,
+  ...props
+}) => {
+  const vs = VARIANT_STYLES[variant] ?? VARIANT_STYLES.default;
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border transition-all duration-150 ${getVariantClasses()} ${className}`}
+      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold tracking-wide ${className}`}
+      style={{
+        background: vs.bg,
+        color: vs.color,
+        border: vs.border,
+        ...styleProp,
+      }}
       {...props}
     >
       {children}

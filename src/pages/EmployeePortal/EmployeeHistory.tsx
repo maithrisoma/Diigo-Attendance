@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '../../components/ui/Table';
+import { TableWrapper, TableHeader, TableRow, TableHead, TableBody, TableCell } from '../../components/ui/Table';
 import { Badge } from '../../components/ui/Badge';
 import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
@@ -145,7 +145,7 @@ export const EmployeeHistory: React.FC = () => {
       {/* History Table */}
       <Card>
         <CardContent className="p-0">
-          <Table>
+          <TableWrapper>
             <TableHeader>
               <TableRow>
                 <TableHead>Date</TableHead>
@@ -217,7 +217,7 @@ export const EmployeeHistory: React.FC = () => {
                 ))
               )}
             </TableBody>
-          </Table>
+          </TableWrapper>
         </CardContent>
       </Card>
     </div>

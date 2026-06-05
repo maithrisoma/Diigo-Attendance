@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useData } from '../../context/DataContext';
 import { useToast } from '../../components/ui/Toast';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '../../components/ui/Table';
+import { TableWrapper, TableHeader, TableRow, TableHead, TableBody, TableCell } from '../../components/ui/Table';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { Select } from '../../components/ui/Select';
@@ -343,7 +343,7 @@ export const Reports: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <Table>
+              <TableWrapper>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Department Name</TableHead>
@@ -364,7 +364,7 @@ export const Reports: React.FC = () => {
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>
+              </TableWrapper>
             </CardContent>
           </Card>
 
@@ -377,7 +377,7 @@ export const Reports: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <Table>
+              <TableWrapper>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Employee ID</TableHead>
@@ -411,7 +411,7 @@ export const Reports: React.FC = () => {
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>
+              </TableWrapper>
             </CardContent>
           </Card>
 

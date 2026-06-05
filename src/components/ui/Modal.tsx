@@ -1,11 +1,10 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { X } from 'lucide-react';
-import { Button } from './Button';
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  title: string;
+  title?: string;
   children: React.ReactNode;
   size?: 'sm' | 'md' | 'lg' | 'xl';
 }
@@ -17,67 +16,39 @@ export const Modal: React.FC<ModalProps> = ({
   children,
   size = 'md',
 }) => {
-  // ESC key to close
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        onClose();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
-
-  // Lock body scroll when open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen]);
-
   if (!isOpen) return null;
 
-  const getSizeClasses = () => {
-    switch (size) {
-      case 'sm':
-        return 'max-w-sm';
-      case 'lg':
-        return 'max-w-lg';
-      case 'xl':
-        return 'max-w-2xl';
-      case 'md':
-      default:
-        return 'max-w-md';
-    }
+  const sizes = {
+    sm: 'max-w-sm',
+    md: 'max-w-lg',
+    lg: 'max-w-2xl',
+    xl: 'max-w-4xl',
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300 animate-in fade-in"
+        className="absolute inset-0 bg-lilac-900/30 backdrop-blur-sm"
         onClick={onClose}
       />
-
-      {/* Content Container */}
+      {/* Modal */}
       <div
-        className={`relative w-full ${getSizeClasses()} bg-card text-card-foreground border border-border shadow-xl rounded-xl overflow-hidden transition-all duration-300 animate-in fade-in zoom-in-95 z-50 max-h-[90vh] flex flex-col`}
+        className={`relative w-full ${sizes[size]} glass-card p-0 animate-fadeInUp shadow-lilac-lg`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-border">
-          <h2 className="text-lg font-semibold font-display text-foreground">{title}</h2>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" onClick={onClose}>
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-
-        {/* Body */}
-        <div className="p-6 overflow-y-auto flex-1">{children}</div>
+        {title && (
+          <div className="flex items-center justify-between px-6 py-5 border-b border-lilac-300/40">
+            <h3 className="text-base font-bold text-lilac-900">{title}</h3>
+            <button
+              onClick={onClose}
+              className="p-1.5 rounded-full hover:bg-lilac-100 text-lilac-500 hover:text-lilac-900 transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+        <div className="p-6">{children}</div>
       </div>
     </div>
   );
